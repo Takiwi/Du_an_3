@@ -1,0 +1,7 @@
+# pnpm-workspace.yaml (chỉ ở root)
+packages:
+  - "frontend/*"
+  - "backend/*"
+  - "packages/*"
+allowBuilds:
+  unrs-resolver: true
