@@ -1,0 +1,24 @@
+enum STATUS {
+    ACTIVE
+    BANNED
+    INACTIVE
+}
+
+enum ROLE {
+    USER
+    ADMIN
+}
+
+model User{
+    id String @id @default(uuid())
+    username String @db.VarChar(255)
+    email String @unique @db.VarChar(255)
+    password String @db.VarChar(255)
+    status STATUS @default(INACTIVE)
+    Role ROLE @default(USER)
+    refreshToken RefreshToken[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("Users")
+}

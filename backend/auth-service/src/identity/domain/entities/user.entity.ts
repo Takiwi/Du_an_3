@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { BaseEntity } from './base.entity';
 
 type STATUS = 'ACTIVE' | 'BANNED' | 'INACTIVE';
@@ -6,11 +7,13 @@ export class User extends BaseEntity {
   readonly id: string;
   private _username: string;
   private _email: string;
+
+  @Exclude()
   private _password: string;
   private _status: STATUS;
 
   readonly createAt: Date;
-  protected updateAt: Date;
+  protected _updateAt: Date;
 
   constructor(
     id: string,
@@ -28,7 +31,7 @@ export class User extends BaseEntity {
     this._password = password;
     this._status = status;
     this.createAt = createAt ?? new Date();
-    this.updateAt = updateAt ?? new Date();
+    this._updateAt = updateAt ?? new Date();
   }
 
   get username() {
@@ -41,5 +44,9 @@ export class User extends BaseEntity {
 
   get status() {
     return this._status;
+  }
+
+  get password() {
+    return this._password;
   }
 }
