@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2023",
+    "baseUrl": ".",
+    "paths": {
+      "@packages/core/*": ["./*"]
+    },
+    "strict": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
+}

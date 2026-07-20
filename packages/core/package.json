@@ -1,0 +1,25 @@
+{
+  "name": "@packages/core",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./exceptions": {
+      "types": "./exceptions/globalExceptions.ts",
+      "default": "./exceptions/globalExceptions.ts"
+    },
+    "./utils/*": {
+      "types": "./utils/*.ts",
+      "default": "./utils/*.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  }
+}

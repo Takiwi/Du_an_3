@@ -5,5 +5,12 @@ packages:
   - "packages/*"
 allowBuilds:
   '@prisma/engines': true
+  base64: true
+  compress-buffer: true
+  hiredis: true
+  iconv: true
+  pg: true
   prisma: true
+  stacktrace: true
   unrs-resolver: true
+  uriparser: true

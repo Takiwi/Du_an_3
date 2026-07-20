@@ -1,4 +1,4 @@
-import { CreateUserDto } from 'src/identity/presentation/dtos/createUser.dto';
+import { CreateUserDto } from 'src/identity/application/dtos/createUser.dto';
 import { User } from '../entities/user.entity';
 
 export const USER_REPOSITORY_TOKEN = 'IUserRepository';

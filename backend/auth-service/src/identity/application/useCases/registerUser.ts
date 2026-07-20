@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserAlreadyExistsException } from 'src/identity/domain/exceptions/AuthException';
-import * as userResponseInterface from 'src/identity/domain/repositories/userResponse.interface';
-import { CreateUserDto } from 'src/identity/presentation/dtos/createUser.dto';
+import * as userResponseInterface from 'src/identity/domain/repositories/IUser.repository';
+import { CreateUserDto } from '../dtos/createUser.dto';
 
 @Injectable()
 export class RegisterUserUseCase {
