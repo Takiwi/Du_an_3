@@ -1,15 +1,16 @@
 {
-  "name": "@packages/core",
+ "name": "@packages/core",
   "version": "1.0.0",
-  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "./exceptions": {
-      "types": "./exceptions/globalExceptions.ts",
-      "default": "./exceptions/globalExceptions.ts"
+    "./exceptions/*": {
+      "types": "./dist/exceptions/*.d.ts",
+      "default": "./dist/exceptions/*.js"
     },
     "./utils/*": {
-      "types": "./utils/*.ts",
-      "default": "./utils/*.ts"
+      "types": "./dist/utils/*.d.ts",
+      "default": "./dist/utils/*.js"
     }
   },
   "scripts": {
@@ -20,6 +21,8 @@
     "@nestjs/common": "^11.0.1"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6"
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.13.3",
+    "typescript": "^5.9.3"
   }
 }

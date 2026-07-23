@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppModule } from 'src/app.module';
 import { IdentityController } from './presentation/controllers/identity.controller';
 import { RegisterUserUseCase } from './application/useCases/registerUser';
 import { userRepository } from './infrastructure/persistence/repositories/user.repository';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
-  imports: [AppModule],
+  imports: [SharedModule],
   controllers: [IdentityController],
   providers: [
     RegisterUserUseCase,
