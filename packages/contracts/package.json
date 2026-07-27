@@ -2,7 +2,22 @@
   "name": "@packages/contracts",
   "version": "1.0.0",
   "description": "",
-  "main": "src/*",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./errors/*": {
+      "types": "./dist/errors/*.d.ts",
+      "default": "./dist/errors/*.js"
+    },
+    "./utils/*": {
+      "types": "./dist/utils/*.d.ts",
+      "default": "./dist/utils/*.js"
+    },
+    "./constants/*": {
+      "types": "./dist/constants/*.d.ts",
+      "default": "./dist/constants/*.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch"
@@ -13,5 +28,13 @@
   "type": "module",
   "dependencies": {
     "zod": "^4.4.3"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.13.3",
+    "typescript": "^5.9.3"
   }
 }
