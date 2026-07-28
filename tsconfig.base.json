@@ -12,9 +12,15 @@
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "declarationMap": true,
+    "composite": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@packages/core/*": ["./packages/core/dist/*"],
+      "@packages/contracts/*": ["./packages/contracts/dist/*"]
+    }
   }
 }

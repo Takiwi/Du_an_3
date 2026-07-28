@@ -1,21 +1,34 @@
 {
- "name": "@packages/core",
+  "name": "@packages/core",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "./exceptions/*": {
-      "types": "./dist/exceptions/*.d.ts",
-      "default": "./dist/exceptions/*.js"
+    "./errors/*": {
+      "types": "./dist/errors/*.d.ts",
+      "default": "./dist/errors/*.js"
     },
     "./utils/*": {
       "types": "./dist/utils/*.d.ts",
       "default": "./dist/utils/*.js"
+    },
+    "./middlewares/*": {
+      "types": "./dist/middlewares/*.d.ts",
+      "default": "./dist/middlewares/*.js"
+    },
+    "./constants/*": {
+      "types": "./dist/constants/*.d.ts",
+      "default": "./dist/constants/*.js"
+    },
+    "./cls/*": {
+      "types": "./dist/cls/*.d.ts",
+      "default": "./dist/cls/*.js"
     }
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "build": "tsc -b",
+    "dev": "tsc -b --watch",
+    "clean": "tsc -b --clean"
   },
   "peerDependencies": {
     "@nestjs/common": "^11.0.1"

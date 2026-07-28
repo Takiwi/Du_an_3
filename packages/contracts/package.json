@@ -12,15 +12,12 @@
     "./utils/*": {
       "types": "./dist/utils/*.d.ts",
       "default": "./dist/utils/*.js"
-    },
-    "./constants/*": {
-      "types": "./dist/constants/*.d.ts",
-      "default": "./dist/constants/*.js"
     }
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "build": "tsc -b",
+    "dev": "tsc -b --watch",
+    "clean": "tsc -b --clean"
   },
   "keywords": [],
   "author": "",

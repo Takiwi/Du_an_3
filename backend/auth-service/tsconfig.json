@@ -3,9 +3,12 @@
   "compilerOptions": {
     "removeComments": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": "./"
+    "rootDir": "./src"
   },
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/contracts" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
