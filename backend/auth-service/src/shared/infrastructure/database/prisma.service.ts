@@ -11,4 +11,9 @@ export class PrismaService extends PrismaClient {
 
     super({ adapter });
   }
+
+  async onModuleInit() {
+    await this.$connect();
+    console.log(`Kết nối PostgreSQL thành công!`);
+  }
 }

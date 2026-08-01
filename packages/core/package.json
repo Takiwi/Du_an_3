@@ -31,7 +31,8 @@
     "clean": "tsc -b --clean"
   },
   "peerDependencies": {
-    "@nestjs/common": "^11.0.1"
+    "@nestjs/common": "^11.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

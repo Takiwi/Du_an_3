@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserAlreadyExistsException } from '../../domain/exceptions/AuthException';
+import { UserAlreadyExistsException } from '../errors/application.error';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
@@ -16,8 +16,7 @@ export class RegisterUserUseCase {
   async execute(dto: CreateUserDto) {
     const existingUser = await this.userRepository.findByEmail(dto.email);
 
-    if (existingUser)
-      throw new UserAlreadyExistsException('EMAIL_ALREADY_EXISTS', '');
+    if (existingUser) throw new UserAlreadyExistsException(dto.email);
 
     return this.userRepository.insertUser(dto);
   }

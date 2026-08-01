@@ -1,19 +1,19 @@
-import { Exclude } from 'class-transformer';
-import { BaseEntity } from './base.entity';
+import { BaseEntity } from '../shared/base.entity';
 
 type STATUS = 'ACTIVE' | 'BANNED' | 'INACTIVE';
+type ROLE = 'USER' | 'ADMIN';
 
 export class User extends BaseEntity {
   readonly id: string;
   private _username: string;
   private _email: string;
 
-  @Exclude()
   private _password: string;
   private _status: STATUS;
+  private _role: ROLE;
 
-  readonly createAt: Date;
-  protected _updateAt: Date;
+  readonly createdAt: Date;
+  protected _updatedAt: Date;
 
   constructor(
     id: string,
@@ -21,7 +21,8 @@ export class User extends BaseEntity {
     email: string,
     password: string,
     status: STATUS,
-    createAt: Date,
+    role: ROLE,
+    createdAt: Date,
     updateAt: Date,
   ) {
     super();
@@ -30,8 +31,31 @@ export class User extends BaseEntity {
     this._username = username;
     this._password = password;
     this._status = status;
-    this.createAt = createAt ?? new Date();
-    this._updateAt = updateAt ?? new Date();
+    this._role = role;
+    this.createdAt = createdAt ?? new Date();
+    this._updatedAt = updateAt ?? new Date();
+  }
+
+  static fromPrismaEntity(dto: {
+    id: string;
+    username: string;
+    email: string;
+    password: string;
+    status: STATUS;
+    role: ROLE;
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
+    return new User(
+      dto.id,
+      dto.username,
+      dto.email,
+      dto.password,
+      dto.status,
+      dto.role,
+      dto.createdAt,
+      dto.updatedAt,
+    );
   }
 
   get username() {

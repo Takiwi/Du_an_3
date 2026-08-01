@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
 import { User } from '../../../domain/entities/user.entity';
 import { IUserRepository } from '../../../domain/repositories/IUser.repository';
 import { PrismaService } from '../../../../shared/infrastructure/database/prisma.service';
@@ -15,11 +14,7 @@ export class userRepository implements IUserRepository {
       },
     });
 
-    if (!prismaUser) return null;
-
-    return plainToInstance(User, prismaUser, {
-      excludeExtraneousValues: false,
-    });
+    return prismaUser ? User.fromPrismaEntity(prismaUser) : null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -29,25 +24,23 @@ export class userRepository implements IUserRepository {
       },
     });
 
-    if (!userEmail) return null;
-
-    return plainToInstance(User, userEmail, { excludeExtraneousValues: false });
+    return userEmail ? User.fromPrismaEntity(userEmail) : null;
   }
 
   async insertUser(user: User): Promise<User | null> {
-    return plainToInstance(
-      User,
-      await this.prismaService.user.create({
+    const result = await this.prismaService.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
         data: {
           email: user.email,
           username: user.username,
           password: user.password,
           status: user.status,
         },
-      }),
-      {
-        excludeExtraneousValues: true,
-      },
-    );
+      });
+
+      return User.fromPrismaEntity(newUser);
+    });
+
+    return result ?? null;
   }
 }
