@@ -16,4 +16,8 @@ export class PrismaService extends PrismaClient {
     await this.$connect();
     console.log(`Kết nối PostgreSQL thành công!`);
   }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
 }

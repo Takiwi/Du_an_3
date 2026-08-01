@@ -1,18 +1,23 @@
 import { Module } from '@nestjs/common';
 import { IdentityController } from './presentation/controllers/identity.controller';
-import { RegisterUserUseCase } from './application/useCases/registerUser';
-import { userRepository } from './infrastructure/persistence/repositories/user.repository';
 import { SharedModule } from '../shared/shared.module';
+import { BcryptPasswordHasher } from './infrastructure/services/bcryptPasswordHasher';
+import { PrismaUserRepository } from './infrastructure/persistence/repositories/prismaUser.repository';
+import { RegisterUserUseCase } from './application/useCases/registerUser';
 
 @Module({
   imports: [SharedModule],
   controllers: [IdentityController],
   providers: [
-    RegisterUserUseCase,
+    {
+      provide: 'IPasswordHasher',
+      useClass: BcryptPasswordHasher,
+    },
     {
       provide: 'IUserRepository',
-      useClass: userRepository,
+      useClass: PrismaUserRepository,
     },
+    RegisterUserUseCase,
   ],
 })
 export class IdentityModule {}

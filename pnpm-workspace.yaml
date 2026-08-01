@@ -6,6 +6,7 @@ packages:
 allowBuilds:
   '@prisma/engines': true
   base64: true
+  bcrypt: true
   compress-buffer: true
   hiredis: true
   iconv: true

@@ -4,10 +4,10 @@ import { IUserRepository } from '../../../domain/repositories/IUser.repository';
 import { PrismaService } from '../../../../shared/infrastructure/database/prisma.service';
 
 @Injectable()
-export class userRepository implements IUserRepository {
+export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findById(id: string): Promise<User | null> {
+  async findUserById(id: string): Promise<User | null> {
     const prismaUser = await this.prismaService.user.findUnique({
       where: {
         id,
@@ -17,7 +17,7 @@ export class userRepository implements IUserRepository {
     return prismaUser ? User.fromPrismaEntity(prismaUser) : null;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findUserByEmail(email: string): Promise<User | null> {
     const userEmail = await this.prismaService.user.findUnique({
       where: {
         email,

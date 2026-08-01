@@ -12,9 +12,6 @@ export class User extends BaseEntity {
   private _status: STATUS;
   private _role: ROLE;
 
-  readonly createdAt: Date;
-  protected _updatedAt: Date;
-
   constructor(
     id: string,
     username: string,
@@ -22,8 +19,6 @@ export class User extends BaseEntity {
     password: string,
     status: STATUS,
     role: ROLE,
-    createdAt: Date,
-    updateAt: Date,
   ) {
     super();
     this.id = id;
@@ -32,8 +27,6 @@ export class User extends BaseEntity {
     this._password = password;
     this._status = status;
     this._role = role;
-    this.createdAt = createdAt ?? new Date();
-    this._updatedAt = updateAt ?? new Date();
   }
 
   static fromPrismaEntity(dto: {
@@ -43,8 +36,6 @@ export class User extends BaseEntity {
     password: string;
     status: STATUS;
     role: ROLE;
-    createdAt: Date;
-    updatedAt: Date;
   }) {
     return new User(
       dto.id,
@@ -53,8 +44,6 @@ export class User extends BaseEntity {
       dto.password,
       dto.status,
       dto.role,
-      dto.createdAt,
-      dto.updatedAt,
     );
   }
 
@@ -72,5 +61,9 @@ export class User extends BaseEntity {
 
   get password() {
     return this._password;
+  }
+
+  public get role(): string {
+    return this._role;
   }
 }

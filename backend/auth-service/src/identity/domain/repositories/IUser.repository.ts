@@ -2,9 +2,11 @@ import { User } from '../entities/user.entity';
 
 export const USER_REPOSITORY_TOKEN = 'IUserRepository';
 
-export interface IUserRepository {
-  findById(id: string): Promise<User | null>;
-  findByEmail(email: string): Promise<User | null>;
+type CreateUserProps = Omit<User, 'id' | 'status' | 'role'>;
 
-  insertUser(user: User): Promise<User | null>;
+export interface IUserRepository {
+  findUserById(id: string): Promise<User | null>;
+  findUserByEmail(email: string): Promise<User | null>;
+
+  insertUser(data: CreateUserProps): Promise<User | null>;
 }
