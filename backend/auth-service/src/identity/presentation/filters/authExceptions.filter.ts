@@ -8,7 +8,8 @@ import {
 import { Request, Response } from 'express';
 import { ClsService } from '@packages/core/cls/cls.service';
 import { mapAppErrorToStatus } from './mapStatus';
-import { AppError } from '@packages/contracts/errors/app.error';
+import { AppError } from '@packages/core/errors/app.error';
+import { ValidationFieldException } from '../errors/validationField.error';
 
 @Injectable()
 @Catch()
@@ -26,6 +27,13 @@ export class AuthExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof AppError) {
       status = mapAppErrorToStatus(exception);
+      errorCode = exception.code;
+      finalMessage = exception.message;
+      detailsError = exception.details;
+    }
+
+    if (exception instanceof ValidationFieldException) {
+      status = exception.getStatus();
       errorCode = exception.code;
       finalMessage = exception.message;
       detailsError = exception.details;

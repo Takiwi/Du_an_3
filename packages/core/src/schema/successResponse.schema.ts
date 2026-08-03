@@ -11,6 +11,6 @@ export const SuccessResponseSchema = <T extends zod.ZodType>(dataSchema: T) =>
     }),
   });
 
-export type SuccessResponse<T extends zod.ZodTypeAny> = zod.infer<
+export type SuccessResponse<T extends zod.ZodType> = zod.infer<
   typeof SuccessResponseSchema<T>
 >;

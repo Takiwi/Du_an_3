@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { AppError } from '@packages/contracts/errors/app.error';
+import { AppError } from '@packages/core/errors/app.error';
 
 export function mapAppErrorToStatus(error: AppError) {
   switch (error.code) {

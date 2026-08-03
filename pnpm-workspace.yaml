@@ -5,6 +5,7 @@ packages:
   - "packages/*"
 allowBuilds:
   '@prisma/engines': true
+  '@scarf/scarf': true
   base64: true
   bcrypt: true
   compress-buffer: true

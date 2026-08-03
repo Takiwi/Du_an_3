@@ -1,12 +1,25 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
+import { ClsService } from '@packages/core/cls/cls.service';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
-import { SuccessResponse } from '@packages/contracts/schema/successResponse.schema';
-import { ZodType } from 'zod';
 
-export class FormatResponse<T extends ZodType> implements NestInterceptor<
-  T,
-  SuccessResponse<T>
-> {
+interface SuccessResponse<T> {
+  success: true;
+  data: T;
+  meta: {
+    requestId: string;
+    timestamp: string;
+  };
+}
+
+@Injectable()
+export class FormatResponse<T> implements NestInterceptor {
+  constructor(private readonly clsService: ClsService) {}
+
   intercept(
     context: ExecutionContext,
     next: CallHandler<T>,
@@ -14,10 +27,13 @@ export class FormatResponse<T extends ZodType> implements NestInterceptor<
     const now = Date.now();
 
     return next.handle().pipe(
-      map((data) => ({
+      map((data): SuccessResponse<T> => ({
         success: true,
         data,
-        timestamp: new Date().toISOString(),
+        meta: {
+          requestId: this.clsService.get('requestId') ?? '',
+          timestamp: new Date().toISOString(),
+        },
       })),
       tap(() => {
         console.log(`Xử lý mất ${Date.now() - now}ms`);

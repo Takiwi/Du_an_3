@@ -1,4 +1,4 @@
-import { AppError } from '@packages/contracts/errors/app.error';
+import { AppError } from '@packages/core/errors/app.error';
 
 export enum ApplicationErrorCode {
   USER_NOT_FOUND = 'USER_NOT_FOUND',

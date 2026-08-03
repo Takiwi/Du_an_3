@@ -4,7 +4,7 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '../../domain/repositories/IUser.repository';
-import { CreateUserDto } from '../dtos/createUser.dto';
+import { CreateUserInput } from '../contracts/createUser.contract';
 import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
@@ -19,7 +19,7 @@ export class RegisterUserUseCase {
     private readonly passwordHasher: IPasswordHasher,
   ) {}
 
-  async execute(dto: CreateUserDto) {
+  async execute(dto: CreateUserInput) {
     // Check email
     const existingUser = await this.userRepository.findUserByEmail(dto.email);
 
