@@ -1,8 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
-import { AppError } from '@packages/core/errors/app.error';
 
-export function mapAppErrorToStatus(error: AppError) {
-  switch (error.code) {
+export function mapErrorCodeToStatus(errorCode: string) {
+  switch (errorCode) {
     case 'USER_NOT_FOUND':
       return HttpStatus.BAD_REQUEST;
     case 'EMAIL_ALREADY_EXISTS':

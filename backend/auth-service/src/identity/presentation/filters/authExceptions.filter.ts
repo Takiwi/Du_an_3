@@ -7,9 +7,10 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClsService } from '@packages/core/cls/cls.service';
-import { mapAppErrorToStatus } from './mapStatus';
+import { mapErrorCodeToStatus } from './mapStatus';
 import { AppError } from '@packages/core/errors/app.error';
 import { ValidationFieldException } from '../errors/validationField.error';
+import { ValidationErrorDetail } from '../dto/responses/validationErrorDetail.dto';
 
 @Injectable()
 @Catch()
@@ -23,13 +24,12 @@ export class AuthExceptionFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let errorCode = 'INTERNAL_SERVER_ERROR';
     let finalMessage = 'An unexpected error occurred. Please try again later.';
-    let detailsError: Record<string, unknown>[] | undefined = undefined;
+    let detailsError: ValidationErrorDetail[] = [];
 
     if (exception instanceof AppError) {
-      status = mapAppErrorToStatus(exception);
+      status = mapErrorCodeToStatus(exception.code);
       errorCode = exception.code;
       finalMessage = exception.message;
-      detailsError = exception.details;
     }
 
     if (exception instanceof ValidationFieldException) {

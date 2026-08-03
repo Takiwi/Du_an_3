@@ -2,7 +2,7 @@ import { applyDecorators, Type } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { ApiSuccessResponseDto } from '../presentation/dto/successResponse.dto';
 
-export const ApiStanderResponse = <TModel extends Type<any>>(
+export const ApiSuccessResponse = <TModel extends Type<any>>(
   model: TModel,
   status = 200,
 ) => {

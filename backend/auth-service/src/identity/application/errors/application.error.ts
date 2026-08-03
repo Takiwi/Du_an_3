@@ -9,7 +9,7 @@ export class UserNotFoundError extends AppError {
   readonly code = ApplicationErrorCode.USER_NOT_FOUND;
 
   constructor(userId: string) {
-    super(`User with ID ${userId} was not found.`, [{ userId }]);
+    super(`User with ID ${userId} was not found.`);
   }
 }
 
@@ -17,6 +17,6 @@ export class UserAlreadyExistsException extends AppError {
   readonly code = ApplicationErrorCode.EMAIL_ALREADY_EXISTS;
 
   constructor(email: string) {
-    super(`User with email ${email} is already exists.`, [{ email }]);
+    super(`User with email ${email} is already exists.`);
   }
 }

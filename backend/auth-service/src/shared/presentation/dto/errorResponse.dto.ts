@@ -8,7 +8,11 @@ export class ApiErrorResponseDto<T> {
   isOperational: boolean;
 
   @ApiProperty({
-    example: { code: 'USER_NOT_FOUND', message: 'User not found', details: [] },
+    example: {
+      code: 'USER_NOT_FOUND',
+      message: 'User not found',
+      details: [{}],
+    },
   })
   error: {
     code: string;
