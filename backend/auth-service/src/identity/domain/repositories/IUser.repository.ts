@@ -8,5 +8,5 @@ export interface IUserRepository {
   findUserById(id: string): Promise<User | null>;
   findUserByEmail(email: string): Promise<User | null>;
 
-  insertUser(data: CreateUserProps): Promise<User | null>;
+  insertUser(data: CreateUserProps): Promise<User>;
 }

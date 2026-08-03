@@ -27,7 +27,7 @@ export class PrismaUserRepository implements IUserRepository {
     return userEmail ? User.fromPrismaEntity(userEmail) : null;
   }
 
-  async insertUser(user: User): Promise<User | null> {
+  async insertUser(user: User): Promise<User> {
     const result = await this.prismaService.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
@@ -41,6 +41,6 @@ export class PrismaUserRepository implements IUserRepository {
       return User.fromPrismaEntity(newUser);
     });
 
-    return result ?? null;
+    return result;
   }
 }
