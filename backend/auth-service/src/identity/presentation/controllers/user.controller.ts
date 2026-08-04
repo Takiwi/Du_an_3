@@ -1,9 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiErrorResponse } from '../../../shared/decorators/apiErrorResponse.decorator';
+import { ApiCommonErrors } from '../../../shared/decorators/apiCommonErrors.decorator';
 
-@ApiErrorResponse('INTERNAL_SERVER_ERROR', {
-  description: 'Internal server error',
-})
+@ApiCommonErrors()
 @Controller('user/')
 export class UserController {
   @Get('me')

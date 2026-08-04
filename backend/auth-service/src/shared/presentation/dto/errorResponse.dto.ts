@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MetaDto } from './meta.dto';
-
-export class ApiErrorResponseDto<T> {
+export class ApiErrorResponseDto {
   @ApiProperty({ example: false })
   success: false;
 
@@ -14,8 +13,6 @@ export class ApiErrorResponseDto<T> {
   @ApiProperty({ example: 'Thất bại' })
   message: string;
 
-  details: T;
-
   @ApiProperty({ type: MetaDto })
   meta: MetaDto;
 
@@ -23,14 +20,12 @@ export class ApiErrorResponseDto<T> {
     isOperational: boolean,
     code: string,
     message: string,
-    details: T,
     meta: MetaDto,
   ) {
     this.success = false;
     this.isOperational = isOperational;
     this.code = code;
     this.message = message;
-    this.details = details;
     this.meta = meta;
   }
 }

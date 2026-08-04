@@ -7,7 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ClsService } from '@packages/core/cls/cls.service';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
-import { RESPONSE_MESSAGE_KEY } from '../../decorators/responseMessage.decorator';
+import { RESPONSE_MESSAGE_KEY } from '../../decorators/apiSuccessResponse.decorator';
 import { ApiSuccessResponseDto } from '../dto/successResponse.dto';
 
 @Injectable()

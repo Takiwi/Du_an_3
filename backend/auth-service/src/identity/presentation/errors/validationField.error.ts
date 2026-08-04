@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { ValidationErrorDetail } from '../dto/responses/validationErrorDetail.dto';
+import { ValidationDetailDto } from '../dto/responses/validationErrorDetail.dto';
 
 export enum PresentationErrorCode {
   VALIDATION_ERROR = 'VALIDATION_ERROR',
@@ -10,7 +10,7 @@ export class ValidationFieldException extends BadRequestException {
 
   constructor(
     message: string,
-    public readonly details: ValidationErrorDetail[],
+    public readonly details: ValidationDetailDto[],
   ) {
     super({ message, details });
   }

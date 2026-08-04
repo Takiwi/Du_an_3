@@ -1,23 +1,21 @@
-import { applyDecorators, HttpStatus, Type } from '@nestjs/common';
+import { applyDecorators, HttpStatus } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { ApiErrorResponseDto } from '../presentation/dto/errorResponse.dto';
 import { mapErrorCodeToStatus } from '../../identity/presentation/filters/mapStatus';
+import { ValidationErrorDetail } from '../../identity/presentation/dto/responses/validationErrorDetail.dto';
 
-class EmptyDetailDto {}
-
-export const ApiErrorResponse = <TModel extends Type<any>>(
+export const ApiErrorResponse = (
   errorCode: string,
+  message: string,
   options?: {
     description?: string;
-    model?: TModel;
     isArray?: boolean;
   },
 ) => {
-  const model = options?.model ?? EmptyDetailDto;
   const status = mapErrorCodeToStatus(errorCode);
 
   return applyDecorators(
-    ApiExtraModels(ApiErrorResponseDto, model),
+    ApiExtraModels(ApiErrorResponseDto),
     ApiResponse({
       status,
       description: options?.description ?? `Error response (status ${status})`,
@@ -26,9 +24,13 @@ export const ApiErrorResponse = <TModel extends Type<any>>(
           { $ref: getSchemaPath(ApiErrorResponseDto) },
           {
             properties: {
+              message: { type: 'string', example: message },
               details: options?.isArray
-                ? { type: 'array', items: { $ref: getSchemaPath(model) } }
-                : { $ref: getSchemaPath(model) },
+                ? {
+                    type: 'array',
+                    items: { $ref: getSchemaPath(ValidationErrorDetail) },
+                  }
+                : { type: 'array', example: [] },
               code: { type: 'string', example: errorCode },
               isOperational: {
                 type: 'boolean',

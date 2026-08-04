@@ -10,7 +10,8 @@ import { ClsService } from '@packages/core/cls/cls.service';
 import { mapErrorCodeToStatus } from './mapStatus';
 import { AppError } from '@packages/core/errors/app.error';
 import { ValidationFieldException } from '../errors/validationField.error';
-import { ValidationErrorDetail } from '../dto/responses/validationErrorDetail.dto';
+import { ValidationDetailDto } from '../dto/responses/validationErrorDetail.dto';
+import { ApiErrorResponseDto } from '../../../shared/presentation/dto/errorResponse.dto';
 
 @Injectable()
 @Catch()
@@ -24,7 +25,7 @@ export class AuthExceptionFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let errorCode = 'INTERNAL_SERVER_ERROR';
     let finalMessage = 'An unexpected error occurred. Please try again later.';
-    let detailsError: ValidationErrorDetail[] = [];
+    let detailsError: ValidationDetailDto[] | undefined;
 
     if (exception instanceof AppError) {
       status = mapErrorCodeToStatus(exception.code);
@@ -39,15 +40,13 @@ export class AuthExceptionFilter implements ExceptionFilter {
       detailsError = exception.details;
     }
 
-    response.status(status).json({
-      success: false,
-      isOperational: status.valueOf() < 500 ? true : false,
-      code: errorCode,
-      message: finalMessage,
-      requestId: requestId,
-      details: detailsError,
+    const result = new ApiErrorResponseDto(
+      status === HttpStatus.INTERNAL_SERVER_ERROR ? false : true,
+      errorCode,
+      finalMessage,
+      { requestId: requestId, timestamp: new Date().toISOString() },
+    );
 
-      timestamp: new Date().toISOString(),
-    });
+    response.status(status).json(result);
   }
 }

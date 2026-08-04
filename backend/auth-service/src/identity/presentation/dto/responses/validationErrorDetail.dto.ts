@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ValidationErrorDetail {
+export class ValidationDetailDto {
   @ApiProperty({ example: 'email' })
   field: string;
 

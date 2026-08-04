@@ -1,0 +1,24 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { ValidationDetailDto } from '../../../identity/presentation/dto/responses/validationErrorDetail.dto';
+import { ApiErrorResponseDto } from './errorResponse.dto';
+import { MetaDto } from './meta.dto';
+
+export class ValidationErrorResponseDto extends ApiErrorResponseDto {
+  @ApiProperty({ example: 'VALIDATION_ERROR' })
+  code: string;
+
+  @ApiProperty({ type: () => [ValidationDetailDto] })
+  details: ValidationDetailDto[];
+
+  constructor(
+    isOperational: boolean,
+    code: string,
+    message: string,
+    meta: MetaDto,
+    details: ValidationDetailDto[],
+  ) {
+    super(isOperational, code, message, meta);
+    this.code = code;
+    this.details = details;
+  }
+}
