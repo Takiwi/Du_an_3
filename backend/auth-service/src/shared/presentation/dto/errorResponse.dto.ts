@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MetaDto } from './meta.dto';
 
 export class ApiErrorResponseDto<T> {
   @ApiProperty({ example: false })
@@ -7,35 +8,29 @@ export class ApiErrorResponseDto<T> {
   @ApiProperty({ example: true })
   isOperational: boolean;
 
-  @ApiProperty({
-    example: {
-      code: 'USER_NOT_FOUND',
-      message: 'User not found',
-      details: [{}],
-    },
-  })
-  error: {
-    code: string;
-    message: string;
-    details: T;
-  };
+  @ApiProperty({ example: 'ERROR_CODE' })
+  code: string;
 
-  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
-  timestamp: string;
+  @ApiProperty({ example: 'Thất bại' })
+  message: string;
+
+  details: T;
+
+  @ApiProperty({ type: MetaDto })
+  meta: MetaDto;
 
   constructor(
-    errorCode: string,
-    details: T,
+    isOperational: boolean,
+    code: string,
     message: string,
-    isOperational: boolean = true,
+    details: T,
+    meta: MetaDto,
   ) {
     this.success = false;
     this.isOperational = isOperational;
-    this.error = {
-      code: errorCode,
-      message,
-      details,
-    };
-    this.timestamp = new Date().toISOString();
+    this.code = code;
+    this.message = message;
+    this.details = details;
+    this.meta = meta;
   }
 }

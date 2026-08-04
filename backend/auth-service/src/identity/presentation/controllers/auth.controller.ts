@@ -6,7 +6,6 @@ import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { UserMapper } from '../mappers/user.mapper';
 import { ResponseMessage } from '../../../shared/decorators/responseMessage.decorator';
 import { ApiErrorResponse } from '../../../shared/decorators/apiErrorResponse.decorator';
-import { mapErrorCodeToStatus } from '../filters/mapStatus';
 import { ApplicationErrorCode } from '../../application/errors/application.error';
 import { ApiCommonErrors } from '../../../shared/decorators/apiCommonErrors.decorator';
 
@@ -15,10 +14,10 @@ import { ApiCommonErrors } from '../../../shared/decorators/apiCommonErrors.deco
 export class AuthController {
   constructor(private readonly registerUseCase: RegisterUserUseCase) {}
 
-  @ApiSuccessResponse(UserResponseDto)
-  @ApiErrorResponse(
-    mapErrorCodeToStatus(ApplicationErrorCode.EMAIL_ALREADY_EXISTS),
-  )
+  @ApiSuccessResponse(201, UserResponseDto)
+  @ApiErrorResponse(ApplicationErrorCode.EMAIL_ALREADY_EXISTS, {
+    description: 'Email already exists',
+  })
   @ResponseMessage('User created successfully')
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MetaDto } from './meta.dto';
 
 export class ApiSuccessResponseDto<T> {
   @ApiProperty({ example: true })
@@ -9,13 +10,13 @@ export class ApiSuccessResponseDto<T> {
   @ApiProperty({ example: 'Thành công' })
   message: string;
 
-  @ApiProperty({ example: '2025-01-01T00:00:00.000Z' })
-  timestamp: string;
+  @ApiProperty({ type: MetaDto })
+  meta: MetaDto;
 
-  constructor(data: T, message: string) {
+  constructor(data: T, message: string, meta: MetaDto) {
     this.success = true;
     this.data = data;
     this.message = message;
-    this.timestamp = new Date().toISOString();
+    this.meta = meta;
   }
 }

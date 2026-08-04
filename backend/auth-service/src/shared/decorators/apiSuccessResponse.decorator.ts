@@ -3,8 +3,8 @@ import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { ApiSuccessResponseDto } from '../presentation/dto/successResponse.dto';
 
 export const ApiSuccessResponse = <TModel extends Type<any>>(
-  model: TModel,
   status = 200,
+  model: TModel,
 ) => {
   return applyDecorators(
     ApiExtraModels(ApiSuccessResponseDto, model),

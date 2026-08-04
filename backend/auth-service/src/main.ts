@@ -11,6 +11,9 @@ async function bootstrap() {
   app.use(helmet());
   app.enableShutdownHooks();
 
+  // router
+  app.setGlobalPrefix('/api/v1');
+
   // Cấu hình tài liệu OpenAPI
   const config = new DocumentBuilder()
     .setTitle('Auth service API')
@@ -23,9 +26,6 @@ async function bootstrap() {
 
   // Khởi tạo đường dẫn Swagger UI
   SwaggerModule.setup('api', app, document);
-
-  // router
-  app.setGlobalPrefix('/api/v1');
 
   // guards
 

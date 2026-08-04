@@ -3,6 +3,7 @@ import { HttpStatus } from '@nestjs/common';
 export function mapErrorCodeToStatus(errorCode: string) {
   switch (errorCode) {
     case 'USER_NOT_FOUND':
+    case 'VALIDATION_ERROR':
       return HttpStatus.BAD_REQUEST;
     case 'EMAIL_ALREADY_EXISTS':
       return HttpStatus.CONFLICT;

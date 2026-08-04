@@ -42,12 +42,11 @@ export class AuthExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       success: false,
       isOperational: status.valueOf() < 500 ? true : false,
+      code: errorCode,
+      message: finalMessage,
       requestId: requestId,
-      error: {
-        code: errorCode,
-        message: finalMessage,
-        details: detailsError,
-      },
+      details: detailsError,
+
       timestamp: new Date().toISOString(),
     });
   }

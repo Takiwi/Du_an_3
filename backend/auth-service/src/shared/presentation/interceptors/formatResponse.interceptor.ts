@@ -8,18 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { ClsService } from '@packages/core/cls/cls.service';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { RESPONSE_MESSAGE_KEY } from '../../decorators/responseMessage.decorator';
-
-export const FORMAT_RESPONSE_TOKEN = 'FormatResponse';
-
-interface SuccessResponse<T> {
-  success: true;
-  message?: string;
-  data: T;
-  meta: {
-    requestId: string;
-    timestamp: string;
-  };
-}
+import { ApiSuccessResponseDto } from '../dto/successResponse.dto';
 
 @Injectable()
 export class FormatResponse<T> implements NestInterceptor {
@@ -31,7 +20,7 @@ export class FormatResponse<T> implements NestInterceptor {
   intercept(
     context: ExecutionContext,
     next: CallHandler<T>,
-  ): Observable<SuccessResponse<T>> {
+  ): Observable<ApiSuccessResponseDto<T>> {
     const now = Date.now();
 
     const message = this.reflector.get<string>(
@@ -40,7 +29,7 @@ export class FormatResponse<T> implements NestInterceptor {
     );
 
     return next.handle().pipe(
-      map((data): SuccessResponse<T> => ({
+      map((data): ApiSuccessResponseDto<T> => ({
         success: true,
         message: message ?? undefined,
         data,
