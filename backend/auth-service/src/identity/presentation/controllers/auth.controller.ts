@@ -1,11 +1,12 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { RegisterUserUseCase } from '../../application/useCases/registerUser';
+import { RegisterUserUseCase } from '../../application/useCases/registerUser.usecase';
 import { CreateUserDto } from '../dto/requests/createUser.dto';
 import { ApiSuccessResponse } from '../../../shared/decorators/apiSuccessResponse.decorator';
 import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { UserMapper } from '../mappers/user.mapper';
 import { ApiCommonErrors } from '../../../shared/decorators/apiCommonErrors.decorator';
 import { ApplyApiErrorsResponse } from '../../../shared/decorators/applyApiErrorsResponse.decorator';
+import { LoginDto } from '../dto/requests/login.dto';
 
 @ApiCommonErrors()
 @Controller('auth/')
@@ -20,4 +21,8 @@ export class AuthController {
 
     return UserMapper.toResponseDto(result);
   }
+
+  @ApiSuccessResponse(200, UserResponseDto, 'User created successfully')
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {}
 }

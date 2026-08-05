@@ -8,5 +8,7 @@ export interface IUserRepository {
   findUserById(id: string): Promise<User | null>;
   findUserByEmail(email: string): Promise<User | null>;
 
+  existsByEmail(email: string): Promise<boolean>;
+
   insertUser(data: CreateUserProps): Promise<User>;
 }

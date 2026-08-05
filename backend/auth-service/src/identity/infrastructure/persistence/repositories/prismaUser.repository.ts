@@ -6,25 +6,34 @@ import { PrismaService } from '../../../../shared/infrastructure/database/prisma
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prismaService: PrismaService) {}
-
-  async findUserById(id: string): Promise<User | null> {
-    const prismaUser = await this.prismaService.user.findUnique({
-      where: {
-        id,
-      },
-    });
-
-    return prismaUser ? User.fromPrismaEntity(prismaUser) : null;
-  }
-
   async findUserByEmail(email: string): Promise<User | null> {
-    const userEmail = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         email,
       },
     });
 
-    return userEmail ? User.fromPrismaEntity(userEmail) : null;
+    return user ? User.fromPrismaEntity(user) : null;
+  }
+
+  async findUserById(id: string): Promise<User | null> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return user ? User.fromPrismaEntity(user) : null;
+  }
+
+  async existsByEmail(email: string): Promise<boolean> {
+    const isExist = await this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    return isExist ? true : false;
   }
 
   async insertUser(user: User): Promise<User> {

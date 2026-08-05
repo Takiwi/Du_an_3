@@ -11,13 +11,12 @@ export class ValidationErrorResponseDto extends ApiErrorResponseDto {
   details: ValidationDetailDto[];
 
   constructor(
-    isOperational: boolean,
     code: string,
     message: string,
     meta: MetaDto,
     details: ValidationDetailDto[],
   ) {
-    super(isOperational, code, message, meta);
+    super(code, message, meta);
     this.code = code;
     this.details = details;
   }

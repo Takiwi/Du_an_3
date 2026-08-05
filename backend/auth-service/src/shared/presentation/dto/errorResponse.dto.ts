@@ -17,10 +17,10 @@ export class ApiErrorResponseDto {
   meta: MetaDto;
 
   constructor(
-    isOperational: boolean,
     code: string,
     message: string,
     meta: MetaDto,
+    isOperational: boolean = true,
   ) {
     this.success = false;
     this.isOperational = isOperational;

@@ -1,5 +1,4 @@
 import { ApplicationErrorCode } from '../../identity/application/errors/application.error';
-import { ValidationErrorDetail } from '../../identity/presentation/dto/responses/validationErrorDetail.dto';
 import { PresentationErrorCode } from '../../identity/presentation/errors/validationField.error';
 import { ApiErrorResponse } from './apiErrorResponse.decorator';
 
@@ -18,7 +17,6 @@ export const mapDecorator = {
     'Validation false',
     {
       description: 'Validation failed',
-      model: ValidationErrorDetail,
       isArray: true,
     },
   ),

@@ -13,8 +13,14 @@ export class PrismaService extends PrismaClient {
   }
 
   async onModuleInit() {
-    await this.$connect();
-    console.log(`Kết nối PostgreSQL thành công!`);
+    try {
+      await this.$connect();
+      await this.$queryRaw`SELECT 1`; // ép handshake thật sự
+      console.log(`Kết nối PostgreSQL thành công!`);
+    } catch (error) {
+      console.error('Không thể kết nối PostgreSQL:', error);
+      throw error; // để Nest fail-fast, không cho app start với DB chết
+    }
   }
 
   async onModuleDestroy() {

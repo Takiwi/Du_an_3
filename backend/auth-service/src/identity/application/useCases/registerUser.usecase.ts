@@ -21,9 +21,9 @@ export class RegisterUserUseCase {
 
   async execute(dto: CreateUserInput) {
     // Check email
-    const existingUser = await this.userRepository.findUserByEmail(dto.email);
+    const isEmailTaken = await this.userRepository.existsByEmail(dto.email);
 
-    if (existingUser) throw new UserAlreadyExistsException(dto.email);
+    if (isEmailTaken) throw new UserAlreadyExistsException(dto.email);
 
     // hash password
     const hashedPassword = await this.passwordHasher.hash(dto.password);
