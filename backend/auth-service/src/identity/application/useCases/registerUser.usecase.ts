@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserAlreadyExistsException } from '../errors/application.error';
+import { ApplicationErrorCode } from '../errors/application.error';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
@@ -9,6 +9,9 @@ import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
 } from '../ports/IPasswordHasher.port';
+import { User } from '../../domain/entities/user.entity';
+import { Result, ok, fail } from '@packages/contracts/helpers/resultPattern';
+import { AppError } from '@packages/core/errors/app.error';
 
 @Injectable()
 export class RegisterUserUseCase {
@@ -19,20 +22,28 @@ export class RegisterUserUseCase {
     private readonly passwordHasher: IPasswordHasher,
   ) {}
 
-  async execute(dto: CreateUserInput) {
+  async execute(dto: CreateUserInput): Promise<Result<User, AppError>> {
     // Check email
     const isEmailTaken = await this.userRepository.existsByEmail(dto.email);
 
-    if (isEmailTaken) throw new UserAlreadyExistsException(dto.email);
+    if (isEmailTaken)
+      return fail(
+        new AppError(
+          ApplicationErrorCode.EMAIL_ALREADY_EXISTS,
+          `Email ${dto.email} already exists`,
+        ),
+      );
 
     // hash password
     const hashedPassword = await this.passwordHasher.hash(dto.password);
 
     // insert user
-    return this.userRepository.insertUser({
+    const newUser = await this.userRepository.insertUser({
       email: dto.email,
       username: dto.username,
       password: hashedPassword,
     });
+
+    return ok(newUser);
   }
 }

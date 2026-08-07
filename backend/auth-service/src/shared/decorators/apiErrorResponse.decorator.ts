@@ -1,25 +1,24 @@
-import { applyDecorators, HttpStatus } from '@nestjs/common';
+import { applyDecorators } from '@nestjs/common';
 import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
-import { mapErrorCodeToStatus } from '../../identity/presentation/filters/mapStatus';
+import { mapCodeToGenericError } from '../../identity/presentation/filters/mapError';
 import { ValidationDetailDto } from '../../identity/presentation/dto/responses/validationErrorDetail.dto';
 import { MetaDto } from '../presentation/dto/meta.dto';
 
 export const ApiErrorResponse = (
   errorCode: string,
-  message: string,
   options?: {
     description?: string;
     isArray?: boolean;
   },
 ) => {
-  const status = mapErrorCodeToStatus(errorCode);
+  const { status, message } = mapCodeToGenericError(errorCode);
   const hasDetails = options?.isArray === true;
 
   const baseProperties = {
     success: { type: 'boolean', example: false },
     isOperational: {
       type: 'boolean',
-      example: status === HttpStatus.INTERNAL_SERVER_ERROR ? false : true,
+      example: status === 500 ? false : true,
     },
     code: { type: 'string', example: errorCode },
     message: { type: 'string', example: message },

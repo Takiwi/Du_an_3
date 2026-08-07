@@ -8,10 +8,10 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '../../domain/repositories/IUser.repository';
-import {
-  NotFoundEmailException,
-  PasswordDoNotMatchException,
-} from '../errors/application.error';
+import { fail, ok, Result } from '@packages/contracts/helpers/resultPattern';
+import { AppError } from '@packages/core/errors/app.error';
+import { User } from '../../domain/entities/user.entity';
+import { ApplicationErrorCode } from '../errors/application.error';
 
 @Injectable()
 export class LoginUseCase {
@@ -22,18 +22,32 @@ export class LoginUseCase {
     private readonly passwordHasher: IPasswordHasher,
   ) {}
 
-  async execute(dto: LoginInput) {
+  async execute(dto: LoginInput): Promise<Result<User, AppError>> {
     const user = await this.userRepository.findUserByEmail(dto.email);
 
-    if (!user) throw new NotFoundEmailException(dto.email);
-
+    if (!user) {
+      return fail(
+        new AppError(
+          ApplicationErrorCode.EMAIL_NOT_FOUND,
+          `Not found ${dto.email}`,
+        ),
+      );
+    }
     const isMatch = await this.passwordHasher.compare(
       dto.password,
       user.password,
     );
 
-    if (isMatch) throw new PasswordDoNotMatchException();
+    if (!isMatch) {
+      return fail(
+        new AppError(
+          ApplicationErrorCode.PASSWORD_DO_NOT_MATCH,
+          `Password do not match.`,
+        ),
+      );
+    }
 
     // generate tokens
+    return ok(user);
   }
 }

@@ -1,8 +1,9 @@
-export abstract class AppError extends Error {
-  abstract readonly code: string;
-
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
+export class AppError extends Error {
+  constructor(
+    public readonly code: string,
+    public readonly internalMessage: string,
+    // public readonly cause?: unknown,
+  ) {
+    super(internalMessage);
   }
 }

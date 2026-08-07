@@ -7,24 +7,27 @@ export type errorCode = keyof typeof mapDecorator;
 export const mapDecorator = {
   EMAIL_ALREADY_EXISTS: ApiErrorResponse(
     ApplicationErrorCode.EMAIL_ALREADY_EXISTS,
-    'The email address has already been used',
     {
       description: 'Email already exists',
     },
   ),
-  VALIDATION_ERROR: ApiErrorResponse(
-    PresentationErrorCode.VALIDATION_ERROR,
-    'Validation false',
+  VALIDATION_ERROR: ApiErrorResponse(PresentationErrorCode.VALIDATION_ERROR, {
+    description: 'Validation failed',
+    isArray: true,
+  }),
+  USER_NOT_FOUND: ApiErrorResponse(ApplicationErrorCode.USER_NOT_FOUND, {
+    description: 'User not found',
+  }),
+  EMAIL_NOT_FOUND: ApiErrorResponse(ApplicationErrorCode.EMAIL_NOT_FOUND, {
+    description: 'Email not found',
+  }),
+  PASSWORD_DO_NOT_MATCH: ApiErrorResponse(
+    ApplicationErrorCode.PASSWORD_DO_NOT_MATCH,
     {
-      description: 'Validation failed',
-      isArray: true,
+      description: 'Password do not match',
     },
   ),
-  INTERNAL_SERVER_ERROR: ApiErrorResponse(
-    'INTERNAL_SERVER_ERROR',
-    'The service is experiencing an error; please try again later.',
-    {
-      description: 'Internal server error',
-    },
-  ),
+  INTERNAL_SERVER_ERROR: ApiErrorResponse('INTERNAL_SERVER_ERROR', {
+    description: 'Internal server error',
+  }),
 };

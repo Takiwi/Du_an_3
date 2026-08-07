@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClsService } from '@packages/core/cls/cls.service';
-import { mapErrorCodeToStatus } from './mapStatus';
+import { mapCodeToGenericError } from './mapError';
 import { AppError } from '@packages/core/errors/app.error';
 import { ValidationFieldException } from '../errors/validationField.error';
 import { ApiErrorResponseDto } from '../../../shared/presentation/dto/errorResponse.dto';
@@ -23,15 +23,15 @@ export class AuthExceptionFilter implements ExceptionFilter {
     const timestamp = new Date().toISOString();
 
     if (exception instanceof AppError) {
-      const status = mapErrorCodeToStatus(exception.code);
+      console.log(`Hello`);
+      const { status, message } = mapCodeToGenericError(exception.code);
 
-      const result = new ApiErrorResponseDto(
-        exception.code,
-        exception.message,
-        { requestId: requestId, timestamp: timestamp },
-      );
+      const result = new ApiErrorResponseDto(exception.code, message, {
+        requestId: requestId,
+        timestamp: timestamp,
+      });
 
-      response.status(status).json(result);
+      return response.status(status).json(result);
     }
 
     if (exception instanceof ValidationFieldException) {
@@ -45,10 +45,12 @@ export class AuthExceptionFilter implements ExceptionFilter {
         detailsError,
       );
 
-      response.status(status).json(result);
+      return response.status(status).json(result);
     }
 
-    response
+    console.log(exception);
+
+    return response
       .status(500)
       .json(
         new ApiErrorResponseDto(
