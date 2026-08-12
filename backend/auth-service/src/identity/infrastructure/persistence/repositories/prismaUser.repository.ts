@@ -40,6 +40,7 @@ export class PrismaUserRepository implements IUserRepository {
     const result = await this.prismaService.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
+          id: user._id,
           email: user.email,
           username: user.username,
           password: user.password,

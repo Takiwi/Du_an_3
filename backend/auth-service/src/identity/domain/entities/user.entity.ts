@@ -1,10 +1,10 @@
-import { BaseEntity } from '../shared/base.entity';
+import { randomUUID } from 'crypto';
 
 type STATUS = 'ACTIVE' | 'BANNED' | 'INACTIVE';
 type ROLE = 'USER' | 'ADMIN';
 
-export class User extends BaseEntity {
-  readonly id: string;
+export class User {
+  readonly _id: string;
   private _username: string;
   private _email: string;
 
@@ -12,21 +12,24 @@ export class User extends BaseEntity {
   private _status: STATUS;
   private _role: ROLE;
 
-  constructor(
+  private constructor(
     id: string,
     username: string,
     email: string,
     password: string,
-    status: STATUS,
-    role: ROLE,
+    status: STATUS = 'INACTIVE',
+    role: ROLE = 'USER',
   ) {
-    super();
-    this.id = id;
+    this._id = id;
     this._email = email;
     this._username = username;
     this._password = password;
     this._status = status;
     this._role = role;
+  }
+
+  static create(props: { username: string; email: string; password: string }) {
+    return new User(randomUUID(), props.username, props.email, props.password);
   }
 
   static fromPrismaEntity(dto: {
@@ -45,6 +48,10 @@ export class User extends BaseEntity {
       dto.status,
       dto.role,
     );
+  }
+
+  public get id(): string {
+    return this._id;
   }
 
   get username() {

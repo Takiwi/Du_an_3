@@ -1,11 +1,10 @@
 export const JWT_AUTHENTICATION_TOKEN = 'IJwtAuthentication';
 
-export interface TokenPayload {
+export interface JwtPayload {
   sub: string;
   email: string;
 }
 
 export interface IJwtAuthentication {
-  generateAccessToken(payload: TokenPayload): string;
-  generateRefreshToken(userId: string): string;
+  generateTokenPair(payload: JwtPayload): Promise<string[]>;
 }

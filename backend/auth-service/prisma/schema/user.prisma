@@ -10,12 +10,12 @@ enum ROLE {
 }
 
 model User{
-    id String @id @default(uuid())
+    id String @id
     username String @db.VarChar(255)
     email String @unique @db.VarChar(255)
     password String @db.VarChar(255)
-    status STATUS @default(INACTIVE)
-    role ROLE @default(USER)
+    status STATUS
+    role ROLE
     refreshToken RefreshToken[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

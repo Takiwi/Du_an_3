@@ -15,10 +15,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(email: string, password: string): Promise<User> {
-    const user = unwrapResult(
+    const result = unwrapResult(
       await this.loginUseCase.execute({ email, password }),
     );
 
-    return user;
+    return result.user;
   }
 }
