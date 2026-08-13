@@ -1,37 +1,21 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '../../application/ports/IJwtAuthentication.port';
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AppError } from '@packages/core/errors/app.error';
-import { ClsService } from '@packages/core/cls/cls.service';
-
-interface RequestWithCookies extends Request {
-  cookies: { accessToken?: string; [key: string]: string | undefined };
-}
-
+import { AuthenticatedUser } from '../../infrastructure/auth/jwt.strategy';
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly jwtService: JwtService,
-    private readonly clsService: ClsService,
-  ) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<RequestWithCookies>();
-    const token = request.cookies?.accessToken;
-
-    if (!token) throw new AppError('UNAUTHORIZED', 'No access token provided');
-
-    try {
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
-
-      this.clsService.set('userId', payload.sub);
-      return true;
-    } catch {
-      throw new AppError('UNAUTHORIZED', 'Invalid or expired token');
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  handleRequest<TUser = AuthenticatedUser>(
+    err: any,
+    user: TUser,
+    info: any,
+  ): TUser {
+    if (err || !user) {
+      throw new AppError(
+        'VALIDATION_TOKEN_FALSE',
+        `Invalid or expired token, ${info}`,
+      );
     }
+
+    return user;
   }
 }

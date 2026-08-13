@@ -16,6 +16,8 @@ import { PASSWORD_HASHER_TOKEN } from './application/ports/IPasswordHasher.port'
 import { USER_REPOSITORY_TOKEN } from './domain/repositories/IUser.repository';
 import { RT_REPOSITORY_TOKEN } from './domain/repositories/IRefreshToken.repository';
 import { RefreshTokenRepository } from './infrastructure/persistence/repositories/refreshToken.repository';
+import { MeUseCase } from './application/useCases/me.usecase';
+import { JwtStrategy } from './infrastructure/auth/jwt.strategy';
 
 @Module({
   imports: [
@@ -49,6 +51,8 @@ import { RefreshTokenRepository } from './infrastructure/persistence/repositorie
       useClass: UserRepository,
     },
     LocalStrategy,
+    JwtStrategy,
+    MeUseCase,
     LoginUseCase,
     RegisterUserUseCase,
   ],

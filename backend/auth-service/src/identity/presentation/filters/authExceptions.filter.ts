@@ -23,7 +23,6 @@ export class AuthExceptionFilter implements ExceptionFilter {
     const timestamp = new Date().toISOString();
 
     if (exception instanceof AppError) {
-      console.log(`Hello`);
       const { status, message } = mapCodeToGenericError(exception.code);
 
       const result = new ApiErrorResponseDto(exception.code, message, {

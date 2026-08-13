@@ -3,7 +3,7 @@ import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { LoginUseCase } from '../../application/useCases/login.usecase';
 import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
-import { User } from '../../domain/entities/user.entity';
+import { LoginOutput } from '../../application/contracts/login.contract';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -14,11 +14,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(email: string, password: string): Promise<User> {
+  async validate(email: string, password: string): Promise<LoginOutput> {
     const result = unwrapResult(
       await this.loginUseCase.execute({ email, password }),
     );
 
-    return result.user;
+    return result;
   }
 }

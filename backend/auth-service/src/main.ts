@@ -4,14 +4,14 @@ import { ValidationError, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationFieldException } from './identity/presentation/errors/validationField.error';
-// import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
   app.enableShutdownHooks();
-  // app.use(cookieParser);
+  app.use(cookieParser());
   // router
   app.setGlobalPrefix('/api/v1');
 

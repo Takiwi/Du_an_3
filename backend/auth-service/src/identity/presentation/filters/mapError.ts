@@ -16,6 +16,11 @@ export function mapCodeToGenericError(errorCode: string): {
         status: HttpStatus.BAD_REQUEST,
         message: 'Information verification false',
       };
+    case 'VALIDATION_TOKEN_FALSE':
+      return {
+        status: HttpStatus.UNAUTHORIZED,
+        message: 'Validation false',
+      };
     case 'EMAIL_ALREADY_EXISTS':
       return {
         status: HttpStatus.CONFLICT,

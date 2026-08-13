@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { RegisterUserUseCase } from '../../application/useCases/registerUser.usecase';
 import { CreateUserDto } from '../dto/requests/createUser.dto';
 import { ApiSuccessResponse } from '../../../shared/decorators/apiSuccessResponse.decorator';
@@ -9,8 +9,9 @@ import { ApplyApiErrorsResponse } from '../../../shared/decorators/applyApiError
 import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 import { LocalAuthGuard } from '../guards/localAuth.guard';
 import { CurrentUser } from '../../../shared/decorators/currentUser.decorator';
-import { User } from '../../domain/entities/user.entity';
-import { LoginDto } from '../dto/requests/login.dto';
+import { LoginOutput } from '../../application/contracts/login.contract';
+import { Response } from 'express';
+import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 
 @ApiCommonErrors()
 @Controller('auth/')
@@ -36,7 +37,31 @@ export class AuthController {
   ])
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Body() loginDto: LoginDto, @CurrentUser() user: User) {
-    return UserMapper.toResponseDto(user);
+  login(
+    @CurrentUser() result: LoginOutput,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 phút
+    });
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      path: '/auth/refresh', // giới hạn path nếu muốn refresh token chỉ gửi tới endpoint refresh
+    });
+
+    return UserMapper.toResponseDto(result.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout() {
+    console.log(`Hello from logout`);
   }
 }
