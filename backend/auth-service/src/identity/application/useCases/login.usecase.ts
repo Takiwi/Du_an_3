@@ -8,13 +8,24 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '../../domain/repositories/IUser.repository';
-import { fail, ok, Result } from '@packages/contracts/helpers/resultPattern';
+import {
+  fail,
+  ok,
+  Result,
+  unwrapResult,
+} from '@packages/contracts/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';
 import { ApplicationErrorCode } from '../errors/application.error';
 import {
   IJwtAuthentication,
   JWT_AUTHENTICATION_TOKEN,
 } from '../ports/IJwtAuthentication.port';
+import {
+  IRefreshTokenRepository,
+  RT_REPOSITORY_TOKEN,
+} from '../../domain/repositories/IRefreshToken.repository';
+import { RefreshToken } from '../../domain/entities/refreshToken.entity';
+import { UserId } from '../../domain/value-objects/userId.vo';
 
 @Injectable()
 export class LoginUseCase {
@@ -25,6 +36,8 @@ export class LoginUseCase {
     private readonly passwordHasher: IPasswordHasher,
     @Inject(JWT_AUTHENTICATION_TOKEN)
     private readonly jwtAuth: IJwtAuthentication,
+    @Inject(RT_REPOSITORY_TOKEN)
+    private readonly refreshTokenRepository: IRefreshTokenRepository,
   ) {}
 
   async execute(dto: LoginInput): Promise<Result<LoginOutput, AppError>> {
@@ -53,12 +66,19 @@ export class LoginUseCase {
     }
 
     // generate tokens
-    const [accessToken, refreshToken] = await this.jwtAuth.generateTokenPair({
+    const { accessToken, refreshToken } = await this.jwtAuth.generateTokenPair({
       sub: user.id,
       email: user.email,
     });
 
     // save refresh token
+    const newRefreshToken = RefreshToken.create({
+      userId: unwrapResult(UserId.create(user.id)),
+      token: refreshToken,
+      tokensUsed: [],
+    });
+
+    await this.refreshTokenRepository.insertRefreshToken(newRefreshToken);
 
     return ok({ user, accessToken, refreshToken });
   }

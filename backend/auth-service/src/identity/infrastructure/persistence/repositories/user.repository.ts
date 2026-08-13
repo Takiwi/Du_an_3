@@ -4,7 +4,7 @@ import { IUserRepository } from '../../../domain/repositories/IUser.repository';
 import { PrismaService } from '../../../../shared/infrastructure/database/prisma.service';
 
 @Injectable()
-export class PrismaUserRepository implements IUserRepository {
+export class UserRepository implements IUserRepository {
   constructor(private readonly prismaService: PrismaService) {}
   async findUserByEmail(email: string): Promise<User | null> {
     const user = await this.prismaService.user.findUnique({
@@ -36,21 +36,16 @@ export class PrismaUserRepository implements IUserRepository {
     return isExist ? true : false;
   }
 
-  async insertUser(user: User): Promise<User> {
-    const result = await this.prismaService.$transaction(async (tx) => {
-      const newUser = await tx.user.create({
-        data: {
-          id: user._id,
-          email: user.email,
-          username: user.username,
-          password: user.password,
-          status: user.status,
-        },
-      });
-
-      return User.fromPrismaEntity(newUser);
+  async insertUser(user: User): Promise<void> {
+    await this.prismaService.user.create({
+      data: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        password: user.password,
+        status: user.status,
+        role: user.role,
+      },
     });
-
-    return result;
   }
 }

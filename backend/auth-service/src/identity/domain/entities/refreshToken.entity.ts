@@ -1,16 +1,17 @@
 import { randomUUID } from 'crypto';
+import { UserId } from '../value-objects/userId.vo';
 
 export class RefreshToken {
-  readonly _id: string;
-  private _userId: string;
+  private readonly _id: string;
+  private _userId: UserId;
   private _token: string;
   private _tokensUsed: string[];
 
   private constructor(
     id: string,
-    userId: string,
+    userId: UserId,
     token: string,
-    tokensUsed: string[],
+    tokensUsed: string[] = [],
   ) {
     this._id = id;
     this._userId = userId;
@@ -18,9 +19,27 @@ export class RefreshToken {
     this._tokensUsed = tokensUsed;
   }
 
-  create(props: { userId: string; token: string; tokensUsed: string[] }) {
+  static create(props: {
+    userId: UserId;
+    token: string;
+    tokensUsed?: string[];
+  }) {
     return new RefreshToken(
       randomUUID(),
+      props.userId,
+      props.token,
+      props.tokensUsed,
+    );
+  }
+
+  static fromPrismaEntity(props: {
+    id: string;
+    userId: UserId;
+    token: string;
+    tokensUsed: string[];
+  }) {
+    return new RefreshToken(
+      props.id,
       props.userId,
       props.token,
       props.tokensUsed,
@@ -31,15 +50,15 @@ export class RefreshToken {
     return this._id;
   }
 
-  public get userId(): string {
-    return this.userId;
+  public get userId(): UserId {
+    return this._userId;
   }
 
   public get token(): string {
-    return this.token;
+    return this._token;
   }
 
   public get tokensUsed(): string[] {
-    return this.tokensUsed;
+    return this._tokensUsed;
   }
 }

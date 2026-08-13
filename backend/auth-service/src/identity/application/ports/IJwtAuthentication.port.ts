@@ -5,6 +5,11 @@ export interface JwtPayload {
   email: string;
 }
 
+export interface TokenPair {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export interface IJwtAuthentication {
-  generateTokenPair(payload: JwtPayload): Promise<string[]>;
+  generateTokenPair(payload: JwtPayload): Promise<TokenPair>;
 }

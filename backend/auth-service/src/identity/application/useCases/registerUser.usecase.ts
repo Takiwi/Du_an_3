@@ -40,12 +40,12 @@ export class RegisterUserUseCase {
     // insert user
     const user = User.create({
       email: dto.email,
-      username: hashedPassword,
-      password: dto.password,
+      username: dto.username,
+      password: hashedPassword,
     });
 
-    const newUser = await this.userRepository.insertUser(user);
+    await this.userRepository.insertUser(user);
 
-    return ok(newUser);
+    return ok(user);
   }
 }

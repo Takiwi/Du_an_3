@@ -4,7 +4,7 @@ type STATUS = 'ACTIVE' | 'BANNED' | 'INACTIVE';
 type ROLE = 'USER' | 'ADMIN';
 
 export class User {
-  readonly _id: string;
+  private readonly _id: string;
   private _username: string;
   private _email: string;
 
@@ -28,11 +28,24 @@ export class User {
     this._role = role;
   }
 
-  static create(props: { username: string; email: string; password: string }) {
-    return new User(randomUUID(), props.username, props.email, props.password);
+  static create(props: {
+    username: string;
+    email: string;
+    password: string;
+    status?: STATUS;
+    role?: ROLE;
+  }) {
+    return new User(
+      randomUUID(),
+      props.username,
+      props.email,
+      props.password,
+      props.status,
+      props.role,
+    );
   }
 
-  static fromPrismaEntity(dto: {
+  static fromPrismaEntity(props: {
     id: string;
     username: string;
     email: string;
@@ -41,12 +54,12 @@ export class User {
     role: ROLE;
   }) {
     return new User(
-      dto.id,
-      dto.username,
-      dto.email,
-      dto.password,
-      dto.status,
-      dto.role,
+      props.id,
+      props.username,
+      props.email,
+      props.password,
+      props.status,
+      props.role,
     );
   }
 
@@ -70,7 +83,7 @@ export class User {
     return this._password;
   }
 
-  public get role(): string {
+  get role() {
     return this._role;
   }
 }
