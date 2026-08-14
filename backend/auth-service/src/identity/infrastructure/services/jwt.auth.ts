@@ -18,13 +18,13 @@ export class JwtAuthentication implements IJwtAuthentication {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         algorithm: 'RS256',
-        expiresIn: this.configService.get<number>('JWT_ACCESS_EXPIRES_IN'),
+        expiresIn: '15m',
       }),
       this.jwtService.signAsync(
         { sub: payload.sub },
         {
           algorithm: 'RS256',
-          expiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRES_IN'),
+          expiresIn: '7d',
         },
       ),
     ]);

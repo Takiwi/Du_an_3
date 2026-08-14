@@ -17,6 +17,7 @@ export function mapCodeToGenericError(errorCode: string): {
         message: 'Information verification false',
       };
     case 'VALIDATION_TOKEN_FALSE':
+    case 'TOKEN_NOT_FOUND':
       return {
         status: HttpStatus.UNAUTHORIZED,
         message: 'Validation false',

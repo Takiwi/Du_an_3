@@ -2,9 +2,11 @@ export type Result<T, E> =
   | { success: true; value: T }
   | { success: false; error: E };
 
-export const ok = <T>(value: T): Result<T, never> => ({
+export const ok = <T = void>(
+  ...args: T extends void ? [] : [value: T]
+): Result<T, never> => ({
   success: true,
-  value,
+  value: args[0] as T,
 });
 
 export const fail = <E>(error: E): Result<never, E> => ({
