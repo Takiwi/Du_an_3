@@ -24,7 +24,11 @@ export class AuthController {
     private readonly logoutUseCase: LogoutUseCase,
   ) {}
 
-  @ApiSuccessResponse(201, UserResponseDto, 'User created successfully')
+  @ApiSuccessResponse({
+    status: 201,
+    model: UserResponseDto,
+    message: 'User created successfully',
+  })
   @ApplyApiErrorsResponse(['EMAIL_ALREADY_EXISTS', 'VALIDATION_ERROR'])
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
@@ -35,7 +39,11 @@ export class AuthController {
     return UserMapper.toResponseDto(user);
   }
 
-  @ApiSuccessResponse(200, UserResponseDto, 'Login successfully')
+  @ApiSuccessResponse({
+    status: 200,
+    model: UserResponseDto,
+    message: 'Login successfully',
+  })
   @ApplyApiErrorsResponse([
     'EMAIL_NOT_FOUND',
     'VALIDATION_ERROR',
@@ -54,34 +62,51 @@ export class AuthController {
       maxAge: 15 * 60 * 1000, // 15 phút
     });
 
-    res.cookie('refreshToken', result.refreshToken, {
+    res.cookie('sessionId', result.sessionId, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      path: '/auth/refresh', // giới hạn path nếu muốn refresh token chỉ gửi tới endpoint refresh
     });
 
     return UserMapper.toResponseDto(result.user);
   }
 
+  @ApiSuccessResponse({
+    status: 204,
+    message: 'Logout successfully',
+  })
+  @ApplyApiErrorsResponse([
+    'SESSION_ID_NOT_FOUND',
+    'TOKEN_NOT_FOUND',
+    'USER_NOT_FOUND',
+  ])
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Res() res: Response, @Req() req: RequestWithCookies) {
-    const accessToken = req.cookies?.accessToken;
-    const refreshToken = req.cookies?.refreshToken;
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: RequestWithCookies,
+  ) {
+    const sessionId = req.cookies?.sessionId;
 
-    // browser không gửi refresh token lên do không đúng path (chưa fix)
-    console.log(refreshToken);
+    if (!sessionId)
+      throw new AppError('SESSION_ID_NOT_FOUND', 'Session id is missing');
 
-    if (!accessToken || !refreshToken)
-      throw new AppError('TOKEN_NOT_FOUND', 'Token is missing');
-
-    await this.logoutUseCase.execute(refreshToken);
+    await this.logoutUseCase.execute(sessionId);
 
     res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
+    res.clearCookie('sessionId');
+  }
 
-    console.log(`Hello from logout`);
+  @ApiSuccessResponse({
+    status: 204,
+    message: 'Refresh token successfully exchanged',
+  })
+  @Post('refresh')
+  async refresh(
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: RequestWithCookies,
+  ) {
+    const sessionId = req.cookies?.sessionId;
   }
 }

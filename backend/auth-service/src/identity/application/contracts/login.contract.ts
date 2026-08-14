@@ -8,5 +8,5 @@ export interface LoginInput {
 export interface LoginOutput {
   user: User;
   accessToken: string;
-  refreshToken: string;
+  sessionId: string;
 }

@@ -10,7 +10,7 @@ import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 export interface RequestWithCookies extends Request {
   cookies: {
     accessToken?: string;
-    refreshToken?: string;
+    sessionId?: string;
     [key: string]: string | undefined;
   };
 }

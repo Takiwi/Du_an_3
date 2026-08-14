@@ -5,14 +5,14 @@ import {
   TokenPair,
 } from '../../application/ports/IJwtAuthentication.port';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtAuthentication implements IJwtAuthentication {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
+
+  async verifyToken(token: string): Promise<void> {
+    await this.jwtService.verifyAsync<JwtPayload>(token);
+  }
 
   async generateTokenPair(payload: JwtPayload): Promise<TokenPair> {
     const [accessToken, refreshToken] = await Promise.all([

@@ -31,8 +31,8 @@ export class FormatResponse<T> implements NestInterceptor {
     return next.handle().pipe(
       map((data): ApiSuccessResponseDto<T> => ({
         success: true,
-        message: message ?? undefined,
-        data,
+        message: message ?? null,
+        data: data ?? null,
         meta: {
           requestId: this.clsService.get('requestId') ?? '',
           timestamp: new Date().toISOString(),

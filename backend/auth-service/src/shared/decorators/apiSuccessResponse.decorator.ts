@@ -4,15 +4,23 @@ import { ApiSuccessResponseDto } from '../presentation/dto/successResponse.dto';
 
 export const RESPONSE_MESSAGE_KEY = 'response_message';
 
-export const ApiSuccessResponse = <TModel extends Type<any>>(
+export const ApiSuccessResponse = <TModel extends Type<any>>({
   status = 200,
-  model: TModel,
-  message: string,
-) => {
+  model,
+  message,
+}: {
+  status?: number;
+  model?: TModel;
+  message: string;
+}) => {
   SetMetadata(RESPONSE_MESSAGE_KEY, message);
 
+  const dataSchema = model
+    ? { $ref: getSchemaPath(model) }
+    : { type: 'object', nullable: true, example: null };
+
   return applyDecorators(
-    ApiExtraModels(ApiSuccessResponseDto, model),
+    ApiExtraModels(ApiSuccessResponseDto, ...(model ? [model] : [])),
     ApiResponse({
       status,
       schema: {
@@ -20,7 +28,7 @@ export const ApiSuccessResponse = <TModel extends Type<any>>(
           { $ref: getSchemaPath(ApiSuccessResponseDto) },
           {
             properties: {
-              data: { $ref: getSchemaPath(model) },
+              data: dataSchema,
               message: { type: 'string', example: message },
             },
           },

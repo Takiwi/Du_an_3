@@ -9,6 +9,28 @@ import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 @Injectable()
 export class RefreshTokenRepository implements IRefreshTokenRepository {
   constructor(private readonly prismaService: PrismaService) {}
+  async deleteById(id: string): Promise<void> {
+    await this.prismaService.refreshToken.delete({
+      where: {
+        id,
+      },
+    });
+  }
+  async findById(id: string): Promise<RefreshToken | null> {
+    const result = await this.prismaService.refreshToken.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return result
+      ? RefreshToken.fromPrismaEntity({
+          ...result,
+          userId: unwrapResult(UserId.create(result.id)),
+        })
+      : null;
+  }
+
   async deleteByToken(token: string): Promise<void> {
     await this.prismaService.refreshToken.delete({
       where: { token },

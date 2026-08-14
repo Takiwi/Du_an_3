@@ -3,6 +3,7 @@ import { ValidationDetailDto } from '../dto/responses/validationErrorDetail.dto'
 
 export enum PresentationErrorCode {
   VALIDATION_ERROR = 'VALIDATION_ERROR',
+  SESSION_ID_NOT_FOUND = 'SESSION_ID_NOT_FOUND',
 }
 
 export class ValidationFieldException extends BadRequestException {

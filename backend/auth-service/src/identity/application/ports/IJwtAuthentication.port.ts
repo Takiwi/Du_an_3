@@ -12,4 +12,6 @@ export interface TokenPair {
 
 export interface IJwtAuthentication {
   generateTokenPair(payload: JwtPayload): Promise<TokenPair>;
+
+  verifyToken(token: string): Promise<void>;
 }

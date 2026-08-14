@@ -5,6 +5,15 @@ import { ApiErrorResponse } from './apiErrorResponse.decorator';
 export type errorCode = keyof typeof mapDecorator;
 
 export const mapDecorator = {
+  TOKEN_NOT_FOUND: ApiErrorResponse(ApplicationErrorCode.TOKEN_NOT_FOUND, {
+    description: 'Token not found',
+  }),
+  SESSION_ID_NOT_FOUND: ApiErrorResponse(
+    PresentationErrorCode.SESSION_ID_NOT_FOUND,
+    {
+      description: 'Session id is missing',
+    },
+  ),
   EMAIL_ALREADY_EXISTS: ApiErrorResponse(
     ApplicationErrorCode.EMAIL_ALREADY_EXISTS,
     {

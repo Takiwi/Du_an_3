@@ -80,6 +80,6 @@ export class LoginUseCase {
 
     await this.refreshTokenRepository.insertRefreshToken(newRefreshToken);
 
-    return ok({ user, accessToken, refreshToken });
+    return ok({ user, accessToken, sessionId: newRefreshToken.id });
   }
 }

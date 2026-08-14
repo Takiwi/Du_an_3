@@ -5,7 +5,7 @@ export class ApiSuccessResponseDto<T> {
   @ApiProperty({ example: true })
   success: true;
 
-  data: T;
+  data: T | null;
 
   @ApiProperty({ example: 'Thành công' })
   message: string;

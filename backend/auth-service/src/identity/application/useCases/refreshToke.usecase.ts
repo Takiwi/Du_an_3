@@ -1,10 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
-import {
-  IUserRepository,
-  USER_REPOSITORY_TOKEN,
-} from '../../domain/repositories/IUser.repository';
 import { fail, ok, Result } from '@packages/contracts/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';
+import { LoginOutput } from '../contracts/login.contract';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   IRefreshTokenRepository,
   RT_REPOSITORY_TOKEN,
@@ -15,16 +12,15 @@ import {
 } from '../ports/IJwtAuthentication.port';
 
 @Injectable()
-export class LogoutUseCase {
+export class RefreshTokenUseCase {
   constructor(
-    @Inject(USER_REPOSITORY_TOKEN)
-    private readonly userRepository: IUserRepository,
-    @Inject(RT_REPOSITORY_TOKEN)
-    private readonly refreshTokenRepository: IRefreshTokenRepository,
     @Inject(JWT_AUTHENTICATION_TOKEN)
     private readonly jwtService: IJwtAuthentication,
+    @Inject(RT_REPOSITORY_TOKEN)
+    private readonly refreshTokenRepository: IRefreshTokenRepository,
   ) {}
-  async execute(sessionId: string): Promise<Result<void, AppError>> {
+
+  async execute(sessionId: string): Promise<Result<LoginOutput, AppError>> {
     const refreshToken = await this.refreshTokenRepository.findById(sessionId);
 
     if (!refreshToken)
@@ -33,9 +29,9 @@ export class LogoutUseCase {
     // verify expiresIn
     await this.jwtService.verifyToken(refreshToken.token);
 
-    // delete refresh token
-    await this.refreshTokenRepository.deleteById(sessionId);
-
-    return ok();
+    // is token used?
+    if (refreshToken.token in refreshToken.tokensUsed) {
+      return ok(refreshToken);
+    }
   }
 }

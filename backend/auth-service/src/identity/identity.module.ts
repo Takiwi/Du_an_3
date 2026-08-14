@@ -19,6 +19,7 @@ import { RefreshTokenRepository } from './infrastructure/persistence/repositorie
 import { MeUseCase } from './application/useCases/me.usecase';
 import { JwtStrategy } from './infrastructure/auth/jwt.strategy';
 import { LogoutUseCase } from './application/useCases/logout.usecase';
+import { RefreshTokenUseCase } from './application/useCases/refreshToke.usecase';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { LogoutUseCase } from './application/useCases/logout.usecase';
     MeUseCase,
     LoginUseCase,
     LogoutUseCase,
+    RefreshTokenUseCase,
     RegisterUserUseCase,
   ],
 })
