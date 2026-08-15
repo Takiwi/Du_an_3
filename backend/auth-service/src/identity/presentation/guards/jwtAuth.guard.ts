@@ -1,14 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AppError } from '@packages/core/errors/app.error';
-import { AuthenticatedUser } from '../../infrastructure/auth/jwt.strategy';
+import { JwtPayload } from '../../application/ports/IJwtAuthentication.port';
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  handleRequest<TUser = AuthenticatedUser>(
-    err: any,
-    user: TUser,
-    info: any,
-  ): TUser {
+  handleRequest<TUser = JwtPayload>(err: any, user: TUser, info: any): TUser {
     if (err || !user) {
       throw new AppError(
         'VALIDATION_TOKEN_FALSE',

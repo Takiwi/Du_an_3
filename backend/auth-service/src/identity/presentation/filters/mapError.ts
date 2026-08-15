@@ -19,6 +19,7 @@ export function mapCodeToGenericError(errorCode: string): {
     case 'VALIDATION_TOKEN_FALSE':
     case 'TOKEN_NOT_FOUND':
     case 'SESSION_ID_NOT_FOUND':
+    case 'TOKEN_USED':
       return {
         status: HttpStatus.UNAUTHORIZED,
         message: 'Validation false',

@@ -24,8 +24,8 @@ export class LogoutUseCase {
     @Inject(JWT_AUTHENTICATION_TOKEN)
     private readonly jwtService: IJwtAuthentication,
   ) {}
-  async execute(sessionId: string): Promise<Result<void, AppError>> {
-    const refreshToken = await this.refreshTokenRepository.findById(sessionId);
+  async execute(token: string): Promise<Result<void, AppError>> {
+    const refreshToken = await this.refreshTokenRepository.findByToken(token);
 
     if (!refreshToken)
       return fail(new AppError('TOKEN_NOT_FOUND', 'Token is missing'));
@@ -34,7 +34,9 @@ export class LogoutUseCase {
     await this.jwtService.verifyToken(refreshToken.token);
 
     // delete refresh token
-    await this.refreshTokenRepository.deleteById(sessionId);
+    await this.refreshTokenRepository.deleteById(token);
+
+    // add access token to blacklist
 
     return ok();
   }

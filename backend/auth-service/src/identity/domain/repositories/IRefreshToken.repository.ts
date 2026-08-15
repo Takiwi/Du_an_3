@@ -11,4 +11,9 @@ export interface IRefreshTokenRepository {
   deleteManyByUserId(userId: string): Promise<void>;
 
   insertRefreshToken(token: RefreshToken): Promise<void>;
+
+  updateTokenAndTokensUsedByToken(
+    newToken: string,
+    oldToken: string,
+  ): Promise<void>;
 }

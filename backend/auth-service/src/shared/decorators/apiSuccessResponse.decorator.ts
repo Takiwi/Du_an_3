@@ -13,13 +13,12 @@ export const ApiSuccessResponse = <TModel extends Type<any>>({
   model?: TModel;
   message: string;
 }) => {
-  SetMetadata(RESPONSE_MESSAGE_KEY, message);
-
   const dataSchema = model
     ? { $ref: getSchemaPath(model) }
     : { type: 'object', nullable: true, example: null };
 
   return applyDecorators(
+    SetMetadata(RESPONSE_MESSAGE_KEY, message),
     ApiExtraModels(ApiSuccessResponseDto, ...(model ? [model] : [])),
     ApiResponse({
       status,

@@ -15,6 +15,7 @@ import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { LogoutUseCase } from '../../application/useCases/logout.usecase';
 import { RequestWithCookies } from '../../infrastructure/auth/jwt.strategy';
 import { AppError } from '@packages/core/errors/app.error';
+import { RefreshTokenUseCase } from '../../application/useCases/refreshToke.usecase';
 
 @ApiCommonErrors()
 @Controller('auth/')
@@ -22,6 +23,7 @@ export class AuthController {
   constructor(
     private readonly registerUseCase: RegisterUserUseCase,
     private readonly logoutUseCase: LogoutUseCase,
+    private readonly refreshTokenUseCase: RefreshTokenUseCase,
   ) {}
 
   @ApiSuccessResponse({
@@ -52,7 +54,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(
-    @CurrentUser() result: LoginOutput,
+    @CurrentUser<LoginOutput>() result: LoginOutput,
     @Res({ passthrough: true }) res: Response,
   ) {
     res.cookie('accessToken', result.accessToken, {
@@ -62,11 +64,12 @@ export class AuthController {
       maxAge: 15 * 60 * 1000, // 15 phút
     });
 
-    res.cookie('sessionId', result.sessionId, {
+    res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      path: 'auth/',
     });
 
     return UserMapper.toResponseDto(result.user);
@@ -76,37 +79,56 @@ export class AuthController {
     status: 204,
     message: 'Logout successfully',
   })
-  @ApplyApiErrorsResponse([
-    'SESSION_ID_NOT_FOUND',
-    'TOKEN_NOT_FOUND',
-    'USER_NOT_FOUND',
-  ])
+  @ApplyApiErrorsResponse(['TOKEN_NOT_FOUND', 'USER_NOT_FOUND'])
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(
     @Res({ passthrough: true }) res: Response,
     @Req() req: RequestWithCookies,
   ) {
-    const sessionId = req.cookies?.sessionId;
+    const refreshToken = req.cookies?.refreshToken;
 
-    if (!sessionId)
-      throw new AppError('SESSION_ID_NOT_FOUND', 'Session id is missing');
+    if (!refreshToken)
+      throw new AppError('TOKEN_NOT_FOUND', 'Token is missing');
 
-    await this.logoutUseCase.execute(sessionId);
+    await this.logoutUseCase.execute(refreshToken);
 
     res.clearCookie('accessToken');
-    res.clearCookie('sessionId');
+    res.clearCookie('refreshToken');
   }
 
   @ApiSuccessResponse({
     status: 204,
     message: 'Refresh token successfully exchanged',
   })
+  @ApplyApiErrorsResponse(['TOKEN_NOT_FOUND', 'USER_NOT_FOUND', 'TOKEN_USED'])
   @Post('refresh')
   async refresh(
     @Res({ passthrough: true }) res: Response,
     @Req() req: RequestWithCookies,
   ) {
-    const sessionId = req.cookies?.sessionId;
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken)
+      throw new AppError('TOKEN_NOT_FOUND', 'Token is missing');
+
+    const result = unwrapResult(
+      await this.refreshTokenUseCase.execute(refreshToken),
+    );
+
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 phút
+    });
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      path: 'auth/',
+    });
   }
 }

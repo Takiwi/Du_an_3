@@ -18,7 +18,7 @@ export class JwtAuthentication implements IJwtAuthentication {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         algorithm: 'RS256',
-        expiresIn: '15m',
+        expiresIn: '5m',
       }),
       this.jwtService.signAsync(
         { sub: payload.sub },
