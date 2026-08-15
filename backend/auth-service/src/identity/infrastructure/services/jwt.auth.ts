@@ -3,7 +3,7 @@ import {
   IJwtAuthentication,
   JwtPayload,
   TokenPair,
-} from '../../application/ports/IJwtAuthentication.port';
+} from '@auth/application/ports/IJwtAuthentication.port';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

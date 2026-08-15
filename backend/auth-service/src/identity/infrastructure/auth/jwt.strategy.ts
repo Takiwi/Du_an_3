@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { Strategy } from 'passport-jwt';
-import { JwtPayload } from '../../application/ports/IJwtAuthentication.port';
-import { MeUseCase } from '../../application/useCases/me.usecase';
+import { JwtPayload } from '@auth/application/ports/IJwtAuthentication.port';
+import { MeUseCase } from '@auth/application/useCases/me.usecase';
 
 export interface RequestWithCookies extends Request {
   cookies: {

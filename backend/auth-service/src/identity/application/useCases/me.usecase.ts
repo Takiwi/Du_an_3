@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
-} from '../../domain/repositories/IUser.repository';
+} from '@auth/domain/repositories/IUser.repository';
 import { fail, ok, Result } from '@packages/contracts/helpers/resultPattern';
-import { User } from '../../domain/entities/user.entity';
+import { User } from '@auth/domain/entities/user.entity';
 import { AppError } from '@packages/core/errors/app.error';
 
 @Injectable()

@@ -5,12 +5,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   IRefreshTokenRepository,
   RT_REPOSITORY_TOKEN,
-} from '../../domain/repositories/IRefreshToken.repository';
+} from '@auth/domain/repositories/IRefreshToken.repository';
 import {
   IJwtAuthentication,
   JWT_AUTHENTICATION_TOKEN,
 } from '../ports/IJwtAuthentication.port';
-import { USER_REPOSITORY_TOKEN } from '../../domain/repositories/IUser.repository';
+import { USER_REPOSITORY_TOKEN } from '@auth/domain/repositories/IUser.repository';
 import { UserRepository } from '../../infrastructure/persistence/repositories/user.repository';
 
 @Injectable()

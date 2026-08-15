@@ -1,8 +1,8 @@
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
-import { CreateUserInput } from '../../../application/contracts/createUser.contract';
+import { RegisterInput } from '@auth/application/contracts/register.contract';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateUserDto implements CreateUserInput {
+export class CreateUserDto implements RegisterInput {
   @ApiProperty({ example: 'Nguyen Van A' })
   @IsString({ message: 'This filed must be a string' })
   @MinLength(2, { message: 'The username must have at least 2 characters' })

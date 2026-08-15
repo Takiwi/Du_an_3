@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { IPasswordHasher } from '../../application/ports/IPasswordHasher.port';
+import { IPasswordHasher } from '@auth/application/ports/IPasswordHasher.port';
 
 export class BcryptPasswordHasher implements IPasswordHasher {
   async compare(

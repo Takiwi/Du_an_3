@@ -2,13 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
-} from '../../domain/repositories/IUser.repository';
+} from '@auth/domain/repositories/IUser.repository';
 import { fail, ok, Result } from '@packages/contracts/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';
 import {
   IRefreshTokenRepository,
   RT_REPOSITORY_TOKEN,
-} from '../../domain/repositories/IRefreshToken.repository';
+} from '@auth/domain/repositories/IRefreshToken.repository';
 import {
   IJwtAuthentication,
   JWT_AUTHENTICATION_TOKEN,

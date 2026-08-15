@@ -9,8 +9,8 @@ import { ClsService } from '@packages/core/cls/cls.service';
 import { mapCodeToGenericError } from './mapError';
 import { AppError } from '@packages/core/errors/app.error';
 import { ValidationFieldException } from '../errors/validationField.error';
-import { ApiErrorResponseDto } from '../../../shared/presentation/dto/errorResponse.dto';
-import { ValidationErrorResponseDto } from '../../../shared/presentation/dto/validationErrorResponse.dto';
+import { ApiErrorResponseDto } from '@shared/presentation/dto/errorResponse.dto';
+import { ValidationErrorResponseDto } from '@shared/presentation/dto/validationErrorResponse.dto';
 
 @Injectable()
 @Catch()

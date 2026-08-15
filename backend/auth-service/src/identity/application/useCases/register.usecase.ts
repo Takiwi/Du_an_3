@@ -3,13 +3,13 @@ import { ApplicationErrorCode } from '../errors/application.error';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
-} from '../../domain/repositories/IUser.repository';
-import { CreateUserInput } from '../contracts/createUser.contract';
+} from '@auth/domain/repositories/IUser.repository';
+import { RegisterInput } from '../contracts/register.contract';
 import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
 } from '../ports/IPasswordHasher.port';
-import { User } from '../../domain/entities/user.entity';
+import { User } from '@auth/domain/entities/user.entity';
 import { Result, ok, fail } from '@packages/contracts/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';
 
@@ -22,7 +22,7 @@ export class RegisterUserUseCase {
     private readonly passwordHasher: IPasswordHasher,
   ) {}
 
-  async execute(dto: CreateUserInput): Promise<Result<User, AppError>> {
+  async execute(dto: RegisterInput): Promise<Result<User, AppError>> {
     // Check email
     const isEmailTaken = await this.userRepository.existsByEmail(dto.email);
 

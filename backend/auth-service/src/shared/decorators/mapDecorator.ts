@@ -5,6 +5,9 @@ import { ApiErrorResponse } from './apiErrorResponse.decorator';
 export type errorCode = keyof typeof mapDecorator;
 
 export const mapDecorator = {
+  VALIDATION_TOKEN_FALSE: ApiErrorResponse(ApplicationErrorCode.TOKEN_USED, {
+    description: 'Invalid or expired token',
+  }),
   TOKEN_USED: ApiErrorResponse(ApplicationErrorCode.TOKEN_USED, {
     description: 'Token has already been used',
   }),

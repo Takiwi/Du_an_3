@@ -1,12 +1,12 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiCommonErrors } from '../../../shared/decorators/apiCommonErrors.decorator';
-import { ApiSuccessResponse } from '../../../shared/decorators/apiSuccessResponse.decorator';
+import { ApiCommonErrors } from '@shared/decorators/apiCommonErrors.decorator';
+import { ApiSuccessResponse } from '@shared/decorators/apiSuccessResponse.decorator';
 import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { JwtAuthGuard } from '../guards/jwtAuth.guard';
-import { ApplyApiErrorsResponse } from '../../../shared/decorators/applyApiErrorsResponse.decorator';
-import { CurrentUser } from '../../../shared/decorators/currentUser.decorator';
-import { JwtPayload } from '../../application/ports/IJwtAuthentication.port';
-import { MeUseCase } from '../../application/useCases/me.usecase';
+import { ApplyApiErrorsResponse } from '@shared/decorators/applyApiErrorsResponse.decorator';
+import { CurrentUser } from '@shared/decorators/currentUser.decorator';
+import { JwtPayload } from '@auth/application/ports/IJwtAuthentication.port';
+import { MeUseCase } from '@auth/application/useCases/me.usecase';
 import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 import { UserMapper } from '../mappers/user.mapper';
 

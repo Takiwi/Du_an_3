@@ -7,7 +7,7 @@ import { LoginInput, LoginOutput } from '../contracts/login.contract';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
-} from '../../domain/repositories/IUser.repository';
+} from '@auth/domain/repositories/IUser.repository';
 import {
   fail,
   ok,
@@ -23,9 +23,9 @@ import {
 import {
   IRefreshTokenRepository,
   RT_REPOSITORY_TOKEN,
-} from '../../domain/repositories/IRefreshToken.repository';
-import { RefreshToken } from '../../domain/entities/refreshToken.entity';
-import { UserId } from '../../domain/value-objects/userId.vo';
+} from '@auth/domain/repositories/IRefreshToken.repository';
+import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
+import { UserId } from '@auth/domain/value-objects/userId.vo';
 
 @Injectable()
 export class LoginUseCase {

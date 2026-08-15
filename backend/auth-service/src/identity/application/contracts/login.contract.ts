@@ -1,4 +1,4 @@
-import { User } from '../../domain/entities/user.entity';
+import { User } from '@auth/domain/entities/user.entity';
 
 export interface LoginInput {
   email: string;

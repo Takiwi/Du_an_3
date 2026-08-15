@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../../shared/infrastructure/database/prisma.service';
-import { IRefreshTokenRepository } from '../../../domain/repositories/IRefreshToken.repository';
-import { RefreshToken } from '../../../domain/entities/refreshToken.entity';
+import { PrismaService } from '@shared/infrastructure/database/prisma.service';
+import { IRefreshTokenRepository } from '@auth/domain/repositories/IRefreshToken.repository';
+import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
 import * as crypto from 'crypto';
-import { UserId } from '../../../domain/value-objects/userId.vo';
+import { UserId } from '@auth/domain/value-objects/userId.vo';
 import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 
 @Injectable()

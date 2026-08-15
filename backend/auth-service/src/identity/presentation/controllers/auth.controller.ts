@@ -1,21 +1,21 @@
 import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { RegisterUserUseCase } from '../../application/useCases/registerUser.usecase';
+import { RegisterUserUseCase } from '@auth/application/useCases/register.usecase';
 import { CreateUserDto } from '../dto/requests/createUser.dto';
-import { ApiSuccessResponse } from '../../../shared/decorators/apiSuccessResponse.decorator';
+import { ApiSuccessResponse } from '@shared/decorators/apiSuccessResponse.decorator';
 import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { UserMapper } from '../mappers/user.mapper';
-import { ApiCommonErrors } from '../../../shared/decorators/apiCommonErrors.decorator';
-import { ApplyApiErrorsResponse } from '../../../shared/decorators/applyApiErrorsResponse.decorator';
+import { ApiCommonErrors } from '@shared/decorators/apiCommonErrors.decorator';
+import { ApplyApiErrorsResponse } from '@shared/decorators/applyApiErrorsResponse.decorator';
 import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 import { LocalAuthGuard } from '../guards/localAuth.guard';
-import { CurrentUser } from '../../../shared/decorators/currentUser.decorator';
-import { LoginOutput } from '../../application/contracts/login.contract';
+import { CurrentUser } from '@shared/decorators/currentUser.decorator';
+import { LoginOutput } from '@auth/application/contracts/login.contract';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../guards/jwtAuth.guard';
-import { LogoutUseCase } from '../../application/useCases/logout.usecase';
+import { LogoutUseCase } from '@auth/application/useCases/logout.usecase';
 import { RequestWithCookies } from '../../infrastructure/auth/jwt.strategy';
 import { AppError } from '@packages/core/errors/app.error';
-import { RefreshTokenUseCase } from '../../application/useCases/refreshToke.usecase';
+import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToke.usecase';
 
 @ApiCommonErrors()
 @Controller('auth/')
