@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
-} from '../ports/IPasswordHasher.port';
-import { LoginInput, LoginOutput } from '../contracts/login.contract';
+} from '../../ports/IPasswordHasher.port';
+import { LoginInput, LoginOutput } from './login.contract';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
@@ -15,11 +15,11 @@ import {
   unwrapResult,
 } from '@packages/contracts/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';
-import { ApplicationErrorCode } from '../errors/application.error';
+import { ApplicationErrorCode } from '../../errors/application.error';
 import {
   IJwtAuthentication,
   JWT_AUTHENTICATION_TOKEN,
-} from '../ports/IJwtAuthentication.port';
+} from '../../ports/IJwtAuthentication.port';
 import {
   IRefreshTokenRepository,
   RT_REPOSITORY_TOKEN,

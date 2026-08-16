@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ApplicationErrorCode } from '../errors/application.error';
+import { ApplicationErrorCode } from '../../errors/application.error';
 import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '@auth/domain/repositories/IUser.repository';
-import { RegisterInput } from '../contracts/register.contract';
+import { RegisterInput } from './register.contract';
 import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
-} from '../ports/IPasswordHasher.port';
+} from '../../ports/IPasswordHasher.port';
 import { User } from '@auth/domain/entities/user.entity';
 import { Result, ok, fail } from '@packages/contracts/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';

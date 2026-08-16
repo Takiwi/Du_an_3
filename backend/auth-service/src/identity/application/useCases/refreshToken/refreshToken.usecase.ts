@@ -1,6 +1,5 @@
 import { fail, ok, Result } from '@packages/contracts/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';
-import { LoginOutput } from '../contracts/login.contract';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   IRefreshTokenRepository,
@@ -9,9 +8,12 @@ import {
 import {
   IJwtAuthentication,
   JWT_AUTHENTICATION_TOKEN,
-} from '../ports/IJwtAuthentication.port';
-import { USER_REPOSITORY_TOKEN } from '@auth/domain/repositories/IUser.repository';
-import { UserRepository } from '../../infrastructure/persistence/repositories/user.repository';
+  TokenPair,
+} from '../../ports/IJwtAuthentication.port';
+import {
+  IUserRepository,
+  USER_REPOSITORY_TOKEN,
+} from '@auth/domain/repositories/IUser.repository';
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -21,10 +23,10 @@ export class RefreshTokenUseCase {
     @Inject(RT_REPOSITORY_TOKEN)
     private readonly refreshTokenRepository: IRefreshTokenRepository,
     @Inject(USER_REPOSITORY_TOKEN)
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(token: string): Promise<Result<LoginOutput, AppError>> {
+  async execute(token: string): Promise<Result<TokenPair, AppError>> {
     const hasRefreshToken = await this.refreshTokenRepository.findById(token);
 
     if (!hasRefreshToken)
@@ -69,6 +71,6 @@ export class RefreshTokenUseCase {
       token,
     );
 
-    return ok({ user, accessToken, refreshToken });
+    return ok({ accessToken, refreshToken });
   }
 }

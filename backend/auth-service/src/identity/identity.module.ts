@@ -3,8 +3,8 @@ import { AuthController } from './presentation/controllers/auth.controller';
 import { SharedModule } from '../shared/shared.module';
 import { BcryptPasswordHasher } from './infrastructure/services/bcryptPasswordHasher';
 import { UserRepository } from './infrastructure/persistence/repositories/user.repository';
-import { RegisterUserUseCase } from '@auth/application/useCases/register.usecase';
-import { LoginUseCase } from '@auth/application/useCases/login.usecase';
+import { RegisterUserUseCase } from '@auth/application/useCases/register/register.usecase';
+import { LoginUseCase } from '@auth/application/useCases/login/login.usecase';
 import { UserController } from './presentation/controllers/user.controller';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './infrastructure/auth/local.strategy';
@@ -16,10 +16,10 @@ import { PASSWORD_HASHER_TOKEN } from '@auth/application/ports/IPasswordHasher.p
 import { USER_REPOSITORY_TOKEN } from '@auth/domain/repositories/IUser.repository';
 import { RT_REPOSITORY_TOKEN } from '@auth/domain/repositories/IRefreshToken.repository';
 import { RefreshTokenRepository } from './infrastructure/persistence/repositories/refreshToken.repository';
-import { MeUseCase } from '@auth/application/useCases/me.usecase';
+import { MeUseCase } from '@auth/application/useCases/me/me.usecase';
 import { JwtStrategy } from './infrastructure/auth/jwt.strategy';
-import { LogoutUseCase } from '@auth/application/useCases/logout.usecase';
-import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToke.usecase';
+import { LogoutUseCase } from '@auth/application/useCases/logout/logout.usecase';
+import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToken/refreshToken.usecase';
 
 @Module({
   imports: [

@@ -47,8 +47,6 @@ export class AuthExceptionFilter implements ExceptionFilter {
       return response.status(status).json(result);
     }
 
-    console.log(exception);
-
     return response
       .status(500)
       .json(

@@ -4,15 +4,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { Strategy } from 'passport-jwt';
 import { JwtPayload } from '@auth/application/ports/IJwtAuthentication.port';
-import { MeUseCase } from '@auth/application/useCases/me.usecase';
-
-export interface RequestWithCookies extends Request {
-  cookies: {
-    accessToken?: string;
-    refreshToken?: string;
-    [key: string]: string | undefined;
-  };
-}
+import { MeUseCase } from '@auth/application/useCases/me/me.usecase';
+import { RequestWithCookies } from '../../presentation/types/requestCookie.type';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {

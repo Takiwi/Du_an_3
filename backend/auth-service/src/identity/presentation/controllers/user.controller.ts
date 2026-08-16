@@ -6,7 +6,7 @@ import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { ApplyApiErrorsResponse } from '@shared/decorators/applyApiErrorsResponse.decorator';
 import { CurrentUser } from '@shared/decorators/currentUser.decorator';
 import { JwtPayload } from '@auth/application/ports/IJwtAuthentication.port';
-import { MeUseCase } from '@auth/application/useCases/me.usecase';
+import { MeUseCase } from '@auth/application/useCases/me/me.usecase';
 import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 import { UserMapper } from '../mappers/user.mapper';
 
@@ -14,6 +14,7 @@ import { UserMapper } from '../mappers/user.mapper';
 @Controller('user/')
 export class UserController {
   constructor(private readonly meUseCase: MeUseCase) {}
+
   @ApiSuccessResponse({
     status: 200,
     model: UserResponseDto,

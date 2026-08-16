@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { RegisterUserUseCase } from '@auth/application/useCases/register.usecase';
+import { RegisterUserUseCase } from '@auth/application/useCases/register/register.usecase';
 import { CreateUserDto } from '../dto/requests/createUser.dto';
 import { ApiSuccessResponse } from '@shared/decorators/apiSuccessResponse.decorator';
 import { UserResponseDto } from '../dto/responses/userResponse.dto';
@@ -9,13 +9,13 @@ import { ApplyApiErrorsResponse } from '@shared/decorators/applyApiErrorsRespons
 import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 import { LocalAuthGuard } from '../guards/localAuth.guard';
 import { CurrentUser } from '@shared/decorators/currentUser.decorator';
-import { LoginOutput } from '@auth/application/contracts/login.contract';
+import { LoginOutput } from '@auth/application/useCases/login/login.contract';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../guards/jwtAuth.guard';
-import { LogoutUseCase } from '@auth/application/useCases/logout.usecase';
-import { RequestWithCookies } from '../../infrastructure/auth/jwt.strategy';
+import { LogoutUseCase } from '@auth/application/useCases/logout/logout.usecase';
+import { RequestWithCookies } from '../types/requestCookie.type';
 import { AppError } from '@packages/core/errors/app.error';
-import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToke.usecase';
+import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToken/refreshToken.usecase';
 
 @ApiCommonErrors()
 @Controller('auth/')

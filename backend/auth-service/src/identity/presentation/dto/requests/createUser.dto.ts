@@ -1,5 +1,5 @@
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
-import { RegisterInput } from '@auth/application/contracts/register.contract';
+import { RegisterInput } from '@auth/application/useCases/register/register.contract';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto implements RegisterInput {

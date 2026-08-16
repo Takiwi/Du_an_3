@@ -12,7 +12,7 @@ import {
 import {
   IJwtAuthentication,
   JWT_AUTHENTICATION_TOKEN,
-} from '../ports/IJwtAuthentication.port';
+} from '../../ports/IJwtAuthentication.port';
 
 @Injectable()
 export class LogoutUseCase {
