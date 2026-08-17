@@ -10,8 +10,8 @@ import { Injectable } from '@nestjs/common';
 export class JwtAuthentication implements IJwtAuthentication {
   constructor(private readonly jwtService: JwtService) {}
 
-  async verifyToken(token: string): Promise<void> {
-    await this.jwtService.verifyAsync<JwtPayload>(token);
+  async verifyToken(token: string): Promise<JwtPayload> {
+    return await this.jwtService.verifyAsync<JwtPayload>(token);
   }
 
   async generateTokenPair(payload: JwtPayload): Promise<TokenPair> {

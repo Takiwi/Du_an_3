@@ -91,7 +91,7 @@ export class AuthController {
     if (!refreshToken)
       throw new AppError('TOKEN_NOT_FOUND', 'Token is missing');
 
-    await this.logoutUseCase.execute(refreshToken);
+    unwrapResult(await this.logoutUseCase.execute(refreshToken));
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');

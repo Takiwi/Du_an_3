@@ -14,6 +14,10 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '@auth/domain/repositories/IUser.repository';
+import {
+  DATA_HASHER_TOKEN,
+  IDataHasher,
+} from '@auth/application/ports/IDataHasher.port';
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -24,53 +28,66 @@ export class RefreshTokenUseCase {
     private readonly refreshTokenRepository: IRefreshTokenRepository,
     @Inject(USER_REPOSITORY_TOKEN)
     private readonly userRepository: IUserRepository,
+    @Inject(DATA_HASHER_TOKEN)
+    private readonly cryptService: IDataHasher,
   ) {}
 
   async execute(token: string): Promise<Result<TokenPair, AppError>> {
-    const hasRefreshToken = await this.refreshTokenRepository.findById(token);
+    // is expired
+    const payload = await this.jwtService.verifyToken(token);
 
-    if (!hasRefreshToken)
-      return fail(new AppError('TOKEN_NOT_FOUND', 'Token is missing'));
+    // hash token
+    const hashedToken = this.cryptService.hash(token);
 
-    // verify expiresIn
-    await this.jwtService.verifyToken(hasRefreshToken.token);
+    // has session
+    const hasRefreshToken =
+      await this.refreshTokenRepository.findByToken(hashedToken);
+
+    if (hasRefreshToken) {
+      // get user
+      const user = await this.userRepository.findUserById(payload.sub);
+
+      if (!user || hasRefreshToken.userId.toString() !== payload.sub)
+        return fail(
+          new AppError('USER_NOT_FOUND', `User ${payload.sub} not found`),
+        );
+
+      // generate new token pair
+      const { accessToken, refreshToken } =
+        await this.jwtService.generateTokenPair({
+          sub: user.id,
+          email: user.email,
+        });
+
+      // update old refresh token
+      await this.refreshTokenRepository.updateTokenAndTokensUsedByToken(
+        refreshToken,
+        hashedToken,
+      );
+
+      return ok({ accessToken, refreshToken });
+    }
 
     // is token used?
-    if (hasRefreshToken.tokensUsed.includes(hasRefreshToken.token)) {
+    const isMatch = await this.refreshTokenRepository.isTokenInTokensUsed(
+      payload.sub,
+      hashedToken,
+    );
+
+    if (isMatch) {
+      // delete all session
+      await this.refreshTokenRepository.deleteManyByUserId(payload.sub);
+
       return fail(
         new AppError(
           'TOKEN_USED',
-          `Token for user ${hasRefreshToken.userId.toString()} has already been used`,
+          `Token(${hashedToken}) for userId(${payload.sub}) has already been used`,
         ),
       );
     }
 
-    // get user
-    const user = await this.userRepository.findUserById(
-      hasRefreshToken.userId.toString(),
+    return fail(
+      new AppError('TOKEN_NOT_FOUND', `Token(${hashedToken}) is not found`),
     );
-
-    if (!user)
-      return fail(
-        new AppError(
-          'USER_NOT_FOUND',
-          `User ${hasRefreshToken.userId.toString()} not found`,
-        ),
-      );
-
-    // generate new token pair
-    const { accessToken, refreshToken } =
-      await this.jwtService.generateTokenPair({
-        sub: user.id,
-        email: user.email,
-      });
-
-    // update old refresh token
-    await this.refreshTokenRepository.updateTokenAndTokensUsedByToken(
-      refreshToken,
-      token,
-    );
-
-    return ok({ accessToken, refreshToken });
   }
 }

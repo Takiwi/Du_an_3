@@ -16,4 +16,6 @@ export interface IRefreshTokenRepository {
     newToken: string,
     oldToken: string,
   ): Promise<void>;
+
+  isTokenInTokensUsed(userId: string, token: string): Promise<boolean>;
 }

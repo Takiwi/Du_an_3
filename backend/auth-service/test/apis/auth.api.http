@@ -23,3 +23,7 @@ content-type: application/json
 ###
 GET  http://localhost:3001/api/v1/user/me
 content-type: application/json
+
+###
+POST http://localhost:3001/api/v1/auth/refresh
+content-type: application/json

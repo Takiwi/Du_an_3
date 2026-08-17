@@ -1,14 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@shared/infrastructure/database/prisma.service';
 import { IRefreshTokenRepository } from '@auth/domain/repositories/IRefreshToken.repository';
 import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
-import * as crypto from 'crypto';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
 import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
+import {
+  DATA_HASHER_TOKEN,
+  IDataHasher,
+} from '@auth/application/ports/IDataHasher.port';
 
 @Injectable()
 export class RefreshTokenRepository implements IRefreshTokenRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @Inject(DATA_HASHER_TOKEN)
+    private readonly cryptoService: IDataHasher,
+  ) {}
+
+  async isTokenInTokensUsed(userId: string, token: string): Promise<boolean> {
+    const result = await this.prismaService.refreshToken.findFirst({
+      where: { userId, tokensUsed: { has: token } },
+    });
+
+    return result ? true : false;
+  }
+
   async updateTokenAndTokensUsedByToken(
     newToken: string,
     oldToken: string,
@@ -42,7 +58,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     return result
       ? RefreshToken.fromPrismaEntity({
           ...result,
-          userId: unwrapResult(UserId.create(result.id)),
+          userId: unwrapResult(UserId.create(result.userId)),
         })
       : null;
   }
@@ -63,7 +79,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     return result
       ? RefreshToken.fromPrismaEntity({
           ...result,
-          userId: unwrapResult(UserId.create(result.id)),
+          userId: unwrapResult(UserId.create(result.userId)),
         })
       : null;
   }
@@ -80,10 +96,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       data: {
         id: refreshToken.id,
         userId: refreshToken.userId.toString(),
-        token: crypto
-          .createHash('sha256')
-          .update(refreshToken.token)
-          .digest('hex'),
+        token: this.cryptoService.hash(refreshToken.token),
         tokensUsed: refreshToken.tokensUsed,
       },
     });
