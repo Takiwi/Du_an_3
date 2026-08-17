@@ -4,25 +4,13 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "./errors/*": {
-      "types": "./dist/errors/*.d.ts",
-      "default": "./dist/errors/*.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "./utils/*": {
-      "types": "./dist/utils/*.d.ts",
-      "default": "./dist/utils/*.js"
-    },
-    "./middlewares/*": {
-      "types": "./dist/middlewares/*.d.ts",
-      "default": "./dist/middlewares/*.js"
-    },
-    "./constants/*": {
-      "types": "./dist/constants/*.d.ts",
-      "default": "./dist/constants/*.js"
-    },
-    "./cls/*": {
-      "types": "./dist/cls/*.d.ts",
-      "default": "./dist/cls/*.js"
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
     }
   },
   "scripts": {
@@ -32,8 +20,7 @@
   },
   "peerDependencies": {
     "@nestjs/common": "^11.0.1",
-    "rxjs": "^7.8.1",
-    "zod": "^4.4.3"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

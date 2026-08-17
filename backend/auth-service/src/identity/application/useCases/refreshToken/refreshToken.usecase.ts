@@ -59,9 +59,12 @@ export class RefreshTokenUseCase {
           email: user.email,
         });
 
+      // hash new refresh token
+      const hashedNewRefreshToken = this.cryptService.hash(refreshToken);
+
       // update old refresh token
       await this.refreshTokenRepository.updateTokenAndTokensUsedByToken(
-        refreshToken,
+        hashedNewRefreshToken,
         hashedToken,
       );
 

@@ -23,7 +23,7 @@ export class LogoutUseCase {
     const hashedToken = this.cryptoService.hash(token);
 
     // delete refresh token
-    await this.refreshTokenRepository.deleteById(hashedToken);
+    await this.refreshTokenRepository.deleteByToken(hashedToken);
 
     // add access token to blacklist
 

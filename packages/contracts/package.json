@@ -5,13 +5,13 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "./helpers/*": {
-      "types": "./dist/helpers/*.d.ts",
-      "default": "./dist/helpers/*.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
-    "./utils/*": {
-      "types": "./dist/utils/*.d.ts",
-      "default": "./dist/utils/*.js"
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
     }
   },
   "scripts": {
@@ -23,9 +23,6 @@
   "author": "",
   "license": "ISC",
   "type": "module",
-  "dependencies": {
-    "zod": "^4.4.3"
-  },
   "peerDependencies": {
     "@nestjs/common": "^11.0.1"
   },

@@ -8,7 +8,7 @@
   "scripts": {
     "build": "pnpm --filter @packages/core build && pnpm --filter @packages/contracts build && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "pnpm --filter @packages/core build && pnpm --filter @packages/contracts build && nest start",
+    "start": "pnpm --filter @packages/core build && pnpm --filter @packages/contracts build && nest start --watch",
     "prestart:dev": "pnpm --filter @packages/core build && pnpm --filter @packages/contracts build",
     "start:dev": "nest start --watch",
     "start:debug": "pnpm --filter @packages/core build && pnpm --filter @packages/contracts build && nest start --debug --watch",
