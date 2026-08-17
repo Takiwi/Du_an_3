@@ -3,12 +3,13 @@
   "compilerOptions": {
     "removeComments": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
   },
   "references": [
     { "path": "../../packages/core" },
     { "path": "../../packages/contracts" }
   ],
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }
