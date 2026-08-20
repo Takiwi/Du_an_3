@@ -2,7 +2,9 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
+  Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClsService } from '@packages/core/cls/cls.service';
@@ -11,11 +13,15 @@ import { AppError } from '@packages/core/errors/app.error';
 import { ValidationFieldException } from '../errors/validationField.error';
 import { ApiErrorResponseDto } from '@shared/presentation/dto/errorResponse.dto';
 import { ValidationErrorResponseDto } from '@shared/presentation/dto/validationErrorResponse.dto';
+import { ILogger, LOGGER_TOKEN } from '@packages/core/logging/ILogger.post';
 
 @Injectable()
 @Catch()
 export class AuthExceptionFilter implements ExceptionFilter {
-  constructor(private readonly clsService: ClsService) {}
+  constructor(
+    private readonly clsService: ClsService,
+    @Inject(LOGGER_TOKEN) private readonly logger: ILogger,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse<Response>();
@@ -29,6 +35,8 @@ export class AuthExceptionFilter implements ExceptionFilter {
         requestId: requestId,
         timestamp: timestamp,
       });
+
+      this.logger.error(exception.message, exception);
 
       return response.status(status).json(result);
     }
@@ -44,8 +52,12 @@ export class AuthExceptionFilter implements ExceptionFilter {
         detailsError,
       );
 
+      this.logger.error(exception.message, exception);
+
       return response.status(status).json(result);
     }
+
+    this.logger.error('Super Error', new InternalServerErrorException());
 
     return response
       .status(500)

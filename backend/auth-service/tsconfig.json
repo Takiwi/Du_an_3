@@ -8,7 +8,8 @@
   },
   "references": [
     { "path": "../../packages/core" },
-    { "path": "../../packages/contracts" }
+    { "path": "../../packages/contracts" },
+    { "path": "../../packages/logging" }
   ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]

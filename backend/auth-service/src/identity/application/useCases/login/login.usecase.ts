@@ -26,6 +26,7 @@ import {
 } from '@auth/domain/repositories/IRefreshToken.repository';
 import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
+import { ILogger, LOGGER_TOKEN } from '@packages/core/logging/ILogger.post';
 
 @Injectable()
 export class LoginUseCase {
@@ -38,6 +39,8 @@ export class LoginUseCase {
     private readonly jwtAuth: IJwtAuthentication,
     @Inject(RT_REPOSITORY_TOKEN)
     private readonly refreshTokenRepository: IRefreshTokenRepository,
+    @Inject(LOGGER_TOKEN)
+    private readonly logger: ILogger,
   ) {}
 
   async execute(dto: LoginInput): Promise<Result<LoginOutput, AppError>> {

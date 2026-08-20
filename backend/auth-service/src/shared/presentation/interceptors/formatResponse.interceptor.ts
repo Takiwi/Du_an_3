@@ -1,28 +1,30 @@
 import {
   CallHandler,
   ExecutionContext,
+  Inject,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ClsService } from '@packages/core/cls/cls.service';
-import { catchError, map, Observable, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { RESPONSE_MESSAGE_KEY } from '../../decorators/apiSuccessResponse.decorator';
 import { ApiSuccessResponseDto } from '../dto/successResponse.dto';
+import { ILogger, LOGGER_TOKEN } from '@packages/core/logging/ILogger.post';
 
 @Injectable()
 export class FormatResponse<T> implements NestInterceptor {
   constructor(
     private readonly clsService: ClsService,
     private readonly reflector: Reflector,
+    @Inject(LOGGER_TOKEN)
+    private readonly logger: ILogger,
   ) {}
 
   intercept(
     context: ExecutionContext,
     next: CallHandler<T>,
   ): Observable<ApiSuccessResponseDto<T>> {
-    const now = Date.now();
-
     const message = this.reflector.get<string>(
       RESPONSE_MESSAGE_KEY,
       context.getHandler(),
@@ -38,11 +40,8 @@ export class FormatResponse<T> implements NestInterceptor {
           timestamp: new Date().toISOString(),
         },
       })),
-      tap(() => {
-        console.log(`Xử lý mất ${Date.now() - now}ms`);
-      }),
       catchError((err: Error) => {
-        console.error('Lỗi trong pipeline:', err.message);
+        this.logger.error(err.name, err);
         return throwError(() => err);
       }),
     );

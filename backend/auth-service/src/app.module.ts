@@ -5,11 +5,13 @@ import { RequestIdMiddleware } from '@packages/core/middlewares/requestId.middle
 import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AuthExceptionFilter } from './identity/presentation/filters/authExceptions.filter';
+import { AppLoggerModule } from '@packages/logging/pino-logger.module';
 @Module({
   imports: [
     ClsModule,
     IdentityModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    AppLoggerModule.forRoot('auth-service'),
   ],
   providers: [
     {

@@ -26,7 +26,8 @@
       ],
       "@shared/*": ["backend/auth-service/src/shared/*"],
       "@packages/core/*": ["./packages/core/src/*"],
-      "@packages/contracts/*": ["./packages/contracts/src/*"]
+      "@packages/contracts/*": ["./packages/contracts/src/*"],
+      "@packages/logging/*": ["./packages/logging/src/*"]
     }
   }
 }
