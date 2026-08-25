@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { STATUS, ROLE } from '../../../../generated/prisma/enums';
+import { STATUS, ROLE } from '@generated/prisma/enums';
 export class UserResponseDto {
   @ApiProperty({ example: '123' })
   id: string;
@@ -10,7 +10,7 @@ export class UserResponseDto {
   @ApiProperty({ format: 'email', example: 'example@gmail.com' })
   email: string;
 
-  @ApiProperty({ enum: STATUS, example: STATUS.INACTIVE })
+  @ApiProperty({ enum: STATUS, example: STATUS.ACTIVE })
   status: string;
 
   @ApiProperty({ enum: ROLE, example: ROLE.USER })

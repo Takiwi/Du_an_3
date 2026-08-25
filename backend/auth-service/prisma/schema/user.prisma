@@ -1,7 +1,8 @@
 enum STATUS {
-    ACTIVE
-    BANNED
-    INACTIVE
+  PENDING
+  ACTIVE
+  BANNED
+  DEACTIVATED
 }
 
 enum ROLE {

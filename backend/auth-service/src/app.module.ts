@@ -10,7 +10,7 @@ import { AppLoggerModule } from '@packages/logging/pino-logger.module';
   imports: [
     ClsModule,
     IdentityModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', '.env.db'] }),
     AppLoggerModule.forRoot('auth-service'),
   ],
   providers: [

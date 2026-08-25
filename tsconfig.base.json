@@ -15,19 +15,9 @@
     "declarationMap": true,
     "composite": true,
     "forceConsistentCasingInFileNames": true,
+    "removeComments": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false,
-    "baseUrl": "./",
-    "paths": {
-      "@auth/domain/*": ["backend/auth-service/src/identity/domain/*"],
-      "@auth/application/*": [
-        "backend/auth-service/src/identity/application/*"
-      ],
-      "@shared/*": ["backend/auth-service/src/shared/*"],
-      "@packages/core/*": ["./packages/core/src/*"],
-      "@packages/contracts/*": ["./packages/contracts/src/*"],
-      "@packages/logging/*": ["./packages/logging/src/*"]
-    }
+    "noFallthroughCasesInSwitch": false
   }
 }

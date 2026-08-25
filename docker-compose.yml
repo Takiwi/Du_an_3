@@ -1,2 +1,2 @@
 include:
-  - ./docker-compose.db.yml
+  - ./backend/auth-service/docker-compose.db.yml
