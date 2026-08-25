@@ -5,6 +5,7 @@ export const ApplicationErrorCode = {
   PASSWORD_DO_NOT_MATCH: 'PASSWORD_DO_NOT_MATCH',
   TOKEN_NOT_FOUND: 'TOKEN_NOT_FOUND',
   TOKEN_USED: 'TOKEN_USED',
+  TOO_MANY_ATTEMPTS: 'TOO_MANY_ATTEMPTS',
 } as const;
 
 export type AppErrorCodeType =

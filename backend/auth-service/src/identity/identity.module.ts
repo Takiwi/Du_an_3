@@ -22,6 +22,8 @@ import { LogoutUseCase } from '@auth/application/useCases/logout/logout.usecase'
 import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToken/refreshToken.usecase';
 import { DATA_HASHER_TOKEN } from './application/ports/IDataHasher.port';
 import { CryptoDataHasher } from './infrastructure/services/cryptoDataHasher.service';
+import { FAILED_LOGIN_TRACKER_TOKEN } from './domain/ports/failedLoginTracker.interface';
+import { RedisFailedLoginTracker } from './infrastructure/services/redisFailedLoginTracker.service';
 
 @Module({
   imports: [
@@ -57,6 +59,10 @@ import { CryptoDataHasher } from './infrastructure/services/cryptoDataHasher.ser
     {
       provide: USER_REPOSITORY_TOKEN,
       useClass: UserRepository,
+    },
+    {
+      provide: FAILED_LOGIN_TRACKER_TOKEN,
+      useClass: RedisFailedLoginTracker,
     },
     LocalStrategy,
     JwtStrategy,

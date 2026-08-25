@@ -27,6 +27,10 @@ import {
 import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
 import { ILogger, LOGGER_TOKEN } from '@packages/core/logging/ILogger.post';
+import {
+  FAILED_LOGIN_TRACKER_TOKEN,
+  IFailedLoginTracker,
+} from '@auth/domain/ports/failedLoginTracker.interface';
 
 @Injectable()
 export class LoginUseCase {
@@ -39,6 +43,8 @@ export class LoginUseCase {
     private readonly jwtAuth: IJwtAuthentication,
     @Inject(RT_REPOSITORY_TOKEN)
     private readonly refreshTokenRepository: IRefreshTokenRepository,
+    @Inject(FAILED_LOGIN_TRACKER_TOKEN)
+    private readonly failedLoginTracker: IFailedLoginTracker,
     @Inject(LOGGER_TOKEN)
     private readonly logger: ILogger,
   ) {}
@@ -54,12 +60,35 @@ export class LoginUseCase {
         ),
       );
     }
+
+    if(user.getStatus().isBanned()){
+      return fail(new AppError(''))
+    }
+
     const isMatch = await this.passwordHasher.compare(
       dto.password,
-      user.password,
+      user.getPassword(),
     );
 
     if (!isMatch) {
+      const attempts = await this.failedLoginTracker.incrementAndGet(
+        user.getId(),
+      );
+      const newStatus = user.getStatus().recordFailedLogin(attempts);
+
+      if (!user.getStatus().equals(newStatus)) {
+        user.updateStatus(newStatus);
+
+        await this.userRepository.updateStatusById(user.getId(), newStatus);
+
+        return fail(
+          new AppError(
+            ApplicationErrorCode.TOO_MANY_ATTEMPTS,
+            'More than 5 unsuccessful login attempts',
+          ),
+        );
+      }
+
       return fail(
         new AppError(
           ApplicationErrorCode.PASSWORD_DO_NOT_MATCH,
@@ -70,13 +99,13 @@ export class LoginUseCase {
 
     // generate tokens
     const { accessToken, refreshToken } = await this.jwtAuth.generateTokenPair({
-      sub: user.id,
-      email: user.email,
+      sub: user.getId().toString(),
+      email: user.getEmail(),
     });
 
     // save refresh token
     const newRefreshToken = RefreshToken.create({
-      userId: unwrapResult(UserId.create(user.id)),
+      userId: unwrapResult(UserId.create(user.getId().toString())),
       token: refreshToken,
       tokensUsed: [],
     });

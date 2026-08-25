@@ -4,11 +4,11 @@ import { UserResponseDto } from '../dto/responses/userResponse.dto';
 export class UserMapper {
   static toResponseDto(user: User): UserResponseDto {
     return {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      status: user.status,
-      role: user.role,
+      id: user.getId.toString(),
+      email: user.getEmail(),
+      username: user.getUsername(),
+      status: user.getStatus().currentStatus,
+      role: user.getRole(),
     };
   }
 }

@@ -21,6 +21,10 @@ export class UserId extends ValueObject<string> {
     return ok(new UserId(id));
   }
 
+  public static generate(): UserId {
+    return new UserId(crypto.randomUUID());
+  }
+
   toString(): string {
     return this.id;
   }

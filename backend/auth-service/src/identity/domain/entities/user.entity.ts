@@ -1,24 +1,24 @@
-import { randomUUID } from 'crypto';
-
-export type STATUS = 'PENDING' | 'ACTIVE' | 'BANNED' | 'DEACTIVATED';
+import { AccountStatus, STATUS } from '../value-objects/accountStatus.vo';
+import { UserId } from '../value-objects/userId.vo';
+import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
 
 export type ROLE = 'USER' | 'ADMIN';
 
 export class User {
-  private readonly _id: string;
+  private readonly _id: UserId;
   private _username: string;
   private _email: string;
 
   private _password: string;
-  private _status: STATUS;
+  private _status: AccountStatus;
   private _role: ROLE;
 
   private constructor(
-    id: string,
+    id: UserId,
     username: string,
     email: string,
     password: string,
-    status: STATUS,
+    status: AccountStatus,
     role: ROLE = 'USER',
   ) {
     this._id = id;
@@ -33,13 +33,14 @@ export class User {
     username: string;
     email: string;
     password: string;
-    status?: STATUS;
+    status?: AccountStatus;
     role?: ROLE;
   }) {
-    const userStatus = props.status ?? 'ACTIVE';
+    const userStatus = props.status ?? AccountStatus.active();
+    const userId = UserId.generate();
 
     return new User(
-      randomUUID(),
+      userId,
       props.username,
       props.email,
       props.password,
@@ -56,37 +57,44 @@ export class User {
     status: STATUS;
     role: ROLE;
   }) {
+    const userStatus = new AccountStatus({ status: props.status });
+    const userId = unwrapResult(UserId.create(props.id));
+
     return new User(
-      props.id,
+      userId,
       props.username,
       props.email,
       props.password,
-      props.status,
+      userStatus,
       props.role,
     );
   }
 
-  public get id(): string {
+  getId() {
     return this._id;
   }
 
-  get username() {
+  getUsername() {
     return this._username;
   }
 
-  get email() {
+  getEmail() {
     return this._email;
   }
 
-  get status() {
+  getStatus() {
     return this._status;
   }
 
-  get password() {
+  updateStatus(status: AccountStatus) {
+    this._status = status;
+  }
+
+  getPassword() {
     return this._password;
   }
 
-  get role() {
+  getRole() {
     return this._role;
   }
 }
