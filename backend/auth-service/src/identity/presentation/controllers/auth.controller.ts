@@ -6,7 +6,7 @@ import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { UserMapper } from '../mappers/user.mapper';
 import { ApiCommonErrors } from '@shared/decorators/apiCommonErrors.decorator';
 import { ApplyApiErrorsResponse } from '@shared/decorators/applyApiErrorsResponse.decorator';
-import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
+import { unwrapResult } from '@packages/core/helpers/resultPattern';
 import { LocalAuthGuard } from '../guards/localAuth.guard';
 import { CurrentUser } from '@shared/decorators/currentUser.decorator';
 import { LoginOutput } from '@auth/application/useCases/login/login.contract';

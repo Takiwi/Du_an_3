@@ -27,6 +27,8 @@ services:
       - '6379:6379' # Bỏ hoặc đổi thành "6380:6379" nếu bị trùng port ở máy host
     volumes:
       - auth_redis_data:/data # Volume riêng cho Redis
+    networks:
+      - redis-net
     deploy:
       resources:
         limits:
@@ -37,6 +39,21 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: my-redis-ui
+    restart: always
+    environment:
+      - REDIS_HOSTS=LocalRedis:redis:6379
+    ports:
+      - '8081:8081'
+    networks:
+      - redis-net
+    depends_on:
+      - redis
 volumes:
   auth_postgres_data:
   auth_redis_data:
+networks:
+  redis-net:
+    driver: bridge

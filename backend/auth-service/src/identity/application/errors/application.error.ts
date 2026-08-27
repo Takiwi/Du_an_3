@@ -6,6 +6,7 @@ export const ApplicationErrorCode = {
   TOKEN_NOT_FOUND: 'TOKEN_NOT_FOUND',
   TOKEN_USED: 'TOKEN_USED',
   TOO_MANY_ATTEMPTS: 'TOO_MANY_ATTEMPTS',
+  USER_BANNED: 'USER_BANNED',
 } as const;
 
 export type AppErrorCodeType =

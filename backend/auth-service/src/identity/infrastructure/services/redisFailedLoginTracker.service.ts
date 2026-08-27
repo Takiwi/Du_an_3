@@ -23,9 +23,9 @@ export class RedisFailedLoginTracker implements IFailedLoginTracker {
     return results[0][1] as number;
   }
 
-  async reset(userId: UserId): Promise<void> {
-    const key = `failed_login:${userId.toString()}`;
+  // async reset(userId: UserId): Promise<void> {
+  //   const key = `failed_login:${userId.toString()}`;
 
-    await this.redis.del(key);
-  }
+  //   await this.redis.del(key);
+  // }
 }

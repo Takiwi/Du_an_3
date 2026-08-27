@@ -1,6 +1,6 @@
 import { AccountStatus, STATUS } from '../value-objects/accountStatus.vo';
 import { UserId } from '../value-objects/userId.vo';
-import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
+import { unwrapResult } from '@packages/core/helpers/resultPattern';
 
 export type ROLE = 'USER' | 'ADMIN';
 

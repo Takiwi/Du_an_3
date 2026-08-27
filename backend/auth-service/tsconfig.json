@@ -16,13 +16,11 @@
 
       // Path trỏ ra các package dùng chung bên ngoài
       "@packages/core/*": ["../../packages/core/src/*"],
-      "@packages/contracts/*": ["../../packages/contracts/src/*"],
       "@packages/logging/*": ["../../packages/logging/src/*"]
     }
   },
   "references": [
     { "path": "../../packages/core" },
-    { "path": "../../packages/contracts" },
     { "path": "../../packages/logging" }
   ],
   "include": ["src/**/*"],

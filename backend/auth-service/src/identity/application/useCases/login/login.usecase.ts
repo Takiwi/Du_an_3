@@ -13,7 +13,7 @@ import {
   ok,
   Result,
   unwrapResult,
-} from '@packages/contracts/helpers/resultPattern';
+} from '@packages/core/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';
 import { ApplicationErrorCode } from '../../errors/application.error';
 import {
@@ -50,6 +50,7 @@ export class LoginUseCase {
   ) {}
 
   async execute(dto: LoginInput): Promise<Result<LoginOutput, AppError>> {
+    // check email
     const user = await this.userRepository.findUserByEmail(dto.email);
 
     if (!user) {
@@ -61,21 +62,32 @@ export class LoginUseCase {
       );
     }
 
-    if(user.getStatus().isBanned()){
-      return fail(new AppError(''))
+    // check account status
+    if (user.getStatus().isBanned()) {
+      return fail(
+        new AppError(
+          ApplicationErrorCode.USER_BANNED,
+          'The account has been banned',
+        ),
+      );
     }
 
+    // check password
     const isMatch = await this.passwordHasher.compare(
       dto.password,
       user.getPassword(),
     );
 
     if (!isMatch) {
+      // increase failedLoginCounter and set key-value in redis
       const attempts = await this.failedLoginTracker.incrementAndGet(
         user.getId(),
       );
+
+      // check the number of failed login attempts
       const newStatus = user.getStatus().recordFailedLogin(attempts);
 
+      // check whether the account status is banned
       if (!user.getStatus().equals(newStatus)) {
         user.updateStatus(newStatus);
 

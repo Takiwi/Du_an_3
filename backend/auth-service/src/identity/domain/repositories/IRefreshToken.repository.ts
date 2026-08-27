@@ -1,14 +1,15 @@
 import { RefreshToken } from '../entities/refreshToken.entity';
+import { UserId } from '../value-objects/userId.vo';
 
 export const RT_REPOSITORY_TOKEN = 'IRefreshTokenRepository';
 
 export interface IRefreshTokenRepository {
   findByToken(token: string): Promise<RefreshToken | null>;
-  findById(id: string): Promise<RefreshToken | null>;
+  findById(id: UserId): Promise<RefreshToken | null>;
 
   deleteByToken(token: string): Promise<void>;
-  deleteById(id: string): Promise<void>;
-  deleteManyByUserId(userId: string): Promise<void>;
+  deleteById(id: UserId): Promise<void>;
+  deleteManyByUserId(userId: UserId): Promise<void>;
 
   insertRefreshToken(token: RefreshToken): Promise<void>;
 

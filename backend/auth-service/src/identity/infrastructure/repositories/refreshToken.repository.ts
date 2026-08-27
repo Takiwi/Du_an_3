@@ -3,7 +3,7 @@ import { PrismaService } from '@shared/infrastructure/database/prisma.service';
 import { IRefreshTokenRepository } from '@auth/domain/repositories/IRefreshToken.repository';
 import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
-import { unwrapResult } from '@packages/contracts/helpers/resultPattern';
+import { unwrapResult } from '@packages/core/helpers/resultPattern';
 import {
   DATA_HASHER_TOKEN,
   IDataHasher,
@@ -94,10 +94,10 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   async insertRefreshToken(refreshToken: RefreshToken): Promise<void> {
     await this.prismaService.refreshToken.create({
       data: {
-        id: refreshToken.id,
-        userId: refreshToken.userId.toString(),
-        token: this.cryptoService.hash(refreshToken.token),
-        tokensUsed: refreshToken.tokensUsed,
+        id: refreshToken.getId().toString(),
+        userId: refreshToken.getUserId().toString(),
+        token: this.cryptoService.hash(refreshToken.getToken()),
+        tokensUsed: refreshToken.getTokensUsed(),
       },
     });
   }

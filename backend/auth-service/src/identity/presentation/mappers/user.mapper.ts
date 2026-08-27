@@ -7,7 +7,7 @@ export class UserMapper {
       id: user.getId.toString(),
       email: user.getEmail(),
       username: user.getUsername(),
-      status: user.getStatus().currentStatus,
+      status: user.getStatus().currentStatus(),
       role: user.getRole(),
     };
   }

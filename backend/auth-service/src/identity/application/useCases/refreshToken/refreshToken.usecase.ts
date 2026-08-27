@@ -1,4 +1,4 @@
-import { fail, ok, Result } from '@packages/contracts/helpers/resultPattern';
+import { fail, ok, Result } from '@packages/core/helpers/resultPattern';
 import { AppError } from '@packages/core/errors/app.error';
 import { Inject, Injectable } from '@nestjs/common';
 import {
@@ -45,9 +45,11 @@ export class RefreshTokenUseCase {
 
     if (hasRefreshToken) {
       // get user
-      const user = await this.userRepository.findUserById(payload.sub);
+      const user = await this.userRepository.findUserById(
+        hasRefreshToken.getUserId(),
+      );
 
-      if (!user || hasRefreshToken.userId.toString() !== payload.sub)
+      if (!user || hasRefreshToken.getUserId().toString() !== payload.sub)
         return fail(
           new AppError('USER_NOT_FOUND', `User ${payload.sub} not found`),
         );
@@ -55,8 +57,8 @@ export class RefreshTokenUseCase {
       // generate new token pair
       const { accessToken, refreshToken } =
         await this.jwtService.generateTokenPair({
-          sub: user.id,
-          email: user.email,
+          sub: user.getId().toString(),
+          email: user.getEmail(),
         });
 
       // hash new refresh token
