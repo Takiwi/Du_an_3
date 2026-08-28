@@ -8,12 +8,14 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClsService } from '@packages/request-context';
-import { mapCodeToGenericError } from './mapError';
 import { AppError } from '@packages/pattern';
 import { ValidationFieldException } from '../errors/validationField.error';
-import { ApiErrorResponseDto } from '@shared/presentation/dto/errorResponse.dto';
-import { ValidationErrorResponseDto } from '@shared/presentation/dto/validationErrorResponse.dto';
+import {
+  ApiErrorResponseDto,
+  ValidationErrorResponseDto,
+} from '@packages/api-docs';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
+import { ERROR_DEFINITIONS } from '../configs/error.config';
 
 @Injectable()
 @Catch()
@@ -29,7 +31,9 @@ export class AuthExceptionFilter implements ExceptionFilter {
     const timestamp = new Date().toISOString();
 
     if (exception instanceof AppError) {
-      const { status, message } = mapCodeToGenericError(exception.code);
+      const code = exception.code as keyof typeof ERROR_DEFINITIONS;
+      const status = ERROR_DEFINITIONS[code].status;
+      const message = ERROR_DEFINITIONS[code].message;
 
       const result = new ApiErrorResponseDto(exception.code, message, {
         requestId: requestId,

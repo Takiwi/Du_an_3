@@ -7,7 +7,7 @@ export interface IRefreshTokenRepository {
   findByToken(token: string): Promise<RefreshToken | null>;
   findById(userId: UserId): Promise<RefreshToken | null>;
 
-  deleteByToken(token: string): Promise<void>;
+  deleteByToken(token: string): Promise<RefreshToken>;
   deleteById(userId: UserId): Promise<void>;
   deleteManyByUserId(userId: UserId): Promise<void>;
 

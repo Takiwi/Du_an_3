@@ -17,13 +17,15 @@
       // Path trỏ ra các package dùng chung bên ngoài
       "@packages/pattern/*": ["../../packages/pattern/src/*"],
       "@packages/request-context/*": ["../../packages/request-context/src/*"],
-      "@packages/logging/*": ["../../packages/logging/src/*"]
+      "@packages/logging/*": ["../../packages/logging/src/*"],
+      "@packages/api-docs/*": ["../../packages/api-docs/src/*"]
     }
   },
   "references": [
     { "path": "../../packages/pattern" },
     { "path": "../../packages/request-context" },
-    { "path": "../../packages/logging" }
+    { "path": "../../packages/logging" },
+    { "path": "../../packages/api-docs" }
   ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "test", "dist", "**/*.spec.ts"]

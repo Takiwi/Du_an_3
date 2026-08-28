@@ -1,11 +1,13 @@
 import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { RegisterUserUseCase } from '@auth/application/useCases/register/register.usecase';
 import { CreateUserDto } from '../dto/requests/createUser.dto';
-import { ApiSuccessResponse } from '@shared/decorators/apiSuccessResponse.decorator';
+import {
+  ApiSuccessResponse,
+  ApplyApiErrorsResponse,
+  ApiCommonErrors,
+} from '@packages/api-docs';
 import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { UserMapper } from '../mappers/user.mapper';
-import { ApiCommonErrors } from '@shared/decorators/apiCommonErrors.decorator';
-import { ApplyApiErrorsResponse } from '@shared/decorators/applyApiErrorsResponse.decorator';
 import { unwrapResult, AppError } from '@packages/pattern';
 import { LocalAuthGuard } from '../guards/localAuth.guard';
 import { CurrentUser } from '@shared/decorators/currentUser.decorator';
@@ -15,6 +17,7 @@ import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { LogoutUseCase } from '@auth/application/useCases/logout/logout.usecase';
 import { RequestWithCookies } from '../types/requestCookie.type';
 import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToken/refreshToken.usecase';
+import { ERROR_DEFINITIONS } from '../configs/error.config';
 
 @ApiCommonErrors()
 @Controller('auth/')
@@ -30,7 +33,10 @@ export class AuthController {
     model: UserResponseDto,
     message: 'User created successfully',
   })
-  @ApplyApiErrorsResponse(['EMAIL_ALREADY_EXISTS', 'VALIDATION_ERROR'])
+  @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
+    'EMAIL_ALREADY_EXISTS',
+    'VALIDATION_ERROR',
+  ])
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     const user = unwrapResult(
@@ -45,7 +51,7 @@ export class AuthController {
     model: UserResponseDto,
     message: 'Login successfully',
   })
-  @ApplyApiErrorsResponse([
+  @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
     'EMAIL_NOT_FOUND',
     'VALIDATION_ERROR',
     'PASSWORD_DO_NOT_MATCH',
@@ -78,7 +84,10 @@ export class AuthController {
     status: 204,
     message: 'Logout successfully',
   })
-  @ApplyApiErrorsResponse(['TOKEN_NOT_FOUND', 'USER_NOT_FOUND'])
+  @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
+    'TOKEN_NOT_FOUND',
+    'USER_NOT_FOUND',
+  ])
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(
@@ -100,7 +109,11 @@ export class AuthController {
     status: 204,
     message: 'Refresh token successfully exchanged',
   })
-  @ApplyApiErrorsResponse(['TOKEN_NOT_FOUND', 'USER_NOT_FOUND', 'TOKEN_USED'])
+  @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
+    'TOKEN_NOT_FOUND',
+    'USER_NOT_FOUND',
+    'TOKEN_USED',
+  ])
   @Post('refresh')
   async refresh(
     @Res({ passthrough: true }) res: Response,

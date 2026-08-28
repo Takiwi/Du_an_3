@@ -60,10 +60,12 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     return result ? RefreshToken.fromPrismaEntity(result) : null;
   }
 
-  async deleteByToken(token: string): Promise<void> {
-    await this.prismaService.refreshToken.delete({
+  async deleteByToken(token: string): Promise<RefreshToken> {
+    const result = await this.prismaService.refreshToken.delete({
       where: { token },
     });
+
+    return RefreshToken.fromPrismaEntity(result);
   }
 
   async findByToken(token: string): Promise<RefreshToken | null> {

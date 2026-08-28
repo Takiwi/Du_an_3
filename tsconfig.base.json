@@ -16,6 +16,7 @@
     "composite": true,
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
+    "noUncheckedIndexedAccess": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false

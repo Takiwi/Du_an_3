@@ -15,12 +15,13 @@ export class RedisFailedLoginTracker implements IFailedLoginTracker {
     pipeline.expire(key, 300); // 5 minutes
 
     const results = await pipeline.exec();
+    const firstResult = results?.[0];
 
-    if (!results || results[0][0]) {
-      throw results?.[0][0] || new Error('Pipeline execution failed');
+    if (!results || !firstResult || firstResult[0]) {
+      throw firstResult?.[0] || new Error('Pipeline execution failed');
     }
 
-    return results[0][1] as number;
+    return firstResult[1] as number;
   }
 
   // async reset(userId: UserId): Promise<void> {

@@ -1,10 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ValidationDetailDto } from '../../../identity/presentation/dto/responses/validationErrorDetail.dto';
-import { ApiErrorResponseDto } from './errorResponse.dto';
-import { MetaDto } from './meta.dto';
+import { ApiProperty } from "@nestjs/swagger";
+import { ValidationDetailDto } from "../dto/validationErrorDetail.dto";
+import { ApiErrorResponseDto } from "./errorResponse.dto";
+import { MetaDto } from "./meta.dto";
 
 export class ValidationErrorResponseDto extends ApiErrorResponseDto {
-  @ApiProperty({ example: 'VALIDATION_ERROR' })
+  @ApiProperty({ example: "VALIDATION_ERROR" })
   code: string;
 
   @ApiProperty({ type: () => [ValidationDetailDto] })

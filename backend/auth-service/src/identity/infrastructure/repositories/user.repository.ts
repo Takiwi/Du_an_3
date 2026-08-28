@@ -58,7 +58,7 @@ export class UserRepository implements IUserRepository {
   async insertUser(user: User): Promise<void> {
     await this.prismaService.user.create({
       data: {
-        id: user.getId.toString(),
+        id: user.getId().toString(),
         email: user.getEmail(),
         username: user.getUsername(),
         password: user.getPassword(),

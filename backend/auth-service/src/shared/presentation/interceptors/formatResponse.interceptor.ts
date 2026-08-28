@@ -8,8 +8,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ClsService } from '@packages/request-context';
 import { catchError, map, Observable, throwError } from 'rxjs';
-import { RESPONSE_MESSAGE_KEY } from '../../decorators/apiSuccessResponse.decorator';
-import { ApiSuccessResponseDto } from '../dto/successResponse.dto';
+import {
+  RESPONSE_MESSAGE_KEY,
+  ApiSuccessResponseDto,
+} from '@packages/api-docs';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 
 @Injectable()

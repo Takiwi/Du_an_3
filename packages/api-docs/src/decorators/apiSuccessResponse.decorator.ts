@@ -1,8 +1,8 @@
-import { applyDecorators, SetMetadata, Type } from '@nestjs/common';
-import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
-import { ApiSuccessResponseDto } from '../presentation/dto/successResponse.dto';
+import { applyDecorators, SetMetadata, Type } from "@nestjs/common";
+import { ApiExtraModels, ApiResponse, getSchemaPath } from "@nestjs/swagger";
+import { ApiSuccessResponseDto } from "../dto/successResponse.dto";
 
-export const RESPONSE_MESSAGE_KEY = 'response_message';
+export const RESPONSE_MESSAGE_KEY = "response_message";
 
 export const ApiSuccessResponse = <TModel extends Type<any>>({
   status = 200,
@@ -15,7 +15,7 @@ export const ApiSuccessResponse = <TModel extends Type<any>>({
 }) => {
   const dataSchema = model
     ? { $ref: getSchemaPath(model) }
-    : { type: 'object', nullable: true, example: null };
+    : { type: "object", nullable: true, example: null };
 
   return applyDecorators(
     SetMetadata(RESPONSE_MESSAGE_KEY, message),
@@ -28,7 +28,7 @@ export const ApiSuccessResponse = <TModel extends Type<any>>({
           {
             properties: {
               data: dataSchema,
-              message: { type: 'string', example: message },
+              message: { type: "string", example: message },
             },
           },
         ],
