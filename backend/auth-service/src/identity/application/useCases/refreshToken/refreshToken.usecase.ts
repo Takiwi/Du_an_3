@@ -1,5 +1,4 @@
-import { fail, ok, Result } from '@packages/core/helpers/resultPattern';
-import { AppError } from '@packages/core/errors/app.error';
+import { fail, ok, Result, AppError } from '@packages/pattern';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   IRefreshTokenRepository,
@@ -81,7 +80,7 @@ export class RefreshTokenUseCase {
 
     if (isMatch) {
       // delete all session
-      await this.refreshTokenRepository.deleteManyByUserId(payload.sub);
+      await this.refreshTokenRepository.deleteManyByUserId(isMatch.getUserId());
 
       return fail(
         new AppError(

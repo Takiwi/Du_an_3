@@ -1,8 +1,8 @@
 import { DynamicModule, Module } from "@nestjs/common";
 import { randomUUID } from "crypto";
 import { LoggerModule as NestjsPinoModule } from "nestjs-pino";
-import { LOGGER_TOKEN } from "@packages/core/logging/ILogger.post";
-import { PinoLoggerService } from "./pino-logger.service.js";
+import { LOGGER_TOKEN } from "../ports/ILogger.port";
+import { PinoLoggerService } from "./pino-logger.service";
 import { ConfigService } from "@nestjs/config";
 
 @Module({})

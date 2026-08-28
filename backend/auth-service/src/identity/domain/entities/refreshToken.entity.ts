@@ -1,14 +1,15 @@
-import { unwrapResult } from '@packages/core/helpers/resultPattern';
+import { randomUUID } from 'crypto';
+import { RefreshTokenId } from '../value-objects/refreshTokenId.vo';
 import { UserId } from '../value-objects/userId.vo';
 
 export class RefreshToken {
-  private readonly _id: UserId;
+  private readonly _id: RefreshTokenId;
   private _userId: UserId;
   private _token: string;
   private _tokensUsed: string[];
 
   private constructor(
-    id: UserId,
+    id: RefreshTokenId,
     userId: UserId,
     token: string,
     tokensUsed: string[] = [],
@@ -20,32 +21,29 @@ export class RefreshToken {
   }
 
   static create(props: {
-    userId: UserId;
+    userId: string;
     token: string;
     tokensUsed?: string[];
   }) {
-    const id = UserId.generate();
+    const id = RefreshTokenId.create(randomUUID());
+    const userId = UserId.create(props.userId.toString());
 
-    return new RefreshToken(id, props.userId, props.token, props.tokensUsed);
+    return new RefreshToken(id, userId, props.token, props.tokensUsed);
   }
 
   static fromPrismaEntity(props: {
     id: string;
-    userId: UserId;
+    userId: string;
     token: string;
     tokensUsed: string[];
   }) {
-    const userId = unwrapResult(UserId.create(props.id));
+    const id = RefreshTokenId.create(props.id);
+    const userId = UserId.create(props.userId);
 
-    return new RefreshToken(
-      userId,
-      props.userId,
-      props.token,
-      props.tokensUsed,
-    );
+    return new RefreshToken(id, userId, props.token, props.tokensUsed);
   }
 
-  public getId(): UserId {
+  public getId(): RefreshTokenId {
     return this._id;
   }
 

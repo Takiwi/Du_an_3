@@ -5,10 +5,10 @@ export const RT_REPOSITORY_TOKEN = 'IRefreshTokenRepository';
 
 export interface IRefreshTokenRepository {
   findByToken(token: string): Promise<RefreshToken | null>;
-  findById(id: UserId): Promise<RefreshToken | null>;
+  findById(userId: UserId): Promise<RefreshToken | null>;
 
   deleteByToken(token: string): Promise<void>;
-  deleteById(id: UserId): Promise<void>;
+  deleteById(userId: UserId): Promise<void>;
   deleteManyByUserId(userId: UserId): Promise<void>;
 
   insertRefreshToken(token: RefreshToken): Promise<void>;
@@ -18,5 +18,8 @@ export interface IRefreshTokenRepository {
     oldToken: string,
   ): Promise<void>;
 
-  isTokenInTokensUsed(userId: string, token: string): Promise<boolean>;
+  isTokenInTokensUsed(
+    userId: string,
+    token: string,
+  ): Promise<RefreshToken | null>;
 }

@@ -1,13 +1,13 @@
 import { EntityId, unwrapResult } from '@packages/pattern';
 
-export class UserId extends EntityId {
+export class RefreshTokenId extends EntityId {
   protected constructor(id: string) {
     super(id);
   }
 
-  static create(id: string): UserId {
+  static create(id: string): RefreshTokenId {
     unwrapResult(EntityId.validateUUID(id));
 
-    return new UserId(id);
+    return new RefreshTokenId(id);
   }
 }

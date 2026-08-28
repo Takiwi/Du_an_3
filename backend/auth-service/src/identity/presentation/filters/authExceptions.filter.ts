@@ -7,13 +7,13 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ClsService } from '@packages/core/cls/cls.service';
+import { ClsService } from '@packages/request-context';
 import { mapCodeToGenericError } from './mapError';
-import { AppError } from '@packages/core/errors/app.error';
+import { AppError } from '@packages/pattern';
 import { ValidationFieldException } from '../errors/validationField.error';
 import { ApiErrorResponseDto } from '@shared/presentation/dto/errorResponse.dto';
 import { ValidationErrorResponseDto } from '@shared/presentation/dto/validationErrorResponse.dto';
-import { ILogger, LOGGER_TOKEN } from '@packages/core/logging/ILogger.post';
+import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 
 @Injectable()
 @Catch()

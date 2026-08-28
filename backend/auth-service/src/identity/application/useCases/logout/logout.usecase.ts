@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ok, Result } from '@packages/core/helpers/resultPattern';
-import { AppError } from '@packages/core/errors/app.error';
+import { ok, Result, AppError } from '@packages/pattern';
 import {
   IRefreshTokenRepository,
   RT_REPOSITORY_TOKEN,

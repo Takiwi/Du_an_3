@@ -6,7 +6,7 @@ import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { UserMapper } from '../mappers/user.mapper';
 import { ApiCommonErrors } from '@shared/decorators/apiCommonErrors.decorator';
 import { ApplyApiErrorsResponse } from '@shared/decorators/applyApiErrorsResponse.decorator';
-import { unwrapResult } from '@packages/core/helpers/resultPattern';
+import { unwrapResult, AppError } from '@packages/pattern';
 import { LocalAuthGuard } from '../guards/localAuth.guard';
 import { CurrentUser } from '@shared/decorators/currentUser.decorator';
 import { LoginOutput } from '@auth/application/useCases/login/login.contract';
@@ -14,7 +14,6 @@ import { Response } from 'express';
 import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { LogoutUseCase } from '@auth/application/useCases/logout/logout.usecase';
 import { RequestWithCookies } from '../types/requestCookie.type';
-import { AppError } from '@packages/core/errors/app.error';
 import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToken/refreshToken.usecase';
 
 @ApiCommonErrors()

@@ -10,8 +10,7 @@ import {
   PASSWORD_HASHER_TOKEN,
 } from '../../ports/IPasswordHasher.port';
 import { User } from '@auth/domain/entities/user.entity';
-import { Result, ok, fail } from '@packages/core/helpers/resultPattern';
-import { AppError } from '@packages/core/errors/app.error';
+import { Result, ok, fail, AppError } from '@packages/pattern';
 
 @Injectable()
 export class RegisterUserUseCase {

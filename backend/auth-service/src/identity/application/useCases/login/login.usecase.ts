@@ -8,13 +8,7 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '@auth/domain/repositories/IUser.repository';
-import {
-  fail,
-  ok,
-  Result,
-  unwrapResult,
-} from '@packages/core/helpers/resultPattern';
-import { AppError } from '@packages/core/errors/app.error';
+import { fail, ok, Result, AppError } from '@packages/pattern';
 import { ApplicationErrorCode } from '../../errors/application.error';
 import {
   IJwtAuthentication,
@@ -25,8 +19,7 @@ import {
   RT_REPOSITORY_TOKEN,
 } from '@auth/domain/repositories/IRefreshToken.repository';
 import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
-import { UserId } from '@auth/domain/value-objects/userId.vo';
-import { ILogger, LOGGER_TOKEN } from '@packages/core/logging/ILogger.post';
+import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 import {
   FAILED_LOGIN_TRACKER_TOKEN,
   IFailedLoginTracker,
@@ -117,7 +110,7 @@ export class LoginUseCase {
 
     // save refresh token
     const newRefreshToken = RefreshToken.create({
-      userId: unwrapResult(UserId.create(user.getId().toString())),
+      userId: user.getId().toString(),
       token: refreshToken,
       tokensUsed: [],
     });

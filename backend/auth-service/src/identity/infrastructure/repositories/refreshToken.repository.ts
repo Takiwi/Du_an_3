@@ -3,7 +3,6 @@ import { PrismaService } from '@shared/infrastructure/database/prisma.service';
 import { IRefreshTokenRepository } from '@auth/domain/repositories/IRefreshToken.repository';
 import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
-import { unwrapResult } from '@packages/core/helpers/resultPattern';
 import {
   DATA_HASHER_TOKEN,
   IDataHasher,
@@ -17,12 +16,15 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     private readonly cryptoService: IDataHasher,
   ) {}
 
-  async isTokenInTokensUsed(userId: string, token: string): Promise<boolean> {
+  async isTokenInTokensUsed(
+    userId: string,
+    token: string,
+  ): Promise<RefreshToken | null> {
     const result = await this.prismaService.refreshToken.findFirst({
       where: { userId, tokensUsed: { has: token } },
     });
 
-    return result ? true : false;
+    return result ? RefreshToken.fromPrismaEntity(result) : null;
   }
 
   async updateTokenAndTokensUsedByToken(
@@ -41,26 +43,21 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       },
     });
   }
-  async deleteById(id: string): Promise<void> {
+  async deleteById(userId: UserId): Promise<void> {
     await this.prismaService.refreshToken.delete({
       where: {
-        id,
+        id: userId.toString(),
       },
     });
   }
-  async findById(id: string): Promise<RefreshToken | null> {
+  async findById(userId: UserId): Promise<RefreshToken | null> {
     const result = await this.prismaService.refreshToken.findUnique({
       where: {
-        id,
+        id: userId.toString(),
       },
     });
 
-    return result
-      ? RefreshToken.fromPrismaEntity({
-          ...result,
-          userId: unwrapResult(UserId.create(result.userId)),
-        })
-      : null;
+    return result ? RefreshToken.fromPrismaEntity(result) : null;
   }
 
   async deleteByToken(token: string): Promise<void> {
@@ -76,17 +73,12 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       },
     });
 
-    return result
-      ? RefreshToken.fromPrismaEntity({
-          ...result,
-          userId: unwrapResult(UserId.create(result.userId)),
-        })
-      : null;
+    return result ? RefreshToken.fromPrismaEntity(result) : null;
   }
-  async deleteManyByUserId(userId: string): Promise<void> {
+  async deleteManyByUserId(userId: UserId): Promise<void> {
     await this.prismaService.refreshToken.findMany({
       where: {
-        userId,
+        userId: userId.toString(),
       },
     });
   }

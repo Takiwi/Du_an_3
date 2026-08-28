@@ -1,4 +1,4 @@
-import { ValueObject } from '@packages/core/pattern/valueObject.pattern';
+import { ValueObject } from '@packages/pattern';
 
 export type STATUS = 'PENDING' | 'ACTIVE' | 'BANNED' | 'DEACTIVATED';
 

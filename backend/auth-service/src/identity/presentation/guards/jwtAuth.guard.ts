@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AppError } from '@packages/core/errors/app.error';
+import { AppError } from '@packages/pattern';
 import { JwtPayload } from '@auth/application/ports/IJwtAuthentication.port';
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {

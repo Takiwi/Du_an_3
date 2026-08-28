@@ -7,7 +7,7 @@ import { ApplyApiErrorsResponse } from '@shared/decorators/applyApiErrorsRespons
 import { CurrentUser } from '@shared/decorators/currentUser.decorator';
 import { JwtPayload } from '@auth/application/ports/IJwtAuthentication.port';
 import { MeUseCase } from '@auth/application/useCases/me/me.usecase';
-import { unwrapResult } from '@packages/core/helpers/resultPattern';
+import { unwrapResult } from '@packages/pattern';
 import { UserMapper } from '../mappers/user.mapper';
 
 @ApiCommonErrors()

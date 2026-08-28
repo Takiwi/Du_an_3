@@ -1,6 +1,6 @@
+import { randomUUID } from 'node:crypto';
 import { AccountStatus, STATUS } from '../value-objects/accountStatus.vo';
 import { UserId } from '../value-objects/userId.vo';
-import { unwrapResult } from '@packages/core/helpers/resultPattern';
 
 export type ROLE = 'USER' | 'ADMIN';
 
@@ -37,7 +37,7 @@ export class User {
     role?: ROLE;
   }) {
     const userStatus = props.status ?? AccountStatus.active();
-    const userId = UserId.generate();
+    const userId = UserId.create(randomUUID());
 
     return new User(
       userId,
@@ -58,7 +58,7 @@ export class User {
     role: ROLE;
   }) {
     const userStatus = new AccountStatus({ status: props.status });
-    const userId = unwrapResult(UserId.create(props.id));
+    const userId = UserId.create(props.id);
 
     return new User(
       userId,

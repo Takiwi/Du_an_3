@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ILogger, LOGGER_TOKEN } from '@packages/core/logging/ILogger.post';
+import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 import Redis from 'ioredis';
 
 @Injectable()

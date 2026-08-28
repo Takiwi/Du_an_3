@@ -6,11 +6,11 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ClsService } from '@packages/core/cls/cls.service';
+import { ClsService } from '@packages/request-context';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { RESPONSE_MESSAGE_KEY } from '../../decorators/apiSuccessResponse.decorator';
 import { ApiSuccessResponseDto } from '../dto/successResponse.dto';
-import { ILogger, LOGGER_TOKEN } from '@packages/core/logging/ILogger.post';
+import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 
 @Injectable()
 export class FormatResponse<T> implements NestInterceptor {

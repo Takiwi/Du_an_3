@@ -1,11 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { IdentityModule } from './identity/identity.module';
-import { ClsModule } from '@packages/core/cls/cls.module';
-import { RequestIdMiddleware } from '@packages/core/middlewares/requestId.middleware';
+import { ClsModule, RequestIdMiddleware } from '@packages/request-context';
 import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AuthExceptionFilter } from './identity/presentation/filters/authExceptions.filter';
-import { AppLoggerModule } from '@packages/logging/pino-logger.module';
+import { AppLoggerModule } from '@packages/logging';
 @Module({
   imports: [
     ClsModule,
