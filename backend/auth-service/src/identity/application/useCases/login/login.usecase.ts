@@ -113,6 +113,7 @@ export class LoginUseCase {
       userId: user.getId().toString(),
       token: refreshToken,
       tokensUsed: [],
+      expiresAt: this.jwtAuth.getTokenExpiresIn('refresh'),
     });
 
     await this.refreshTokenRepository.insertRefreshToken(newRefreshToken);

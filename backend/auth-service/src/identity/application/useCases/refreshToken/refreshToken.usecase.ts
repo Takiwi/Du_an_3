@@ -7,7 +7,6 @@ import {
 import {
   IJwtAuthentication,
   JWT_AUTHENTICATION_TOKEN,
-  TokenPair,
 } from '../../ports/IJwtAuthentication.port';
 import {
   IUserRepository,
@@ -17,6 +16,8 @@ import {
   DATA_HASHER_TOKEN,
   IDataHasher,
 } from '@auth/application/ports/IDataHasher.port';
+import { UserId } from '@auth/domain/value-objects/userId.vo';
+import { RotateTokenOutput } from './refreshToken.contract';
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -31,7 +32,7 @@ export class RefreshTokenUseCase {
     private readonly cryptService: IDataHasher,
   ) {}
 
-  async execute(token: string): Promise<Result<TokenPair, AppError>> {
+  async execute(token: string): Promise<Result<RotateTokenOutput, AppError>> {
     // is expired
     const payload = await this.jwtService.verifyToken(token);
 
@@ -42,56 +43,50 @@ export class RefreshTokenUseCase {
     const hasRefreshToken =
       await this.refreshTokenRepository.findByToken(hashedToken);
 
-    if (hasRefreshToken) {
-      // get user
-      const user = await this.userRepository.findUserById(
+    if (!hasRefreshToken)
+      return fail(new AppError('INVALID_TOKEN', 'Not found token'));
+
+    // get user
+    const userId = UserId.create(payload.sub);
+    const user = await this.userRepository.findUserById(userId);
+
+    if (!user || hasRefreshToken.getUserId().toString() !== payload.sub)
+      return fail(
+        new AppError('USER_NOT_FOUND', `User ${payload.sub} not found`),
+      );
+
+    // generate new token pair
+    const { accessToken, refreshToken } =
+      await this.jwtService.generateTokenPair({
+        sub: user.getId().toString(),
+        email: user.getEmail(),
+      });
+
+    // hash new refresh token
+    const hashedNewRefreshToken = this.cryptService.hash(refreshToken);
+
+    // is token used?
+    const result = hasRefreshToken.route(hashedToken, refreshToken);
+
+    if (!result.success) {
+      // revoke all session
+      await this.refreshTokenRepository.revokeAllForUser(
         hasRefreshToken.getUserId(),
       );
 
-      if (!user || hasRefreshToken.getUserId().toString() !== payload.sub)
-        return fail(
-          new AppError('USER_NOT_FOUND', `User ${payload.sub} not found`),
-        );
-
-      // generate new token pair
-      const { accessToken, refreshToken } =
-        await this.jwtService.generateTokenPair({
-          sub: user.getId().toString(),
-          email: user.getEmail(),
-        });
-
-      // hash new refresh token
-      const hashedNewRefreshToken = this.cryptService.hash(refreshToken);
-
-      // update old refresh token
-      await this.refreshTokenRepository.updateTokenAndTokensUsedByToken(
-        hashedNewRefreshToken,
-        hashedToken,
-      );
-
-      return ok({ accessToken, refreshToken });
+      return fail(result.error);
     }
 
-    // is token used?
-    const isMatch = await this.refreshTokenRepository.isTokenInTokensUsed(
-      payload.sub,
+    // update old refresh token
+    await this.refreshTokenRepository.updateTokenAndTokensUsedByToken(
       hashedToken,
+      hashedNewRefreshToken,
     );
 
-    if (isMatch) {
-      // delete all session
-      await this.refreshTokenRepository.deleteManyByUserId(isMatch.getUserId());
-
-      return fail(
-        new AppError(
-          'TOKEN_USED',
-          `Token(${hashedToken}) for userId(${payload.sub}) has already been used`,
-        ),
-      );
-    }
-
-    return fail(
-      new AppError('TOKEN_NOT_FOUND', `Token(${hashedToken}) is not found`),
-    );
+    return ok({
+      accessToken,
+      refreshToken,
+      refreshTokenExpiresAt: hasRefreshToken.getExpiresAt(),
+    });
   }
 }

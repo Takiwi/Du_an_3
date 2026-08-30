@@ -9,17 +9,12 @@ export interface IRefreshTokenRepository {
 
   deleteByToken(token: string): Promise<RefreshToken>;
   deleteById(userId: UserId): Promise<void>;
-  deleteManyByUserId(userId: UserId): Promise<void>;
+  revokeAllForUser(userId: UserId): Promise<void>;
 
   insertRefreshToken(token: RefreshToken): Promise<void>;
 
   updateTokenAndTokensUsedByToken(
-    newToken: string,
     oldToken: string,
+    newToken: string,
   ): Promise<void>;
-
-  isTokenInTokensUsed(
-    userId: string,
-    token: string,
-  ): Promise<RefreshToken | null>;
 }

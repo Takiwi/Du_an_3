@@ -16,20 +16,9 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     private readonly cryptoService: IDataHasher,
   ) {}
 
-  async isTokenInTokensUsed(
-    userId: string,
-    token: string,
-  ): Promise<RefreshToken | null> {
-    const result = await this.prismaService.refreshToken.findFirst({
-      where: { userId, tokensUsed: { has: token } },
-    });
-
-    return result ? RefreshToken.fromPrismaEntity(result) : null;
-  }
-
   async updateTokenAndTokensUsedByToken(
-    newToken: string,
     oldToken: string,
+    newToken: string,
   ): Promise<void> {
     await this.prismaService.refreshToken.update({
       where: {
@@ -43,6 +32,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       },
     });
   }
+
   async deleteById(userId: UserId): Promise<void> {
     await this.prismaService.refreshToken.delete({
       where: {
@@ -50,6 +40,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       },
     });
   }
+
   async findById(userId: UserId): Promise<RefreshToken | null> {
     const result = await this.prismaService.refreshToken.findUnique({
       where: {
@@ -77,8 +68,9 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
 
     return result ? RefreshToken.fromPrismaEntity(result) : null;
   }
-  async deleteManyByUserId(userId: UserId): Promise<void> {
-    await this.prismaService.refreshToken.findMany({
+
+  async revokeAllForUser(userId: UserId): Promise<void> {
+    await this.prismaService.refreshToken.deleteMany({
       where: {
         userId: userId.toString(),
       },
@@ -91,7 +83,8 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
         id: refreshToken.getId().toString(),
         userId: refreshToken.getUserId().toString(),
         token: this.cryptoService.hash(refreshToken.getToken()),
-        tokensUsed: refreshToken.getTokensUsed(),
+        tokensUsed: refreshToken.getTokensUsed().toArray(),
+        expiresAt: refreshToken.getExpiresAt(),
       },
     });
   }

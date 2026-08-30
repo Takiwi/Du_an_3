@@ -12,6 +12,7 @@
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "strict": true,
     "declarationMap": true,
     "composite": true,
     "forceConsistentCasingInFileNames": true,

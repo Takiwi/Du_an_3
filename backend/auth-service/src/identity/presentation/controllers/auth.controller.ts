@@ -30,8 +30,10 @@ import { RefreshTokenUseCase } from '@auth/application/useCases/refreshToken/ref
 import { ERROR_DEFINITIONS } from '../configs/error.config';
 import { ConfigService } from '@nestjs/config';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
+import { Public } from '@shared/decorators/public.decorator';
 
 @ApiCommonErrors()
+@UseGuards(JwtAuthGuard)
 @Controller('auth/')
 export class AuthController {
   constructor(
@@ -52,6 +54,7 @@ export class AuthController {
     'EMAIL_ALREADY_EXISTS',
     'VALIDATION_ERROR',
   ])
+  @Public()
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     const user = unwrapResult(
@@ -71,6 +74,7 @@ export class AuthController {
     'VALIDATION_ERROR',
     'PASSWORD_DO_NOT_MATCH',
   ])
+  @Public()
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -104,7 +108,6 @@ export class AuthController {
     'TOKEN_NOT_FOUND',
     'USER_NOT_FOUND',
   ])
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
   async logout(
@@ -132,6 +135,7 @@ export class AuthController {
     'USER_NOT_FOUND',
     'TOKEN_USED',
   ])
+  @Public()
   @Post('refresh')
   async refresh(
     @Res({ passthrough: true }) res: Response,
@@ -142,22 +146,27 @@ export class AuthController {
     if (!refreshToken)
       throw new AppError('TOKEN_NOT_FOUND', 'Token is missing');
 
-    const result = unwrapResult(
-      await this.refreshTokenUseCase.execute(refreshToken),
-    );
+    const result = await this.refreshTokenUseCase.execute(refreshToken);
 
-    res.cookie('accessToken', result.accessToken, {
+    if (!result.success) {
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
+
+      throw result.error;
+    }
+
+    res.cookie('accessToken', result.value.accessToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
       maxAge: this.configService.getOrThrow<number>('cookie.accessExpiresIn'), // 5 phút
     });
 
-    res.cookie('refreshToken', result.refreshToken, {
+    res.cookie('refreshToken', result.value.refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: this.configService.getOrThrow<number>('cookie.refreshExpiresIn'), // 7 ngày
+      maxAge: result.value.refreshTokenExpiresAt.getTime() - Date.now(), // thời gian hết hạn chính xác từ lúc login
       path: 'auth/',
     });
   }

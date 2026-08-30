@@ -14,6 +14,14 @@ export class JwtAuthentication implements IJwtAuthentication {
     private readonly configService: ConfigService,
   ) {}
 
+  getTokenExpiresIn(type: 'access' | 'refresh'): number {
+    if (type === 'access') {
+      return this.configService.getOrThrow<number>('jwt.accessTokenExpiresIn');
+    }
+
+    return this.configService.getOrThrow<number>('jwt.refreshTokenExpiresIn');
+  }
+
   async verifyToken(token: string): Promise<JwtPayload> {
     return await this.jwtService.verifyAsync<JwtPayload>(token);
   }
@@ -22,17 +30,13 @@ export class JwtAuthentication implements IJwtAuthentication {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         algorithm: 'RS256',
-        expiresIn: this.configService.getOrThrow<number>(
-          'jwt.accessTokenExpiresIn',
-        ),
+        expiresIn: this.getTokenExpiresIn('access'),
       }),
       this.jwtService.signAsync(
         { sub: payload.sub },
         {
           algorithm: 'RS256',
-          expiresIn: this.configService.getOrThrow<number>(
-            'jwt.refreshTokenExpiresIn',
-          ),
+          expiresIn: this.getTokenExpiresIn('refresh'),
         },
       ),
     ]);
