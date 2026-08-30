@@ -10,8 +10,8 @@ export class RedisService extends Redis implements OnModuleDestroy {
     @Inject(LOGGER_TOKEN) private readonly logger: ILogger,
   ) {
     super({
-      host: config.get('REDIS_HOST'),
-      port: config.get('REDIS_PORT'),
+      host: config.getOrThrow<string>('redis.host'),
+      port: config.getOrThrow<number>('redis.port'),
       lazyConnect: true,
     });
   }

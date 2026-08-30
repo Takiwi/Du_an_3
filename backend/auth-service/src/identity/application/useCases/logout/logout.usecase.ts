@@ -8,7 +8,10 @@ import {
   DATA_HASHER_TOKEN,
   IDataHasher,
 } from '@auth/application/ports/IDataHasher.port';
-import { RedisService } from '@shared/infrastructure/database/redis.service';
+import {
+  BLACKLIST_TOKEN,
+  IBlacklist,
+} from '@auth/application/ports/IBlackList.port';
 
 @Injectable()
 export class LogoutUseCase {
@@ -17,19 +20,21 @@ export class LogoutUseCase {
     private readonly refreshTokenRepository: IRefreshTokenRepository,
     @Inject(DATA_HASHER_TOKEN)
     private readonly cryptoService: IDataHasher,
-    private readonly redis: RedisService,
+    @Inject(BLACKLIST_TOKEN)
+    private readonly blacklist: IBlacklist,
   ) {}
-  async execute(token: string): Promise<Result<void, AppError>> {
+  async execute(
+    accessToken: string,
+    refreshToken: string,
+  ): Promise<Result<void, AppError>> {
     // hash token
-    const hashedToken = this.cryptoService.hash(token);
+    const hashedToken = this.cryptoService.hash(refreshToken);
 
     // delete refresh token
     const result = await this.refreshTokenRepository.deleteByToken(hashedToken);
 
     // add access token to blacklist
-    const key = `blacklist-access-token:${result.getUserId().toString()}`;
-    await this.redis.set(key, token);
-
+    await this.blacklist.insertToken(result.getUserId(), accessToken);
     return ok();
   }
 }

@@ -24,6 +24,8 @@ import { DATA_HASHER_TOKEN } from './application/ports/IDataHasher.port';
 import { CryptoDataHasher } from './infrastructure/services/cryptoDataHasher.service';
 import { FAILED_LOGIN_TRACKER_TOKEN } from './domain/ports/failedLoginTracker.interface';
 import { RedisFailedLoginTracker } from './infrastructure/services/redisFailedLoginTracker.service';
+import { BLACKLIST_TOKEN } from './application/ports/IBlackList.port';
+import { BlacklistToken } from './infrastructure/repositories/blacklistToken.repository';
 
 @Module({
   imports: [
@@ -63,6 +65,10 @@ import { RedisFailedLoginTracker } from './infrastructure/services/redisFailedLo
     {
       provide: FAILED_LOGIN_TRACKER_TOKEN,
       useClass: RedisFailedLoginTracker,
+    },
+    {
+      provide: BLACKLIST_TOKEN,
+      useClass: BlacklistToken,
     },
     LocalStrategy,
     JwtStrategy,

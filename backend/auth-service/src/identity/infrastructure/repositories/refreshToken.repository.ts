@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from '@shared/infrastructure/database/prisma.service';
+import { PrismaService } from '@shared/database/prisma.service';
 import { IRefreshTokenRepository } from '@auth/domain/repositories/IRefreshToken.repository';
 import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
 import { UserId } from '@auth/domain/value-objects/userId.vo';

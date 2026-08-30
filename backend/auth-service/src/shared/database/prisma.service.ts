@@ -1,13 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { PrismaClient } from '../../../generated/prisma/client';
+import { PrismaClient } from '../../generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrismaService extends PrismaClient {
-  constructor(@Inject(LOGGER_TOKEN) private readonly logger: ILogger) {
+  constructor(
+    @Inject(LOGGER_TOKEN) private readonly logger: ILogger,
+    configService: ConfigService,
+  ) {
     const adapter = new PrismaPg({
-      connectionString: process.env.DATABASE_URL,
+      connectionString: configService.getOrThrow<string>(
+        'prismaDatabase.databaseUrl',
+      ),
     });
 
     super({ adapter });

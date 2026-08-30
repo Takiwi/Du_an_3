@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from './infrastructure/database/prisma.service';
-import { FormatResponse } from './presentation/interceptors/formatResponse.interceptor';
+import { PrismaService } from './database/prisma.service';
+import { FormatResponse } from './interceptors/formatResponse.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { RedisService } from './infrastructure/database/redis.service';
+import { RedisService } from './database/redis.service';
 
 @Module({
   providers: [

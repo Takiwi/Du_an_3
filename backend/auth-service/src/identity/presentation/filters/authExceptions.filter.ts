@@ -4,7 +4,7 @@ import {
   ExceptionFilter,
   Inject,
   Injectable,
-  InternalServerErrorException,
+  // InternalServerErrorException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClsService } from '@packages/request-context';
@@ -61,7 +61,14 @@ export class AuthExceptionFilter implements ExceptionFilter {
       return response.status(status).json(result);
     }
 
-    this.logger.error('Super Error', new InternalServerErrorException());
+    const request = host.switchToHttp().getRequest<Request>();
+    this.logger.error(`[${request.method}] ${request.url}`);
+
+    if (exception instanceof Error) {
+      this.logger.error(exception.message, exception, {
+        stack: exception.stack,
+      });
+    }
 
     return response
       .status(500)
