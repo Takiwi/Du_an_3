@@ -18,7 +18,7 @@ import {
 } from '@packages/api-docs';
 import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { UserMapper } from '../mappers/user.mapper';
-import { unwrapResult, AppError } from '@packages/pattern';
+import { AppError } from '@packages/pattern';
 import { LocalAuthGuard } from '../guards/localAuth.guard';
 import { CurrentUser } from '@shared/decorators/currentUser.decorator';
 import { LoginOutput } from '@auth/application/useCases/login/login.contract';
@@ -57,11 +57,11 @@ export class AuthController {
   @Public()
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
-    const user = unwrapResult(
-      await this.registerUseCase.execute(createUserDto),
-    );
+    const user = await this.registerUseCase.execute(createUserDto);
 
-    return UserMapper.toResponseDto(user);
+    if (user.isErr()) throw user.error;
+
+    return UserMapper.toResponseDto(user.value);
   }
 
   @ApiSuccessResponse({
@@ -120,7 +120,9 @@ export class AuthController {
     if (!refreshToken || !accessToken)
       throw new AppError('TOKEN_NOT_FOUND', 'Token is missing');
 
-    unwrapResult(await this.logoutUseCase.execute(accessToken, refreshToken));
+    const result = await this.logoutUseCase.execute(accessToken, refreshToken);
+
+    if (result.isErr()) throw result.error;
 
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
@@ -148,7 +150,7 @@ export class AuthController {
 
     const result = await this.refreshTokenUseCase.execute(refreshToken);
 
-    if (!result.success) {
+    if (result.isErr()) {
       res.clearCookie('accessToken');
       res.clearCookie('refreshToken');
 

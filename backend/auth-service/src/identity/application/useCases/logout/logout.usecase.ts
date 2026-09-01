@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ok, Result, AppError } from '@packages/pattern';
+import { ok, Result } from 'neverthrow';
+import { AppError } from '@packages/pattern';
 import {
   IRefreshTokenRepository,
   RT_REPOSITORY_TOKEN,

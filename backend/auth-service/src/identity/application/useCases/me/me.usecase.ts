@@ -3,9 +3,10 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '@auth/domain/repositories/IUser.repository';
-import { fail, ok, Result, AppError } from '@packages/pattern';
-import { User } from '@auth/domain/entities/user.entity';
+import { AppError } from '@packages/pattern';
+import { User } from '@auth/domain/entities/user/user.entity';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
+import { ok, err, Result } from 'neverthrow';
 
 @Injectable()
 export class MeUseCase {
@@ -17,11 +18,16 @@ export class MeUseCase {
   async execute(userId: string): Promise<Result<User, AppError>> {
     const id = UserId.create(userId);
 
-    const user = await this.userRepository.findUserById(id);
+    if (id.isErr()) return err(id.error);
+
+    const user = await this.userRepository.findUserById(id.value);
 
     if (!user) {
-      return fail(
-        new AppError('USER_NOT_FOUND', `User Id: ${id.toString()} not found`),
+      return err(
+        new AppError(
+          'USER_NOT_FOUND',
+          `User Id: ${id.value.toString()} not found`,
+        ),
       );
     }
 

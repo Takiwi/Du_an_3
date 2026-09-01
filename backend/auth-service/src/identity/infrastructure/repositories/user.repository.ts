@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@auth/domain/entities/user.entity';
+import { User } from '@auth/domain/entities/user/user.entity';
 import { IUserRepository } from '@auth/domain/repositories/IUser.repository';
 import { PrismaService } from '@shared/database/prisma.service';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
@@ -22,7 +22,7 @@ export class UserRepository implements IUserRepository {
       },
     });
 
-    return user ? User.fromPrismaEntity(user) : null;
+    return user ? User.reconstitute(user) : null;
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
@@ -32,7 +32,7 @@ export class UserRepository implements IUserRepository {
       },
     });
 
-    return user ? User.fromPrismaEntity(user) : null;
+    return user ? User.reconstitute(user) : null;
   }
 
   async findUserById(id: UserId): Promise<User | null> {
@@ -42,7 +42,7 @@ export class UserRepository implements IUserRepository {
       },
     });
 
-    return user ? User.fromPrismaEntity(user) : null;
+    return user ? User.reconstitute(user) : null;
   }
 
   async existsByEmail(email: string): Promise<boolean> {
@@ -61,7 +61,7 @@ export class UserRepository implements IUserRepository {
         id: user.getId().toString(),
         email: user.getEmail(),
         username: user.getUsername(),
-        password: user.getPassword(),
+        password: user.getPassword().toString(),
         status: user.getStatus().currentStatus(),
         role: user.getRole(),
       },

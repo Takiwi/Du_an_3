@@ -9,9 +9,9 @@ import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
 } from '../../ports/IPasswordHasher.port';
-import { User } from '@auth/domain/entities/user.entity';
-import { Result, ok, fail, AppError } from '@packages/pattern';
-
+import { User } from '@auth/domain/entities/user/user.entity';
+import { AppError } from '@packages/pattern';
+import { ok, err, Result } from 'neverthrow';
 @Injectable()
 export class RegisterUserUseCase {
   constructor(
@@ -26,7 +26,7 @@ export class RegisterUserUseCase {
     const isEmailTaken = await this.userRepository.existsByEmail(dto.email);
 
     if (isEmailTaken)
-      return fail(
+      return err(
         new AppError(
           ApplicationErrorCode.EMAIL_ALREADY_EXISTS,
           `Email ${dto.email} already exists`,
@@ -37,14 +37,18 @@ export class RegisterUserUseCase {
     const hashedPassword = await this.passwordHasher.hash(dto.password);
 
     // insert user
-    const user = User.create({
+    const user = User.baseEntity({
       email: dto.email,
       username: dto.username,
       password: hashedPassword,
     });
 
-    await this.userRepository.insertUser(user);
+    if (user.isErr()) {
+      return err(user.error);
+    }
 
-    return ok(user);
+    await this.userRepository.insertUser(user.value);
+
+    return ok(user.value);
   }
 }

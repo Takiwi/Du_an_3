@@ -8,7 +8,7 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '@auth/domain/repositories/IUser.repository';
-import { fail, ok, Result, AppError } from '@packages/pattern';
+import { AppError } from '@packages/pattern';
 import { ApplicationErrorCode } from '../../errors/application.error';
 import {
   IJwtAuthentication,
@@ -18,12 +18,13 @@ import {
   IRefreshTokenRepository,
   RT_REPOSITORY_TOKEN,
 } from '@auth/domain/repositories/IRefreshToken.repository';
-import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
+import { RefreshToken } from '@auth/domain/entities/refreshToken/refreshToken.entity';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 import {
   FAILED_LOGIN_TRACKER_TOKEN,
   IFailedLoginTracker,
 } from '@auth/domain/ports/failedLoginTracker.interface';
+import { ok, err, Result } from 'neverthrow';
 
 @Injectable()
 export class LoginUseCase {
@@ -47,7 +48,7 @@ export class LoginUseCase {
     const user = await this.userRepository.findUserByEmail(dto.email);
 
     if (!user) {
-      return fail(
+      return err(
         new AppError(
           ApplicationErrorCode.EMAIL_NOT_FOUND,
           `Not found ${dto.email}`,
@@ -57,7 +58,7 @@ export class LoginUseCase {
 
     // check account status
     if (user.getStatus().isBanned()) {
-      return fail(
+      return err(
         new AppError(
           ApplicationErrorCode.USER_BANNED,
           'The account has been banned',
@@ -68,7 +69,7 @@ export class LoginUseCase {
     // check password
     const isMatch = await this.passwordHasher.compare(
       dto.password,
-      user.getPassword(),
+      user.getPassword().toString(),
     );
 
     if (!isMatch) {
@@ -86,7 +87,7 @@ export class LoginUseCase {
 
         await this.userRepository.updateStatusById(user.getId(), newStatus);
 
-        return fail(
+        return err(
           new AppError(
             ApplicationErrorCode.TOO_MANY_ATTEMPTS,
             'More than 5 unsuccessful login attempts',
@@ -94,7 +95,7 @@ export class LoginUseCase {
         );
       }
 
-      return fail(
+      return err(
         new AppError(
           ApplicationErrorCode.PASSWORD_DO_NOT_MATCH,
           `Password do not match.`,
@@ -109,14 +110,17 @@ export class LoginUseCase {
     });
 
     // save refresh token
-    const newRefreshToken = RefreshToken.create({
+    const newRefreshToken = RefreshToken.baseEntity({
       userId: user.getId().toString(),
       token: refreshToken,
-      tokensUsed: [],
       expiresAt: this.jwtAuth.getTokenExpiresIn('refresh'),
     });
 
-    await this.refreshTokenRepository.insertRefreshToken(newRefreshToken);
+    if (newRefreshToken.isErr()) {
+      return err(newRefreshToken.error);
+    }
+
+    await this.refreshTokenRepository.insertRefreshToken(newRefreshToken.value);
 
     return ok({ user, accessToken, refreshToken });
   }

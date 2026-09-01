@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '@shared/database/prisma.service';
 import { IRefreshTokenRepository } from '@auth/domain/repositories/IRefreshToken.repository';
-import { RefreshToken } from '@auth/domain/entities/refreshToken.entity';
+import { RefreshToken } from '@auth/domain/entities/refreshToken/refreshToken.entity';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
 import {
   DATA_HASHER_TOKEN,
@@ -48,7 +48,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       },
     });
 
-    return result ? RefreshToken.fromPrismaEntity(result) : null;
+    return result ? RefreshToken.reconstitute(result) : null;
   }
 
   async deleteByToken(token: string): Promise<RefreshToken> {
@@ -56,7 +56,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       where: { token },
     });
 
-    return RefreshToken.fromPrismaEntity(result);
+    return RefreshToken.reconstitute(result);
   }
 
   async findByToken(token: string): Promise<RefreshToken | null> {
@@ -66,7 +66,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       },
     });
 
-    return result ? RefreshToken.fromPrismaEntity(result) : null;
+    return result ? RefreshToken.reconstitute(result) : null;
   }
 
   async revokeAllForUser(userId: UserId): Promise<void> {

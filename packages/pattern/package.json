@@ -18,6 +18,9 @@
     "dev": "tsc -b --watch",
     "clean": "tsc -b --clean"
   },
+  "peerDependencies": {
+    "neverthrow": "^8.2.0"
+  },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^24.13.3",

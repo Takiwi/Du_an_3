@@ -1,4 +1,4 @@
-import { fail, ok, Result, AppError } from '@packages/pattern';
+import { AppError } from '@packages/pattern';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   IRefreshTokenRepository,
@@ -18,6 +18,7 @@ import {
 } from '@auth/application/ports/IDataHasher.port';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
 import { RotateTokenOutput } from './refreshToken.contract';
+import { err, ok, Result } from 'neverthrow';
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -44,14 +45,17 @@ export class RefreshTokenUseCase {
       await this.refreshTokenRepository.findByToken(hashedToken);
 
     if (!hasRefreshToken)
-      return fail(new AppError('INVALID_TOKEN', 'Not found token'));
+      return err(new AppError('INVALID_TOKEN', 'Not found token'));
 
     // get user
     const userId = UserId.create(payload.sub);
-    const user = await this.userRepository.findUserById(userId);
+
+    if (userId.isErr()) return err(userId.error);
+
+    const user = await this.userRepository.findUserById(userId.value);
 
     if (!user || hasRefreshToken.getUserId().toString() !== payload.sub)
-      return fail(
+      return err(
         new AppError('USER_NOT_FOUND', `User ${payload.sub} not found`),
       );
 
@@ -66,15 +70,15 @@ export class RefreshTokenUseCase {
     const hashedNewRefreshToken = this.cryptService.hash(refreshToken);
 
     // is token used?
-    const result = hasRefreshToken.route(hashedToken, refreshToken);
+    const result = hasRefreshToken.route(hashedToken, hashedNewRefreshToken);
 
-    if (!result.success) {
+    if (result.isErr()) {
       // revoke all session
       await this.refreshTokenRepository.revokeAllForUser(
         hasRefreshToken.getUserId(),
       );
 
-      return fail(result.error);
+      return err(result.error);
     }
 
     // update old refresh token

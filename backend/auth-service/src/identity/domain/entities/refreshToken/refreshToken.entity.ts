@@ -1,8 +1,14 @@
 import { randomUUID } from 'crypto';
-import { RefreshTokenId } from '../value-objects/refreshTokenId.vo';
-import { UserId } from '../value-objects/userId.vo';
-import { UsedTokenHistory } from '../value-objects/usedTokenHistory.vo';
-import { AppError, fail, ok, Result } from '@packages/pattern';
+import { RefreshTokenId } from '../../value-objects/refreshTokenId.vo';
+import { UserId } from '../../value-objects/userId.vo';
+import { UsedTokenHistory } from '../../value-objects/usedTokenHistory.vo';
+import { AppError } from '@packages/pattern';
+import { ok, err, Result } from 'neverthrow';
+import {
+  BaseRefreshToken,
+  PureRefreshToken,
+  RefreshTokenWithTokenUsed,
+} from './refreshToken.contract';
 
 export class RefreshToken {
   private readonly _id: RefreshTokenId;
@@ -25,38 +31,37 @@ export class RefreshToken {
     this._expiresAt = expiresAt;
   }
 
-  static create(props: {
-    userId: string;
-    token: string;
-    tokensUsed?: string[];
-    expiresAt: number;
-  }) {
-    const id = RefreshTokenId.create(randomUUID());
-    const userId = UserId.create(props.userId.toString());
-    const usedTokenHistory = props.tokensUsed
-      ? UsedTokenHistory.fromArray(props.tokensUsed)
-      : UsedTokenHistory.empty();
+  private static create(
+    props: RefreshTokenWithTokenUsed,
+  ): Result<RefreshToken, AppError> {
+    const idResult = RefreshTokenId.create(randomUUID());
+    const userIdResult = UserId.create(props.userId.toString());
+
+    const combined = Result.combine([idResult, userIdResult]);
+
+    if (combined.isErr()) {
+      return err(combined.error);
+    }
+
+    const [id, userId] = combined.value;
+
     const now = new Date();
     const expiresAt = new Date(now.getTime() + props.expiresAt * 1000);
 
-    return new RefreshToken(
-      id,
-      userId,
-      props.token,
-      usedTokenHistory,
-      expiresAt,
+    return ok(
+      new RefreshToken(id, userId, props.token, props.tokensUsed, expiresAt),
     );
   }
 
-  static fromPrismaEntity(props: {
-    id: string;
-    userId: string;
-    token: string;
-    tokensUsed: string[];
-    expiresAt: Date;
-  }) {
-    const id = RefreshTokenId.create(props.id);
-    const userId = UserId.create(props.userId);
+  static baseEntity(props: BaseRefreshToken): Result<RefreshToken, AppError> {
+    const defaultHistory = UsedTokenHistory.empty();
+
+    return this.create({ ...props, tokensUsed: defaultHistory });
+  }
+
+  static reconstitute(props: PureRefreshToken) {
+    const id = RefreshTokenId.reconstitute(props.id);
+    const userId = UserId.reconstitute(props.userId);
     const usedTokenHistory = UsedTokenHistory.fromArray(props.tokensUsed);
 
     return new RefreshToken(
@@ -74,7 +79,7 @@ export class RefreshToken {
   ): Result<RefreshToken, AppError> {
     // check if the Refresh Token has already been used
     if (this._tokensUsed.contains(incomingToken)) {
-      return fail(
+      return err(
         new AppError(
           'TOKEN_USED_DETECTED',
           'Refresh Token has already been used',
@@ -84,7 +89,7 @@ export class RefreshToken {
 
     // compare current token with incomingToken
     if (this._token !== incomingToken) {
-      return fail(new AppError('INVALID_TOKEN', 'Invalid refresh token'));
+      return err(new AppError('INVALID_TOKEN', 'Invalid refresh token'));
     }
 
     // revoke current token and add new token

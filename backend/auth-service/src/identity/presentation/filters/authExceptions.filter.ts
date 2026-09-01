@@ -33,9 +33,9 @@ export class AuthExceptionFilter implements ExceptionFilter {
     if (exception instanceof AppError) {
       const code = exception.code as keyof typeof ERROR_DEFINITIONS;
       const status = ERROR_DEFINITIONS[code].status;
-      const message = ERROR_DEFINITIONS[code].message;
+      const finalMessage = ERROR_DEFINITIONS[code].message;
 
-      const result = new ApiErrorResponseDto(exception.code, message, {
+      const result = new ApiErrorResponseDto(exception.code, finalMessage, {
         requestId: requestId,
         timestamp: timestamp,
       });

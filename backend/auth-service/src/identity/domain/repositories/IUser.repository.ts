@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entity';
+import { User } from '../entities/user/user.entity';
 import { AccountStatus } from '../value-objects/accountStatus.vo';
 import { UserId } from '../value-objects/userId.vo';
 

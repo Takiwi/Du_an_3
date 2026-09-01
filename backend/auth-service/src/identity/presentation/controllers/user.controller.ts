@@ -9,7 +9,6 @@ import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { CurrentUser } from '@shared/decorators/currentUser.decorator';
 import { JwtPayload } from '@auth/application/ports/IJwtAuthentication.port';
 import { MeUseCase } from '@auth/application/useCases/me/me.usecase';
-import { unwrapResult } from '@packages/pattern';
 import { UserMapper } from '../mappers/user.mapper';
 import { ERROR_DEFINITIONS } from '../configs/error.config';
 
@@ -29,9 +28,11 @@ export class UserController {
   ])
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async userInfo(@CurrentUser<JwtPayload>() result: JwtPayload) {
-    return UserMapper.toResponseDto(
-      unwrapResult(await this.meUseCase.execute(result.sub)),
-    );
+  async userInfo(@CurrentUser<JwtPayload>() userReq: JwtPayload) {
+    const result = await this.meUseCase.execute(userReq.sub);
+
+    if (result.isErr()) throw result.error;
+
+    return UserMapper.toResponseDto(result.value);
   }
 }

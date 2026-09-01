@@ -1,4 +1,4 @@
-import { RefreshToken } from '../entities/refreshToken.entity';
+import { RefreshToken } from '../entities/refreshToken/refreshToken.entity';
 import { UserId } from '../value-objects/userId.vo';
 
 export const RT_REPOSITORY_TOKEN = 'IRefreshTokenRepository';
