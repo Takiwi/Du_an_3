@@ -9,6 +9,7 @@ allowBuilds:
   base64: true
   bcrypt: true
   compress-buffer: true
+  esbuild: true
   hiredis: true
   iconv: true
   pg: true
