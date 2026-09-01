@@ -19,9 +19,6 @@ import {
 import { UserResponseDto } from '../dto/responses/userResponse.dto';
 import { UserMapper } from '../mappers/user.mapper';
 import { AppError } from '@packages/pattern';
-import { LocalAuthGuard } from '../guards/localAuth.guard';
-import { CurrentUser } from '@shared/decorators/currentUser.decorator';
-import { LoginOutput } from '@auth/application/useCases/login/login.contract';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { LogoutUseCase } from '@auth/application/useCases/logout/logout.usecase';
@@ -31,6 +28,8 @@ import { ERROR_DEFINITIONS } from '../configs/error.config';
 import { ConfigService } from '@nestjs/config';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 import { Public } from '@shared/decorators/public.decorator';
+import { LoginDto } from '../dto/requests/login.dto';
+import { LoginUseCase } from '@auth/application/useCases/login/login.usecase';
 
 @ApiCommonErrors()
 @UseGuards(JwtAuthGuard)
@@ -39,6 +38,7 @@ export class AuthController {
   constructor(
     private readonly registerUseCase: RegisterUserUseCase,
     private readonly logoutUseCase: LogoutUseCase,
+    private readonly loginUseCase: LoginUseCase,
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
     private readonly configService: ConfigService,
     @Inject(LOGGER_TOKEN)
@@ -75,21 +75,24 @@ export class AuthController {
     'PASSWORD_DO_NOT_MATCH',
   ])
   @Public()
-  @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(
-    @CurrentUser<LoginOutput>() result: LoginOutput,
+  async login(
+    @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    res.cookie('accessToken', result.accessToken, {
+    const result = await this.loginUseCase.execute(loginDto);
+
+    if (result.isErr()) throw result.error;
+
+    res.cookie('accessToken', result.value.accessToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
       maxAge: this.configService.getOrThrow<number>('cookie.accessExpiresIn'), // 5 phút
     });
 
-    res.cookie('refreshToken', result.refreshToken, {
+    res.cookie('refreshToken', result.value.refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
@@ -97,7 +100,7 @@ export class AuthController {
       path: 'auth/',
     });
 
-    return UserMapper.toResponseDto(result.user);
+    return UserMapper.toResponseDto(result.value.user);
   }
 
   @ApiSuccessResponse({

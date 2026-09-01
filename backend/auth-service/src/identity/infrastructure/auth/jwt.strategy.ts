@@ -11,7 +11,7 @@ import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    configService: ConfigService,
+    private readonly configService: ConfigService,
     private readonly redis: RedisService,
     @Inject(LOGGER_TOKEN)
     private readonly logger: ILogger,
@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         return req.cookies?.accessToken ?? null;
       },
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_PUBLIC_KEY') || '',
+      secretOrKey: configService.getOrThrow<string>('jwt.publicKey'),
       passReqToCallback: true,
     });
   }

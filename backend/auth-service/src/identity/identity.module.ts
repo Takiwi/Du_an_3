@@ -7,7 +7,6 @@ import { RegisterUserUseCase } from '@auth/application/useCases/register/registe
 import { LoginUseCase } from '@auth/application/useCases/login/login.usecase';
 import { UserController } from './presentation/controllers/user.controller';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './infrastructure/auth/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtAuthentication } from './infrastructure/services/jwt.service';
@@ -70,7 +69,6 @@ import { BlacklistToken } from './infrastructure/repositories/blacklistToken.rep
       provide: BLACKLIST_TOKEN,
       useClass: BlacklistToken,
     },
-    LocalStrategy,
     JwtStrategy,
     MeUseCase,
     LoginUseCase,

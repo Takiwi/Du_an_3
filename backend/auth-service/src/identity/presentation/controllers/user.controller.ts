@@ -29,6 +29,9 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async userInfo(@CurrentUser<JwtPayload>() userReq: JwtPayload) {
+    console.log(`EMAIL::::::::::::${userReq.email}`);
+    console.log(`SUB::::::::::::${userReq.sub}`);
+
     const result = await this.meUseCase.execute(userReq.sub);
 
     if (result.isErr()) throw result.error;

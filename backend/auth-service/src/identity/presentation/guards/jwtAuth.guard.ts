@@ -27,10 +27,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (err || !user) {
       const errorMessage = info?.message || info || 'No token provided';
 
-      throw new AppError(
-        'VALIDATION_TOKEN_FALSE',
-        `Invalid or expired token, ${errorMessage}`,
-      );
+      throw new AppError('VALIDATION_TOKEN_FALSE', `${errorMessage}`);
     }
 
     return user;

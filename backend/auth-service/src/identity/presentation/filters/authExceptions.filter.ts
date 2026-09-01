@@ -40,7 +40,7 @@ export class AuthExceptionFilter implements ExceptionFilter {
         timestamp: timestamp,
       });
 
-      this.logger.error(exception.message, exception);
+      this.logger.error(exception.message);
 
       return response.status(status).json(result);
     }

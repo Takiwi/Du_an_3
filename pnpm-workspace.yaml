@@ -1,11 +1,11 @@
 # pnpm-workspace.yaml (chỉ ở root)
 packages:
-  - "frontend/*"
+  - "frontend"
   - "backend/*"
   - "packages/*"
 allowBuilds:
-  '@prisma/engines': true
-  '@scarf/scarf': true
+  "@prisma/engines": true
+  "@scarf/scarf": true
   base64: true
   bcrypt: true
   compress-buffer: true
