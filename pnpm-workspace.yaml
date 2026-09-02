@@ -3,6 +3,9 @@ packages:
   - "frontend"
   - "backend/*"
   - "packages/*"
+catalog:
+  "prisma": ^7.10.0
+  "@prisma/client": ^7.10.0
 allowBuilds:
   "@prisma/engines": true
   "@scarf/scarf": true
@@ -12,8 +15,10 @@ allowBuilds:
   esbuild: true
   hiredis: true
   iconv: true
+  msgpackr-extract: true
   pg: true
   prisma: true
   stacktrace: true
   unrs-resolver: true
   uriparser: true
+  workerd: true

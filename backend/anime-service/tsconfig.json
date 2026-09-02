@@ -1,0 +1,32 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+
+    // Thêm 2 mục này vào compilerOptions
+    "baseUrl": "./",
+    "paths": {
+      // Path nội bộ của riêng auth-service (ngắn gọn vì baseUrl đã là ./)
+      "@auth/domain/*": ["src/domain/*"],
+      "@auth/application/*": ["src/application/*"],
+      "@shared/*": ["src/shared/*"],
+      "@generated/*": ["src/generated/*"],
+
+      // Path trỏ ra các package dùng chung bên ngoài
+      "@packages/pattern/*": ["../../packages/pattern/src/*"],
+      "@packages/request-context/*": ["../../packages/request-context/src/*"],
+      "@packages/logging/*": ["../../packages/logging/src/*"],
+      "@packages/api-docs/*": ["../../packages/api-docs/src/*"]
+    }
+  },
+  "references": [
+    { "path": "../../packages/pattern" },
+    { "path": "../../packages/request-context" },
+    { "path": "../../packages/logging" },
+    { "path": "../../packages/api-docs" }
+  ],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "test", "dist", "**/*.spec.ts"]
+}
