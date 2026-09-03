@@ -4,15 +4,40 @@ import { IUserRepository } from '@auth/domain/repositories/IUser.repository';
 import { PrismaService } from '@shared/database/prisma.service';
 import { UserId } from '@auth/domain/value-objects/userId.vo';
 import { AccountStatus } from '@auth/domain/value-objects/accountStatus.vo';
+import { Password } from '@auth/domain/value-objects/password.vo';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async updateStatusById(
+  async updateUser(
     id: UserId,
-    status: AccountStatus,
-  ): Promise<User | null> {
+    updates: { username?: string; lastUsernameChangedAt?: Date },
+  ): Promise<User> {
+    const result = await this.prismaService.user.update({
+      where: {
+        id: id.toString(),
+      },
+      data: updates,
+    });
+
+    return User.reconstitute(result);
+  }
+
+  async updatePasswordById(userId: UserId, password: Password): Promise<User> {
+    const result = await this.prismaService.user.update({
+      where: {
+        id: userId.toString(),
+      },
+      data: {
+        password: password.toString(),
+      },
+    });
+
+    return User.reconstitute(result);
+  }
+
+  async updateStatusById(id: UserId, status: AccountStatus): Promise<User> {
     const user = await this.prismaService.user.update({
       where: {
         id: id.toString(),
@@ -22,7 +47,7 @@ export class UserRepository implements IUserRepository {
       },
     });
 
-    return user ? User.reconstitute(user) : null;
+    return User.reconstitute(user);
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
@@ -60,7 +85,7 @@ export class UserRepository implements IUserRepository {
       data: {
         id: user.getId().toString(),
         email: user.getEmail(),
-        username: user.getUsername(),
+        username: user.getUsername().toString(),
         password: user.getPassword().toString(),
         status: user.getStatus().currentStatus(),
         role: user.getRole(),

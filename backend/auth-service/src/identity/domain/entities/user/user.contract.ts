@@ -20,4 +20,5 @@ export interface PureUser extends BaseUser {
   id: string;
   status: STATUS;
   role: Role;
+  lastUsernameChangedAt: Date | null;
 }

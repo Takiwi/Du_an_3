@@ -16,6 +16,11 @@ export class Password extends ValueObject<{ value: string }> {
   }
 
   static create(rawPassword: string): Result<Password, AppError> {
+    if (!rawPassword)
+      return err(
+        new AppError('INVALID_PASSWORD', `Invalid password: ${rawPassword}`),
+      );
+
     const trimmedPassword = rawPassword.trim();
 
     const result = this.isInvalidPassword(trimmedPassword);

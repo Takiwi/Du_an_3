@@ -1,0 +1,10 @@
+model Category {
+    id String @id
+
+    animeCategories AnimeCategory[]
+
+    title String @db.VarChar(255)
+    description String? @db.VarChar(255)
+
+    @@map("Categories")
+}

@@ -1,0 +1,9 @@
+model Series {
+    id String @id
+    title String
+    description String? @db.Text
+
+    anime Anime[]
+
+    @@map("Series")
+}

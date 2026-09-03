@@ -7,6 +7,8 @@ export const ApplicationErrorCode = {
   TOKEN_USED: 'TOKEN_USED',
   TOO_MANY_ATTEMPTS: 'TOO_MANY_ATTEMPTS',
   USER_BANNED: 'USER_BANNED',
+  INVALID_TOKEN: 'INVALID_TOKEN',
+  SAME_CURRENT_PASSWORD: 'SAME_CURRENT_PASSWORD',
 } as const;
 
 export type AppErrorCodeType =

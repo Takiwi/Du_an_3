@@ -1,19 +1,23 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import prismaDatabaseConfig from './config/prismaDatabase.config';
 import { PrismaService } from './shared/database/prisma.service';
+import { ClsModule, RequestIdMiddleware } from '@packages/request-context';
 
 @Module({
   imports: [
+    ClsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [prismaDatabaseConfig],
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, PrismaService],
+  controllers: [],
+  providers: [PrismaService],
   exports: [PrismaService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
+  }
+}

@@ -25,6 +25,8 @@ import { FAILED_LOGIN_TRACKER_TOKEN } from './domain/ports/failedLoginTracker.in
 import { RedisFailedLoginTracker } from './infrastructure/services/redisFailedLoginTracker.service';
 import { BLACKLIST_TOKEN } from './application/ports/IBlackList.port';
 import { BlacklistToken } from './infrastructure/repositories/blacklistToken.repository';
+import { UpdateUserUserCase } from '@auth/application/useCases/updateUser/updateUser.usecase';
+import { UpdatePasswordUserCase } from './application/updatePassword/updatePassword.usecase';
 
 @Module({
   imports: [
@@ -75,6 +77,8 @@ import { BlacklistToken } from './infrastructure/repositories/blacklistToken.rep
     LogoutUseCase,
     RefreshTokenUseCase,
     RegisterUserUseCase,
+    UpdateUserUserCase,
+    UpdatePasswordUserCase,
   ],
 })
 export class IdentityModule {}

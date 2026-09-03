@@ -4,9 +4,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto implements RegisterInput {
   @ApiProperty({ example: 'Nguyen Van A' })
-  @IsString({ message: 'This filed must be a string' })
-  @MinLength(2, { message: 'The username must have at least 2 characters' })
-  @MaxLength(100, { message: 'The password must not exceed 100 characters' })
+  @IsString({ message: 'This field must be a string' })
+  @MinLength(3, { message: 'The username must have at least 3 characters' })
+  @MaxLength(30, { message: 'The password must not exceed 30 characters' })
   username: string;
 
   @ApiProperty({ format: 'email', example: 'example@gmail.com' })
@@ -18,10 +18,11 @@ export class CreateUserDto implements RegisterInput {
     example: '12345678',
     writeOnly: true,
     minLength: 8,
+    maxLength: 64,
   })
-  @IsString({ message: 'This filed must be a string' })
+  @IsString({ message: 'This field must be a string' })
   @MinLength(8, { message: 'The password must have at least 8 characters' })
-  @MaxLength(100, { message: 'The password must not exceed 100 characters' })
+  @MaxLength(64, { message: 'The password must not exceed 64 characters' })
   password: string;
 
   constructor(username: string, email: string, password: string) {

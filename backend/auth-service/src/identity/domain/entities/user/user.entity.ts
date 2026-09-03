@@ -5,10 +5,11 @@ import { Password } from '../../value-objects/password.vo';
 import { AppError } from '@packages/pattern';
 import { ok, err, Result } from 'neverthrow';
 import { BaseUser, PureUser, Role, FullUser } from './user.contract';
+import { Username } from '@auth/domain/value-objects/username.vo';
 
 export class User {
   private readonly _id: UserId;
-  private _username: string;
+  private _username: Username;
   private _email: string;
 
   private _password: Password;
@@ -18,7 +19,7 @@ export class User {
   private constructor(
     id: UserId,
     email: string,
-    username: string,
+    username: Username,
     password: Password,
     status: AccountStatus,
     role: Role,
@@ -34,20 +35,25 @@ export class User {
   private static create(props: FullUser): Result<User, AppError> {
     const userIdResult = UserId.create(randomUUID());
     const passwordResult = Password.create(props.password);
+    const usernameResult = Username.firstUsername(props.username);
 
-    const combineResult = Result.combine([userIdResult, passwordResult]);
+    const combineResult = Result.combine([
+      userIdResult,
+      usernameResult,
+      passwordResult,
+    ]);
 
     if (combineResult.isErr()) {
       return err(combineResult.error);
     }
 
-    const [userId, password] = combineResult.value;
+    const [userId, username, password] = combineResult.value;
 
     return ok(
       new User(
         userId,
         props.email,
-        props.username,
+        username,
         password,
         props.status,
         props.role,
@@ -73,11 +79,15 @@ export class User {
     const userStatus = AccountStatus.reconstitute(props.status);
     const userId = UserId.reconstitute(props.id);
     const password = Password.reconstitute(props.password);
+    const username = Username.reconstitute(
+      props.username,
+      props.lastUsernameChangedAt,
+    );
 
     return new User(
       userId,
-      props.username,
       props.email,
+      username,
       password,
       userStatus,
       props.role,
@@ -90,6 +100,14 @@ export class User {
 
   getUsername() {
     return this._username;
+  }
+
+  getLastUsernameChangedAt() {
+    return this._username.getLastUsernameChangedAt();
+  }
+
+  updateUsername(username: Username) {
+    this._username = username;
   }
 
   getEmail() {

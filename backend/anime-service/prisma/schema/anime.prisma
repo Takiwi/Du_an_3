@@ -1,0 +1,33 @@
+enum STATUS {
+    COMING_SOON
+    CURRENT_SHOWING
+    COMPLETED
+}
+
+enum TYPE {
+    TV_SHOW
+    MOVIE
+    OVE
+    SPECIAL
+}
+
+model Anime {
+  id          String   @id
+  title       String
+  description String? @db.Text
+  status      STATUS   @default(COMING_SOON)
+  type        TYPE  @default(MOVIE)
+  seriesId    String
+  series      Series @relation(fields: [seriesId], references: [id])
+  animeCategories AnimeCategory[]
+
+  releaseDate DateTime?
+  season     DateTime 
+
+  view        Int      @default(0)
+  rating      Decimal  @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("Anime")
+}
