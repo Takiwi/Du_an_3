@@ -73,12 +73,9 @@ export class RefreshToken {
     );
   }
 
-  route(
-    incomingToken: string,
-    newToken: string,
-  ): Result<RefreshToken, AppError> {
+  isReuse(token: string): Result<RefreshToken, AppError> {
     // check if the Refresh Token has already been used
-    if (this._tokensUsed.contains(incomingToken)) {
+    if (this._tokensUsed.contains(token)) {
       return err(
         new AppError(
           'TOKEN_USED_DETECTED',
@@ -88,13 +85,13 @@ export class RefreshToken {
     }
 
     // compare current token with incomingToken
-    if (this._token !== incomingToken) {
+    if (this._token === token) {
       return err(new AppError('INVALID_TOKEN', 'Invalid refresh token'));
     }
 
     // revoke current token and add new token
-    this._token = newToken;
-    this._tokensUsed = this._tokensUsed.markUsed(incomingToken);
+    this._token = token;
+    this._tokensUsed = this._tokensUsed.markUsed(token);
 
     return ok(this);
   }

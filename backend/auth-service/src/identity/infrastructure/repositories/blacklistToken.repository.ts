@@ -1,5 +1,4 @@
 import { IBlacklist } from '@auth/application/ports/IBlackList.port';
-import { UserId } from '@auth/domain/value-objects/userId.vo';
 import { Injectable } from '@nestjs/common';
 import { RedisService } from '@shared/database/redis.service';
 
@@ -7,9 +6,13 @@ import { RedisService } from '@shared/database/redis.service';
 export class BlacklistToken implements IBlacklist {
   constructor(private readonly redis: RedisService) {}
 
-  async insertToken(userId: UserId, accessToken: string): Promise<void> {
-    const key = `blacklist-access-token:${userId.toString()}`;
+  async insertToken(
+    tokenId: string,
+    accessToken: string,
+    ttlInSeconds: number,
+  ): Promise<void> {
+    const key = `blacklist-access-token:${tokenId}`;
 
-    await this.redis.set(key, accessToken, 'EX', 300);
+    await this.redis.set(key, accessToken, 'EX', ttlInSeconds);
   }
 }

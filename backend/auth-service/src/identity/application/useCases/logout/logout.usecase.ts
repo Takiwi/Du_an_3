@@ -13,6 +13,8 @@ import {
   BLACKLIST_TOKEN,
   IBlacklist,
 } from '@auth/application/ports/IBlackList.port';
+import { JWT_AUTHENTICATION_TOKEN } from '@auth/application/ports/IJwtAuthentication.port';
+import { JwtAuthentication } from 'src/identity/infrastructure/services/jwt.service';
 
 @Injectable()
 export class LogoutUseCase {
@@ -23,6 +25,8 @@ export class LogoutUseCase {
     private readonly cryptoService: IDataHasher,
     @Inject(BLACKLIST_TOKEN)
     private readonly blacklist: IBlacklist,
+    @Inject(JWT_AUTHENTICATION_TOKEN)
+    private readonly jwtAuthentication: JwtAuthentication,
   ) {}
   async execute(
     accessToken: string,
@@ -32,10 +36,15 @@ export class LogoutUseCase {
     const hashedToken = this.cryptoService.hash(refreshToken);
 
     // delete refresh token
-    const result = await this.refreshTokenRepository.deleteByToken(hashedToken);
+    await this.refreshTokenRepository.deleteByToken(hashedToken);
+
+    const { exp, jti } = this.jwtAuthentication.getExpAndJti(accessToken);
+
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    const ttlInSeconds = exp - nowInSeconds;
 
     // add access token to blacklist
-    await this.blacklist.insertToken(result.getUserId(), accessToken);
+    await this.blacklist.insertToken(jti, accessToken, ttlInSeconds);
     return ok();
   }
 }

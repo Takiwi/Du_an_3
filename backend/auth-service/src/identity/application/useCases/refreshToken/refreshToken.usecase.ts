@@ -9,16 +9,12 @@ import {
   JWT_AUTHENTICATION_TOKEN,
 } from '../../ports/IJwtAuthentication.port';
 import {
-  IUserRepository,
-  USER_REPOSITORY_TOKEN,
-} from '@auth/domain/repositories/IUser.repository';
-import {
   DATA_HASHER_TOKEN,
   IDataHasher,
 } from '@auth/application/ports/IDataHasher.port';
-import { UserId } from '@auth/domain/value-objects/userId.vo';
 import { RotateTokenOutput } from './refreshToken.contract';
 import { err, ok, Result } from 'neverthrow';
+import { MeUseCase } from '../me/me.usecase';
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -27,10 +23,9 @@ export class RefreshTokenUseCase {
     private readonly jwtService: IJwtAuthentication,
     @Inject(RT_REPOSITORY_TOKEN)
     private readonly refreshTokenRepository: IRefreshTokenRepository,
-    @Inject(USER_REPOSITORY_TOKEN)
-    private readonly userRepository: IUserRepository,
     @Inject(DATA_HASHER_TOKEN)
     private readonly cryptService: IDataHasher,
+    private readonly meUseCase: MeUseCase,
   ) {}
 
   async execute(token: string): Promise<Result<RotateTokenOutput, AppError>> {
@@ -48,29 +43,14 @@ export class RefreshTokenUseCase {
       return err(new AppError('INVALID_TOKEN', 'Not found token'));
 
     // get user
-    const userId = UserId.create(payload.sub);
+    const user = await this.meUseCase.execute(payload.sub);
 
-    if (userId.isErr()) return err(userId.error);
-
-    const user = await this.userRepository.findUserById(userId.value);
-
-    if (!user || hasRefreshToken.getUserId().toString() !== payload.sub)
-      return err(
-        new AppError('USER_NOT_FOUND', `User ${payload.sub} not found`),
-      );
-
-    // generate new token pair
-    const { accessToken, refreshToken } =
-      await this.jwtService.generateTokenPair({
-        sub: user.getId().toString(),
-        email: user.getEmail(),
-      });
-
-    // hash new refresh token
-    const hashedNewRefreshToken = this.cryptService.hash(refreshToken);
+    if (user.isErr()) {
+      return err(user.error);
+    }
 
     // is token used?
-    const result = hasRefreshToken.route(hashedToken, hashedNewRefreshToken);
+    const result = hasRefreshToken.isReuse(hashedToken);
 
     if (result.isErr()) {
       // revoke all session
@@ -80,6 +60,16 @@ export class RefreshTokenUseCase {
 
       return err(result.error);
     }
+
+    // generate new token pair
+    const { accessToken, refreshToken } =
+      await this.jwtService.generateTokenPair({
+        sub: user.value.getId().toString(),
+        email: user.value.getEmail(),
+      });
+
+    // hash new refresh token
+    const hashedNewRefreshToken = this.cryptService.hash(refreshToken);
 
     // update old refresh token
     await this.refreshTokenRepository.updateTokenAndTokensUsedByToken(

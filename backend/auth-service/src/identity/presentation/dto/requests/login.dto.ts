@@ -4,7 +4,7 @@ import { LoginInput } from '@auth/application/useCases/login/login.contract';
 
 export class LoginDto implements LoginInput {
   @ApiProperty({ format: 'email', example: 'example@gmail.com' })
-  @IsEmail()
+  @IsEmail({}, { message: 'Invalid email format' })
   email: string;
 
   @ApiProperty({
@@ -13,9 +13,9 @@ export class LoginDto implements LoginInput {
     writeOnly: true,
     minLength: 8,
   })
-  @IsString()
+  @IsString({ message: 'This field must be a string' })
   @MinLength(8, { message: 'The password must have at least 8 characters' })
-  @MaxLength(100, { message: 'The password must not exceed 100 characters' })
+  @MaxLength(64, { message: 'The password must not exceed 64 characters' })
   password: string;
 
   constructor(email: string, password: string) {

@@ -2,7 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 import { PresentationErrorCode } from '../errors/validationField.error';
 import { ApplicationErrorCode } from '@auth/application/errors/application.error';
 import { DomainErrorCode } from '@auth/domain/errors/domain.error';
-import { ErrorDefinition } from '@packages/api-docs/decorators/applyApiErrorsResponse.decorator';
+import { ErrorDefinition } from '@packages/api-docs';
 
 export type ErrorKeys =
   | keyof typeof DomainErrorCode
@@ -14,6 +14,36 @@ export const ERROR_DEFINITIONS: Record<
   ErrorKeys,
   ErrorDefinition<ErrorKeys>
 > = {
+  USERNAME_ALREADY_EXISTS: {
+    code: ApplicationErrorCode.USERNAME_ALREADY_EXISTS,
+    status: HttpStatus.BAD_REQUEST,
+    message: 'User already exists',
+    description: 'User already exists',
+  },
+  INVALID_UUID: {
+    code: 'INVALID_UUID',
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Invalid identifier',
+    description: 'The user identifier has an invalid UUID format',
+  },
+  INVALID_PASSWORD: {
+    code: 'INVALID_PASSWORD',
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Invalid password',
+    description: 'The password cannot be empty',
+  },
+  PASSWORD_FORMAT: {
+    code: 'PASSWORD_FORMAT',
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Invalid password format',
+    description: 'The password does not meet the required format',
+  },
+  USERNAME_INVALID_LENGTH: {
+    code: 'USERNAME_INVALID_LENGTH',
+    status: HttpStatus.BAD_REQUEST,
+    message: 'Invalid username length',
+    description: 'The username must be between 3 and 30 characters long',
+  },
   USERNAME_INVALID_CHARS: {
     code: DomainErrorCode.USERNAME_INVALID_CHARS,
     status: HttpStatus.BAD_REQUEST,

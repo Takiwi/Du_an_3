@@ -9,6 +9,7 @@ export const ApplicationErrorCode = {
   USER_BANNED: 'USER_BANNED',
   INVALID_TOKEN: 'INVALID_TOKEN',
   SAME_CURRENT_PASSWORD: 'SAME_CURRENT_PASSWORD',
+  USERNAME_ALREADY_EXISTS: 'USERNAME_ALREADY_EXISTS',
 } as const;
 
 export type AppErrorCodeType =

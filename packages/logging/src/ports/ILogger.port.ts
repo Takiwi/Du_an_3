@@ -7,6 +7,7 @@ export interface ILogger {
     context?: Record<string, unknown>,
   ): void;
   debug(message: string, context?: Record<string, unknown>): void;
+  fatal(message: string, context?: Record<string, unknown>): void;
 }
 
 export const LOGGER_TOKEN = Symbol("ILogger");

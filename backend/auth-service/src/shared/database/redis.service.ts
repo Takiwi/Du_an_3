@@ -13,6 +13,9 @@ export class RedisService extends Redis implements OnModuleDestroy {
       host: config.getOrThrow<string>('redis.host'),
       port: config.getOrThrow<number>('redis.port'),
       lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      enableOfflineQueue: false,
+      commandTimeout: 2000,
     });
   }
 

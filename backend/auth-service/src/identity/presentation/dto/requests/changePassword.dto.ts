@@ -1,11 +1,9 @@
-import { IsString, Matches, MinLength } from 'class-validator';
+import { IsString, IsStrongPassword, MaxLength } from 'class-validator';
 
 export class ChangePasswordDto {
-  @IsString()
-  @MinLength(8)
-  @Matches(/^(?=.*[A-Z])(?=.*[0-9]).*$/, {
-    message: 'Password must contain at least 1 uppercase and 1 number',
-  })
+  @IsString({ message: 'This field must be a string' })
+  @MaxLength(64, { message: 'The password must not exceed 64 characters' })
+  @IsStrongPassword({}, { message: 'Password is not strong enough.' })
   newPassword: string;
 
   constructor(newPassword: string) {

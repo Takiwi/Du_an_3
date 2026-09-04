@@ -16,4 +16,6 @@ export interface IJwtAuthentication {
   verifyToken(token: string): Promise<JwtPayload>;
 
   getTokenExpiresIn(type: 'access' | 'refresh'): number;
+
+  getExpAndJti(token: string): { exp: number; jti: string };
 }

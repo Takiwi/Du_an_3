@@ -7,6 +7,7 @@ import {
   DATA_HASHER_TOKEN,
   IDataHasher,
 } from '@auth/application/ports/IDataHasher.port';
+import { asyncHandlerError } from '../helpers/asyncHandlerError.helper';
 
 @Injectable()
 export class RefreshTokenRepository implements IRefreshTokenRepository {
@@ -20,24 +21,28 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     oldToken: string,
     newToken: string,
   ): Promise<void> {
-    await this.prismaService.refreshToken.update({
-      where: {
-        token: oldToken,
-      },
-      data: {
-        token: newToken,
-        tokensUsed: {
-          push: oldToken,
+    await asyncHandlerError(async () => {
+      await this.prismaService.refreshToken.update({
+        where: {
+          token: oldToken,
         },
-      },
+        data: {
+          token: newToken,
+          tokensUsed: {
+            push: oldToken,
+          },
+        },
+      });
     });
   }
 
   async deleteById(userId: UserId): Promise<void> {
-    await this.prismaService.refreshToken.delete({
-      where: {
-        id: userId.toString(),
-      },
+    await asyncHandlerError(async () => {
+      await this.prismaService.refreshToken.delete({
+        where: {
+          id: userId.toString(),
+        },
+      });
     });
   }
 
@@ -51,12 +56,12 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     return result ? RefreshToken.reconstitute(result) : null;
   }
 
-  async deleteByToken(token: string): Promise<RefreshToken> {
-    const result = await this.prismaService.refreshToken.delete({
-      where: { token },
+  async deleteByToken(token: string): Promise<void> {
+    await asyncHandlerError(async () => {
+      await this.prismaService.refreshToken.delete({
+        where: { token },
+      });
     });
-
-    return RefreshToken.reconstitute(result);
   }
 
   async findByToken(token: string): Promise<RefreshToken | null> {
@@ -78,14 +83,16 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 
   async insertRefreshToken(refreshToken: RefreshToken): Promise<void> {
-    await this.prismaService.refreshToken.create({
-      data: {
-        id: refreshToken.getId().toString(),
-        userId: refreshToken.getUserId().toString(),
-        token: this.cryptoService.hash(refreshToken.getToken()),
-        tokensUsed: refreshToken.getTokensUsed().toArray(),
-        expiresAt: refreshToken.getExpiresAt(),
-      },
+    await asyncHandlerError(async () => {
+      await this.prismaService.refreshToken.create({
+        data: {
+          id: refreshToken.getId().toString(),
+          userId: refreshToken.getUserId().toString(),
+          token: this.cryptoService.hash(refreshToken.getToken()),
+          tokensUsed: refreshToken.getTokensUsed().toArray(),
+          expiresAt: refreshToken.getExpiresAt(),
+        },
+      });
     });
   }
 }

@@ -31,6 +31,7 @@ export class UserController {
     message: 'Get user info successfully',
   })
   @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
+    'INVALID_UUID',
     'USER_NOT_FOUND',
     'VALIDATION_TOKEN_FALSE',
   ])
@@ -50,12 +51,16 @@ export class UserController {
     message: 'Update user info successfully',
   })
   @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
+    'INVALID_UUID',
     'USER_NOT_FOUND',
     'VALIDATION_TOKEN_FALSE',
+    'USERNAME_INVALID_LENGTH',
+    'USERNAME_INVALID_CHARS',
+    'USERNAME_RESERVED',
     'USERNAME_CHANGE_COOLDOWN',
   ])
   @UseGuards(JwtAuthGuard)
-  @Patch('update/')
+  @Patch('update')
   async update(
     @CurrentUser<JwtPayload>() userReq: JwtPayload,
     @Body() updateUser: UpdateUserDto,
@@ -76,11 +81,16 @@ export class UserController {
     message: 'Update user info successfully',
   })
   @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
+    'INVALID_UUID',
     'USER_NOT_FOUND',
     'VALIDATION_TOKEN_FALSE',
+    'INVALID_PASSWORD',
+    'PASSWORD_FORMAT',
+    'SAME_CURRENT_PASSWORD',
+    'USERNAME_ALREADY_EXISTS',
   ])
   @UseGuards(JwtAuthGuard)
-  @Patch('changePassword/')
+  @Patch('changePassword')
   async changePassword(
     @CurrentUser<JwtPayload>() userReq: JwtPayload,
     @Body() newPassword: ChangePasswordDto,

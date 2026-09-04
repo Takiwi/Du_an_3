@@ -27,8 +27,3 @@ content-type: application/json
 ###
 POST http://localhost:3001/api/v1/auth/refresh
 content-type: application/json
-
-###
-GET  http://localhost:3001/api/v1/user/me
-content-type: application/json
-Cookie: accessToken=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNGYwOTViYy1mZjljLTQ1MDItYTc4Yi1kZDBiNThmODkwMjciLCJlbWFpbCI6InVzZXJAZ21haWwuY29tIiwiaWF0IjoxNzg4MTAzMzI5LCJleHAiOjE3ODgxMDM2Mjl9.mbqK7_yRMjPabx_T7TCXvwJUDGYEAKpjwRYDuXDYUIOri05IrYJ5BXZkGniUy5-eTXNiB4SKrLbF8HvYCHrMQVDhtv-dZw6pQAZowGPMhGMgT4ntvWBFGpjIKBLHXpSA9fltVeKB-JLGoGn6LphqN_sOiDd-xHNusHM1UBY-fEa_mKHqMzp544tN0kUd358H7MHIAr60rAUDJtOXUaIXEdgZn2annGjnHc_bARW51QdEYh1kUO8bW0tuM0-1Gwse9far4ZmAyBztu7INrOF6QOXhkXoACNXmNfkLcsQLPF0FUUMHAWEt6GtoRZdBPMJZdmaMAhIDLriWfiVTOuESKA

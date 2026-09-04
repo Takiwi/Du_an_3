@@ -7,11 +7,11 @@ import {
   IUserRepository,
   USER_REPOSITORY_TOKEN,
 } from '@auth/domain/repositories/IUser.repository';
-import { UserId } from '@auth/domain/value-objects/userId.vo';
 import { err, ok, Result } from 'neverthrow';
 import { User } from '@auth/domain/entities/user/user.entity';
 import { AppError } from '@packages/pattern';
 import { Password } from '@auth/domain/value-objects/password.vo';
+import { MeUseCase } from '../useCases/me/me.usecase';
 
 @Injectable()
 export class UpdatePasswordUserCase {
@@ -20,19 +20,16 @@ export class UpdatePasswordUserCase {
     private readonly passwordHasher: IPasswordHasher,
     @Inject(USER_REPOSITORY_TOKEN)
     private readonly userRepository: IUserRepository,
+    private readonly meUseCase: MeUseCase,
   ) {}
   async execute(
     userId: string,
     newPasswordPlain: string,
   ): Promise<Result<User, AppError>> {
     // does the user exists?
-    const id = UserId.reconstitute(userId);
-    const user = await this.userRepository.findUserById(id);
+    const user = await this.meUseCase.execute(userId);
 
-    if (!user)
-      return err(
-        new AppError('USER_NOT_FOUND', `User with ID ${userId} not found`),
-      );
+    if (user.isErr()) return err(user.error);
 
     // validate password
     const plainPassword = Password.create(newPasswordPlain);
@@ -45,7 +42,7 @@ export class UpdatePasswordUserCase {
     );
 
     const isSame = await this.passwordHasher.compare(
-      user.getPassword().toString(),
+      user.value.getPassword().toString(),
       hashedPassword,
     );
 
@@ -59,7 +56,7 @@ export class UpdatePasswordUserCase {
       );
 
     const result = await this.userRepository.updatePasswordById(
-      id,
+      user.value.getId(),
       Password.reconstitute(hashedPassword),
     );
 

@@ -6,6 +6,7 @@ import {
 } from '@auth/application/ports/IJwtAuthentication.port';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class JwtAuthentication implements IJwtAuthentication {
@@ -13,6 +14,9 @@ export class JwtAuthentication implements IJwtAuthentication {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+  getExpAndJti(token: string): { exp: number; jti: string } {
+    return this.jwtService.decode(token);
+  }
 
   getTokenExpiresIn(type: 'access' | 'refresh'): number {
     if (type === 'access') {
@@ -31,6 +35,7 @@ export class JwtAuthentication implements IJwtAuthentication {
       this.jwtService.signAsync(payload, {
         algorithm: 'RS256',
         expiresIn: this.getTokenExpiresIn('access'),
+        jwtid: randomUUID(), // id for access token
       }),
       this.jwtService.signAsync(
         { sub: payload.sub },

@@ -52,6 +52,12 @@ export class AuthController {
   })
   @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
     'EMAIL_ALREADY_EXISTS',
+    'INVALID_UUID',
+    'USERNAME_INVALID_LENGTH',
+    'USERNAME_INVALID_CHARS',
+    'USERNAME_RESERVED',
+    'INVALID_PASSWORD',
+    'PASSWORD_FORMAT',
     'VALIDATION_ERROR',
   ])
   @Public()
@@ -71,6 +77,9 @@ export class AuthController {
   })
   @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
     'EMAIL_NOT_FOUND',
+    'INVALID_UUID',
+    'USER_BANNED',
+    'TOO_MANY_ATTEMPTS',
     'VALIDATION_ERROR',
     'PASSWORD_DO_NOT_MATCH',
   ])
@@ -107,10 +116,7 @@ export class AuthController {
     status: 204,
     message: 'Logout successfully',
   })
-  @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
-    'TOKEN_NOT_FOUND',
-    'USER_NOT_FOUND',
-  ])
+  @ApplyApiErrorsResponse(ERROR_DEFINITIONS, ['TOKEN_NOT_FOUND'])
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
   async logout(
@@ -137,8 +143,10 @@ export class AuthController {
   })
   @ApplyApiErrorsResponse(ERROR_DEFINITIONS, [
     'TOKEN_NOT_FOUND',
+    'INVALID_TOKEN',
+    'INVALID_UUID',
     'USER_NOT_FOUND',
-    'TOKEN_USED',
+    'TOKEN_USED_DETECTED',
   ])
   @Public()
   @Post('refresh')

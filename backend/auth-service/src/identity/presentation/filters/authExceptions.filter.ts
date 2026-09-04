@@ -16,6 +16,7 @@ import {
 } from '@packages/api-docs';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 import { ERROR_DEFINITIONS } from '../configs/error.config';
+import { Prisma } from '@generated/prisma/client';
 
 @Injectable()
 @Catch()
@@ -27,8 +28,11 @@ export class AuthExceptionFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse<Response>();
+    const request = host.switchToHttp().getRequest<Request>();
     const requestId = this.clsService.get('requestId') ?? '';
     const timestamp = new Date().toISOString();
+
+    this.logger.error(`[${request.method}] ${request.url}`);
 
     if (exception instanceof AppError) {
       const code = exception.code as keyof typeof ERROR_DEFINITIONS;
@@ -61,8 +65,18 @@ export class AuthExceptionFilter implements ExceptionFilter {
       return response.status(status).json(result);
     }
 
-    const request = host.switchToHttp().getRequest<Request>();
-    this.logger.error(`[${request.method}] ${request.url}`);
+    // Prisma error
+    if (
+      exception instanceof Prisma.PrismaClientInitializationError ||
+      exception instanceof Prisma.PrismaClientKnownRequestError ||
+      exception instanceof Prisma.PrismaClientRustPanicError ||
+      exception instanceof Prisma.PrismaClientUnknownRequestError ||
+      exception instanceof Prisma.PrismaClientValidationError
+    ) {
+      this.logger.error(exception.message, exception);
+
+      return response.status(500).json(exception.message);
+    }
 
     if (exception instanceof Error) {
       this.logger.error(exception.message, exception, {
