@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Users" ALTER COLUMN "status" DROP DEFAULT,
-ALTER COLUMN "role" DROP DEFAULT;

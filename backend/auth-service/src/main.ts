@@ -3,9 +3,9 @@ import { AppModule } from './app.module';
 import { ValidationError, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationFieldException } from '@shared/errors/validationField.error';
 import cookieParser from 'cookie-parser';
 import { Logger } from 'nestjs-pino';
+import { ValidationFieldException } from '@presentation/errors/validationField.error';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });

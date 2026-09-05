@@ -41,7 +41,7 @@ services:
       start_period: 10s
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: my-redis-ui
+    container_name: auth-redis-ui
     restart: always
     environment:
       - REDIS_HOSTS=LocalRedis:redis:6379
