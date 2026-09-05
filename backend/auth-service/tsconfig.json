@@ -9,8 +9,9 @@
     "baseUrl": "./",
     "paths": {
       // Path nội bộ của riêng auth-service (ngắn gọn vì baseUrl đã là ./)
-      "@auth/domain/*": ["src/identity/domain/*"],
-      "@auth/application/*": ["src/identity/application/*"],
+      "@modules/*": ["src/modules/*"],
+      "@auth/*": ["src/modules/auth/*"],
+      "@user/*": ["src/modules/user/*"],
       "@shared/*": ["src/shared/*"],
       "@generated/*": ["src/generated/*"],
 

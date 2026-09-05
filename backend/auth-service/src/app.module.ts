@@ -1,9 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { IdentityModule } from './identity/identity.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
 import { ClsModule, RequestIdMiddleware } from '@packages/request-context';
 import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { AuthExceptionFilter } from './identity/presentation/filters/authExceptions.filter';
+import { AuthExceptionFilter } from '@shared/filters/authExceptions.filter';
 import { AppLoggerModule } from '@packages/logging';
 import appConfig from './config/app.config';
 import prismaDatabaseConfig from './config/prismaDatabase.config';
@@ -13,7 +14,8 @@ import cookieConfig from './config/cookie.config';
 @Module({
   imports: [
     ClsModule,
-    IdentityModule,
+    AuthModule,
+    UserModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
