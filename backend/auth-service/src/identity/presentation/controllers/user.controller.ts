@@ -17,6 +17,7 @@ import { UpdatePasswordUserCase } from '@auth/application/updatePassword/updateP
 import { ChangePasswordDto } from '../dto/requests/changePassword.dto';
 
 @ApiCommonErrors()
+@UseGuards(JwtAuthGuard)
 @Controller('user/')
 export class UserController {
   constructor(
@@ -35,7 +36,6 @@ export class UserController {
     'USER_NOT_FOUND',
     'VALIDATION_TOKEN_FALSE',
   ])
-  @UseGuards(JwtAuthGuard)
   @Get('me')
   async userInfo(@CurrentUser<JwtPayload>() userReq: JwtPayload) {
     const result = await this.meUseCase.execute(userReq.sub);
@@ -59,7 +59,6 @@ export class UserController {
     'USERNAME_RESERVED',
     'USERNAME_CHANGE_COOLDOWN',
   ])
-  @UseGuards(JwtAuthGuard)
   @Patch('update')
   async update(
     @CurrentUser<JwtPayload>() userReq: JwtPayload,
@@ -89,7 +88,6 @@ export class UserController {
     'SAME_CURRENT_PASSWORD',
     'USERNAME_ALREADY_EXISTS',
   ])
-  @UseGuards(JwtAuthGuard)
   @Patch('changePassword')
   async changePassword(
     @CurrentUser<JwtPayload>() userReq: JwtPayload,

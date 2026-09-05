@@ -27,6 +27,8 @@ import { BLACKLIST_TOKEN } from './application/ports/IBlackList.port';
 import { BlacklistToken } from './infrastructure/repositories/blacklistToken.repository';
 import { UpdateUserUserCase } from '@auth/application/useCases/updateUser/updateUser.usecase';
 import { UpdatePasswordUserCase } from './application/updatePassword/updatePassword.usecase';
+import { JwksController } from './presentation/controllers/jwks.controller';
+import { JwksService } from './infrastructure/services/jwks.service';
 
 @Module({
   imports: [
@@ -41,7 +43,7 @@ import { UpdatePasswordUserCase } from './application/updatePassword/updatePassw
       inject: [ConfigService],
     }),
   ],
-  controllers: [AuthController, UserController],
+  controllers: [AuthController, UserController, JwksController],
   providers: [
     {
       provide: DATA_HASHER_TOKEN,
@@ -71,6 +73,7 @@ import { UpdatePasswordUserCase } from './application/updatePassword/updatePassw
       provide: BLACKLIST_TOKEN,
       useClass: BlacklistToken,
     },
+    JwksService,
     JwtStrategy,
     MeUseCase,
     LoginUseCase,
