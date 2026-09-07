@@ -1,7 +1,7 @@
 import { UsedTokenHistory } from '../../value-objects/usedTokenHistory.vo';
 
 export interface BaseRefreshToken {
-  userId: string;
+  accountId: string;
   token: string;
   expiresAt: number;
 }

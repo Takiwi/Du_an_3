@@ -1,5 +1,5 @@
+import { AuthStatus, Role } from '@generated/prisma/enums';
 import { ApiProperty } from '@nestjs/swagger';
-import { STATUS, ROLE } from '@generated/prisma/enums';
 
 export class AuthResponseDto {
   @ApiProperty({ example: '123' })
@@ -11,10 +11,10 @@ export class AuthResponseDto {
   @ApiProperty({ format: 'email', example: 'example@gmail.com' })
   email: string;
 
-  @ApiProperty({ enum: STATUS, example: STATUS.ACTIVE })
+  @ApiProperty({ enum: AuthStatus, example: AuthStatus.VERIFIED })
   status: string;
 
-  @ApiProperty({ enum: ROLE, example: ROLE.USER })
+  @ApiProperty({ enum: Role, example: Role.USER })
   role: string;
 
   constructor(

@@ -21,7 +21,7 @@ export class RedisService extends Redis implements OnModuleDestroy {
 
   async onModuleInit() {
     await this.connect();
-    this.logger.info('Successfully connected to auth-redis');
+    this.logger.info('Successfully connected to user-redis');
   }
 
   onModuleDestroy() {

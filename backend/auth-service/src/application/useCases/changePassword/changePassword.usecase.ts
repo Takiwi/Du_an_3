@@ -23,10 +23,10 @@ export class ChangePasswordUseCase {
   ) {}
 
   async execute(
-    userId: string,
+    accountId: string,
     newPasswordPlain: string,
   ): Promise<Result<Account, AppError>> {
-    const accountIdResult = AccountId.create(userId);
+    const accountIdResult = AccountId.create(accountId);
     if (accountIdResult.isErr()) return err(accountIdResult.error);
 
     const account = await this.accountRepository.findById(
@@ -34,7 +34,10 @@ export class ChangePasswordUseCase {
     );
     if (!account) {
       return err(
-        new AppError('USER_NOT_FOUND', `Account with Id ${userId} not found`),
+        new AppError(
+          'USER_NOT_FOUND',
+          `Account with Id ${accountId} not found`,
+        ),
       );
     }
 

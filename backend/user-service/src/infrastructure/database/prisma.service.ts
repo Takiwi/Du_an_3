@@ -23,7 +23,7 @@ export class PrismaService extends PrismaClient {
     try {
       await this.$connect();
       await this.$queryRaw`SELECT 1`; // ép handshake thật sự
-      this.logger.info(`Successfully connected to auth-postgreSQl`);
+      this.logger.info(`Successfully connected to user-postgreSQl`);
     } catch (error) {
       this.logger.error('Connection to PostgreSQL failed');
       throw error; // để Nest fail-fast, không cho app start với DB chết

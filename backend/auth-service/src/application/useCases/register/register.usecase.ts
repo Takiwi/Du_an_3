@@ -11,7 +11,10 @@ import {
 import { Account } from '@domain/entities/account/account.entity';
 import { AppError } from '@packages/pattern';
 import { ok, err, Result } from 'neverthrow';
-import { ClientGrpc } from '@nestjs/microservices';
+import {
+  IUserFacade,
+  USER_FACADE_TOKEN,
+} from '@application/ports/IUserFacade.port';
 
 export interface RegisterOutput {
   account: Account;
@@ -25,8 +28,8 @@ export class RegisterUseCase {
     private readonly accountRepository: IAccountRepository,
     @Inject(PASSWORD_HASHER_TOKEN)
     private readonly passwordHasher: IPasswordHasher,
-    @Inject('USER_PACKAGE')
-    private client: ClientGrpc,
+    @Inject(USER_FACADE_TOKEN)
+    private userFacade: IUserFacade,
   ) {}
 
   async execute(dto: RegisterInput): Promise<Result<RegisterOutput, AppError>> {
@@ -43,29 +46,18 @@ export class RegisterUseCase {
     }
 
     // 2. Send a request to user service to validate the username format and blacklist via User domain
-    await this.messagePublisher.publish('Account.created', {
-      email: dto.email,
-      username: dto.username,
-    });
+    const userProfile = await this.userFacade.createUserProfile(
+      dto.username,
+      dto.email,
+    );
 
-    // 3. Check username availability
-    const isUsernameTaken = await this.userFacade.isUsernameTaken(dto.username);
-    if (isUsernameTaken) {
-      return err(
-        new AppError(
-          'USERNAME_ALREADY_EXISTS',
-          `Username ${dto.username} already exists`,
-        ),
-      );
-    }
+    console.log('Hello');
 
-    // 4. Hash password
-    const hashedPassword = await this.passwordHasher.hash(dto.password);
-
-    // 5. Create Account entity
+    // 3. Create Account entity
     const accountResult = Account.baseEntity({
+      id: userProfile.id,
       email: dto.email,
-      password: hashedPassword,
+      password: dto.password,
     });
 
     if (accountResult.isErr()) {
@@ -74,21 +66,14 @@ export class RegisterUseCase {
 
     const account = accountResult.value;
 
-    // 6. Insert account
-    await this.accountRepository.insertAccount(account, dto.username);
+    // 4. Hash password
+    const hashedPassword = await this.passwordHasher.hash(dto.password);
 
-    // 7. Initialize User Profile via UserFacade
-    const profileResult = await this.userFacade.createProfile({
-      id: account.getId().toString(),
-      email: account.getEmail(),
-      username: dto.username,
-      status: account.getStatus().currentStatus(),
-      role: account.getRole(),
-    });
+    // 5. update password
+    account.updatePassword(hashedPassword);
 
-    if (profileResult.isErr()) {
-      return err(profileResult.error);
-    }
+    // 5. Insert account
+    await this.accountRepository.insertAccount(account);
 
     return ok({ account, username: dto.username });
   }

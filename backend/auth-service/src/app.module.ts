@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ClsModule, RequestIdMiddleware } from '@packages/request-context';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthExceptionFilter } from '@presentation/filters/authExceptions.filter';
 import { AppLoggerModule } from '@packages/logging';
 import appConfig from './config/app.config';
 import prismaDatabaseConfig from './config/prismaDatabase.config';
@@ -37,8 +36,9 @@ import { ChangePasswordUseCase } from './application/useCases/changePassword/cha
 import { FormatResponse } from '@presentation/interceptors/formatResponse.interceptor';
 import { PrismaService } from '@infrastructure/database/prisma.service';
 import { RedisService } from '@infrastructure/database/redis.service';
-import { UserProfileService } from '@infrastructure/services/userProfile.service';
 import { RabbitMQModule } from './modules/rabbitMQ.module';
+import { UserExceptionFilter } from '@presentation/filters/userExceptions.filter';
+import { GRpcModule } from './modules/gRpc.module';
 @Module({
   imports: [
     ClsModule,
@@ -54,6 +54,7 @@ import { RabbitMQModule } from './modules/rabbitMQ.module';
     }),
     AppLoggerModule.forRoot('auth-service'),
     PassportModule,
+    GRpcModule,
     RabbitMQModule,
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
@@ -66,10 +67,6 @@ import { RabbitMQModule } from './modules/rabbitMQ.module';
   controllers: [AuthController, JwksController],
   providers: [
     {
-      provide: 'IUserFacade',
-      useClass: UserProfileService,
-    },
-    {
       provide: APP_INTERCEPTOR,
       useClass: FormatResponse,
     },
@@ -79,7 +76,7 @@ import { RabbitMQModule } from './modules/rabbitMQ.module';
     },
     {
       provide: APP_FILTER,
-      useClass: AuthExceptionFilter,
+      useClass: UserExceptionFilter,
     },
     {
       provide: DATA_HASHER_TOKEN,

@@ -11,5 +11,5 @@ export interface IAccountRepository {
   existsByEmail(email: string): Promise<boolean>;
   updateStatusById(id: AccountId, status: AccountStatus): Promise<Account>;
   updatePasswordById(id: AccountId, password: Password): Promise<Account>;
-  insertAccount(account: Account, initialUsername?: string): Promise<void>;
+  insertAccount(account: Account): Promise<void>;
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Inject,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import {
   ApiCommonErrors,
   ApiSuccessResponse,
@@ -13,9 +21,11 @@ import { ERROR_DEFINITIONS } from '../configs/error.config';
 import { CurrentUser } from '../decorators/currentUser.decorator';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import { CreateProfileDto } from '../dto/requests/createProfile.dto';
-import { GrpcMethod, RpcException } from '@nestjs/microservices';
+import { GrpcMethod, Payload, RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { CreateProfileUseCase } from '@application/useCases/createProfile/createProfile.usecase';
+import { Public } from '../decorators/public.decorator';
+import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 
 @ApiCommonErrors()
 @UseGuards(JwtAuthGuard)
@@ -25,6 +35,7 @@ export class UserController {
     private readonly getProfileUseCase: GetProfileUseCase,
     private readonly updateProfileUseCase: UpdateProfileUseCase,
     private readonly createProfileUseCase: CreateProfileUseCase,
+    @Inject(LOGGER_TOKEN) private readonly logger: ILogger,
   ) {}
 
   // ----------------------------------------------------
@@ -84,20 +95,27 @@ export class UserController {
   // 2. DÀNH CHO CÁC SERVICE KHÁC GỌI QUA gRPC
   // ----------------------------------------------------
 
-  @GrpcMethod('UserService', 'CreateProfile')
-  async create(@Body() createUserDto: CreateProfileDto) {
-    const result = await this.createProfileUseCase.execute(createUserDto);
+  @Public()
+  @GrpcMethod('UserService', 'createUserProfile')
+  async create(@Payload(new ValidationPipe()) createUserDto: CreateProfileDto) {
+    this.logger.debug(`Hello::::::::${createUserDto.email}`);
+    try {
+      const result = await this.createProfileUseCase.execute(createUserDto);
 
-    if (result.isErr()) {
-      throw new RpcException({
-        code: status.ALREADY_EXISTS,
-        message: JSON.stringify({
-          appErrorCode: result.error.code,
-          message: result.error.internalMessage,
-        }),
-      });
+      if (result.isErr()) {
+        throw new RpcException({
+          code: status.ALREADY_EXISTS,
+          message: JSON.stringify({
+            appErrorCode: result.error.code,
+            message: result.error.internalMessage,
+          }),
+        });
+      }
+
+      return result.value;
+    } catch (error) {
+      this.logger.debug('Hello2');
+      console.error(error);
     }
-
-    return result.value;
   }
 }

@@ -19,7 +19,7 @@ import { Prisma } from '@generated/prisma/client';
 
 @Injectable()
 @Catch()
-export class AuthExceptionFilter implements ExceptionFilter {
+export class UserExceptionFilter implements ExceptionFilter {
   constructor(
     private readonly clsService: ClsService,
     @Inject(LOGGER_TOKEN) private readonly logger: ILogger,

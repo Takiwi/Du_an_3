@@ -12,7 +12,7 @@ export class AccountRepository implements IAccountRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findByEmail(email: string): Promise<Account | null> {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.account.findUnique({
       where: { email },
     });
 
@@ -20,7 +20,7 @@ export class AccountRepository implements IAccountRepository {
   }
 
   async findById(id: AccountId): Promise<Account | null> {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.account.findUnique({
       where: { id: id.toString() },
     });
 
@@ -28,7 +28,7 @@ export class AccountRepository implements IAccountRepository {
   }
 
   async existsByEmail(email: string): Promise<boolean> {
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.account.findUnique({
       where: { email },
       select: { id: true },
     });
@@ -41,7 +41,7 @@ export class AccountRepository implements IAccountRepository {
     status: AccountStatus,
   ): Promise<Account> {
     const result = await asyncHandlerError(async () => {
-      return await this.prismaService.user.update({
+      return await this.prismaService.account.update({
         where: { id: id.toString() },
         data: { status: status.currentStatus() },
       });
@@ -55,7 +55,7 @@ export class AccountRepository implements IAccountRepository {
     password: Password,
   ): Promise<Account> {
     const result = await asyncHandlerError(async () => {
-      return await this.prismaService.user.update({
+      return await this.prismaService.account.update({
         where: { id: id.toString() },
         data: { password: password.toString() },
       });
@@ -64,17 +64,12 @@ export class AccountRepository implements IAccountRepository {
     return Account.reconstitute(result);
   }
 
-  async insertAccount(
-    account: Account,
-    initialUsername?: string,
-  ): Promise<void> {
+  async insertAccount(account: Account): Promise<void> {
     await asyncHandlerError(async () => {
-      await this.prismaService.user.create({
+      await this.prismaService.account.create({
         data: {
           id: account.getId().toString(),
           email: account.getEmail(),
-          username:
-            initialUsername || `user_${account.getId().toString().slice(0, 8)}`,
           password: account.getPassword().toString(),
           status: account.getStatus().currentStatus(),
           role: account.getRole(),

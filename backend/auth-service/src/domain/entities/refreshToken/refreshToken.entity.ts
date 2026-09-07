@@ -35,21 +35,21 @@ export class RefreshToken {
     props: RefreshTokenWithTokenUsed,
   ): Result<RefreshToken, AppError> {
     const idResult = RefreshTokenId.create(randomUUID());
-    const userIdResult = AccountId.create(props.userId.toString());
+    const accountIdResult = AccountId.create(props.accountId.toString());
 
-    const combined = Result.combine([idResult, userIdResult]);
+    const combined = Result.combine([idResult, accountIdResult]);
 
     if (combined.isErr()) {
       return err(combined.error);
     }
 
-    const [id, userId] = combined.value;
+    const [id, accountId] = combined.value;
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + props.expiresAt * 1000);
 
     return ok(
-      new RefreshToken(id, userId, props.token, props.tokensUsed, expiresAt),
+      new RefreshToken(id, accountId, props.token, props.tokensUsed, expiresAt),
     );
   }
 
@@ -61,12 +61,12 @@ export class RefreshToken {
 
   static reconstitute(props: PureRefreshToken) {
     const id = RefreshTokenId.reconstitute(props.id);
-    const userId = AccountId.reconstitute(props.userId);
+    const accountId = AccountId.reconstitute(props.accountId);
     const usedTokenHistory = UsedTokenHistory.fromArray(props.tokensUsed);
 
     return new RefreshToken(
       id,
-      userId,
+      accountId,
       props.token,
       usedTokenHistory,
       props.expiresAt,
@@ -97,7 +97,7 @@ export class RefreshToken {
     return this._id;
   }
 
-  public getUserId(): AccountId {
+  public getAccountId(): AccountId {
     return this._userId;
   }
 

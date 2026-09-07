@@ -49,7 +49,7 @@ export class LoginUseCase {
       return err(new AppError('EMAIL_NOT_FOUND', `Not found ${dto.email}`));
     }
 
-    if (account.getStatus().isBanned()) {
+    if (account.getStatus().isLocked()) {
       return err(new AppError('USER_BANNED', 'The account has been banned'));
     }
 
@@ -92,7 +92,7 @@ export class LoginUseCase {
     });
 
     const newRefreshToken = RefreshToken.baseEntity({
-      userId: account.getId().toString(),
+      accountId: account.getId().toString(),
       token: refreshToken,
       expiresAt: this.jwtAuth.getTokenExpiresIn('refresh'),
     });

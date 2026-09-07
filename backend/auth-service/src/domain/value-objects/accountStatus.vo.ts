@@ -1,7 +1,7 @@
 import { AppError, ValueObject } from '@packages/pattern';
 import { err, ok, Result } from 'neverthrow';
 
-export type STATUS = 'PENDING' | 'ACTIVE' | 'BANNED' | 'DEACTIVATED';
+export type STATUS = 'LOCKED' | 'EMAIL_UNVERIFIED' | 'VERIFIED';
 
 export class AccountStatus extends ValueObject<{ status: STATUS }> {
   static readonly MAX_FAIL_LOGIN = 5;
@@ -11,7 +11,7 @@ export class AccountStatus extends ValueObject<{ status: STATUS }> {
   }
 
   static create(status: string): Result<AccountStatus, AppError> {
-    if (!['PENDING', 'ACTIVE', 'BANNED', 'DEACTIVATED'].includes(status)) {
+    if (!['LOCKED', 'EMAIL_UNVERIFIED', 'VERIFIED'].includes(status)) {
       return err(new AppError('INVALID_STATUS', `Invalid status: ${status}`));
     }
 
@@ -23,16 +23,16 @@ export class AccountStatus extends ValueObject<{ status: STATUS }> {
   }
 
   static active() {
-    return new AccountStatus({ status: 'ACTIVE' });
+    return new AccountStatus({ status: 'VERIFIED' });
   }
 
-  static banned() {
-    return new AccountStatus({ status: 'BANNED' });
+  static locked() {
+    return new AccountStatus({ status: 'LOCKED' });
   }
 
   recordFailedLogin(currentAttempts: number): AccountStatus {
     if (currentAttempts >= AccountStatus.MAX_FAIL_LOGIN) {
-      return AccountStatus.banned();
+      return AccountStatus.locked();
     }
 
     return this;
@@ -42,8 +42,8 @@ export class AccountStatus extends ValueObject<{ status: STATUS }> {
     return this.props.status;
   }
 
-  public isBanned(): boolean {
-    return this.props.status === 'BANNED';
+  public isLocked(): boolean {
+    return this.props.status === 'LOCKED';
   }
 
   public toString(): string {

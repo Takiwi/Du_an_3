@@ -77,7 +77,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   async revokeAllForUser(userId: AccountId): Promise<void> {
     await this.prismaService.refreshToken.deleteMany({
       where: {
-        userId: userId.toString(),
+        accountId: userId.toString(),
       },
     });
   }
@@ -87,7 +87,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
       await this.prismaService.refreshToken.create({
         data: {
           id: refreshToken.getId().toString(),
-          userId: refreshToken.getUserId().toString(),
+          accountId: refreshToken.getAccountId().toString(),
           token: this.cryptoService.hash(refreshToken.getToken()),
           tokensUsed: refreshToken.getTokensUsed().toArray(),
           expiresAt: refreshToken.getExpiresAt(),

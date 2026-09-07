@@ -1,5 +1,5 @@
 services:
-  postgres:
+  postgres_auth:
     image: postgres:15-alpine
     container_name: postgres_auth
     env_file:
@@ -19,7 +19,7 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
-  redis:
+  redis_auth:
     image: redis:7-alpine
     container_name: redis_auth
     command: redis-server --appendonly yes # Bật chế độ AOF để lưu dữ liệu lâu dài (nếu cần)
@@ -39,18 +39,18 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-  redis-commander:
+  redis-commander_auth:
     image: rediscommander/redis-commander:latest
     container_name: auth-redis-ui
     restart: always
     environment:
-      - REDIS_HOSTS=LocalRedis:redis:6379
+      - REDIS_HOSTS=LocalRedis:redis_auth:6379
     ports:
       - '8081:8081'
     networks:
       - redis-net
     depends_on:
-      - redis
+      - redis_auth
 volumes:
   auth_postgres_data:
   auth_redis_data:

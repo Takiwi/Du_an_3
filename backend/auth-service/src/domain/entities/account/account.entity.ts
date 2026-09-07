@@ -57,7 +57,7 @@ export class Account {
   }
 
   static createByAdmin(props: BaseAccount): Result<Account, AppError> {
-    const defaultStatus = AccountStatus.banned();
+    const defaultStatus = AccountStatus.locked();
     const defaultRole: Role = 'USER';
 
     return this.create({ ...props, status: defaultStatus, role: defaultRole });
@@ -95,6 +95,14 @@ export class Account {
 
   getPassword(): Password {
     return this._password;
+  }
+
+  updatePassword(plainPassword: string) {
+    const password = Password.create(plainPassword);
+
+    if (password.isErr()) return err(password.error);
+
+    this._password = password.value;
   }
 
   getRole(): Role {

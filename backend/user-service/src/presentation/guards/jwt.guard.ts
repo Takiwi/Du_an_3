@@ -41,9 +41,5 @@ export class JwtAuthGuard implements CanActivate {
     if (request.cookies && request.cookies['access_token']) {
       return request.cookies['access_token'];
     }
-
-    // 2. Dự phòng lấy từ Header (dành cho Mobile App / Postman / Swagger)
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

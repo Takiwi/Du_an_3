@@ -58,7 +58,7 @@ export class RefreshTokenUseCase {
       return err(new AppError('USER_NOT_FOUND', 'Account not found'));
     }
 
-    if (account.getStatus().isBanned()) {
+    if (account.getStatus().isLocked()) {
       return err(new AppError('USER_BANNED', 'The account has been banned'));
     }
 
@@ -66,7 +66,7 @@ export class RefreshTokenUseCase {
     const reuseCheck = hasRefreshToken.isReuse(hashedToken);
     if (reuseCheck.isErr()) {
       await this.refreshTokenRepository.revokeAllForUser(
-        hasRefreshToken.getUserId(),
+        hasRefreshToken.getAccountId(),
       );
       return err(reuseCheck.error);
     }
