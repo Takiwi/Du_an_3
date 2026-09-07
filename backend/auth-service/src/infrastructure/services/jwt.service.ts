@@ -37,6 +37,8 @@ export class JwtAuthentication implements IJwtAuthentication {
         algorithm: 'RS256',
         expiresIn: this.getTokenExpiresIn('access'),
         jwtid: randomUUID(),
+        issuer: this.configService.getOrThrow<string>('jwt.jwtIssuer'),
+        audience: ['user-service', 'anime-service'],
       }),
       this.jwtService.signAsync(
         { sub: payload.sub },

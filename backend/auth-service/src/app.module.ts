@@ -38,6 +38,7 @@ import { FormatResponse } from '@presentation/interceptors/formatResponse.interc
 import { PrismaService } from '@infrastructure/database/prisma.service';
 import { RedisService } from '@infrastructure/database/redis.service';
 import { UserProfileService } from '@infrastructure/services/userProfile.service';
+import { RabbitMQModule } from './modules/rabbitMQ.module';
 @Module({
   imports: [
     ClsModule,
@@ -53,7 +54,7 @@ import { UserProfileService } from '@infrastructure/services/userProfile.service
     }),
     AppLoggerModule.forRoot('auth-service'),
     PassportModule,
-    ConfigModule,
+    RabbitMQModule,
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         privateKey: configService.getOrThrow<string>('JWT_PRIVATE_KEY'),

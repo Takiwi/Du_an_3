@@ -6,6 +6,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { Logger } from 'nestjs-pino';
 import { ValidationFieldException } from '@presentation/errors/validationField.error';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { PROTO_PACKAGES, PROTO_PATHS } from '@packages/grpc-contracts';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -14,6 +16,16 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
   app.enableShutdownHooks();
+
+  // gRPC Microservice (PORT 5000)
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      package: PROTO_PACKAGES.AUTH,
+      protoPath: PROTO_PATHS.AUTH,
+      url: '0.0.0.0:5000',
+    },
+  });
 
   // router
   app.setGlobalPrefix('/api/v1');
@@ -49,6 +61,10 @@ async function bootstrap() {
     }),
   );
 
+  // gRPC
+  await app.startAllMicroservices();
+
+  // REST API
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

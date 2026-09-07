@@ -1,0 +1,19 @@
+syntax = 'proto3';
+
+package user;
+
+UserService  {
+    rpc CreateProfile (CreateProfileInput) returns (CreateProfileOutput)
+}
+
+message CreateProfileInput {
+    username: string = 1;
+    email: string = 1;
+}
+
+message CreateProfileOutput {
+    id: string = 1;
+    username: string = 2;
+    email: string = 3;
+    status: string = 4;
+}

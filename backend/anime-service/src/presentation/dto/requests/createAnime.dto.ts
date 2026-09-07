@@ -1,4 +1,4 @@
-import { CreateAnimeInput } from '@auth/application/usecase/createAnime.contract';
+import { CreateAnimeInput } from '@application/usecase/createAnime.contract';
 import { IsNumber, IsString, Max, Min, MinLength } from 'class-validator';
 
 export class CreateAnimeDto implements CreateAnimeInput {

@@ -11,4 +11,5 @@ export default registerAs('jwt', () => ({
     process.env.JWT_ACCESS_TOKEN_EXPIRED_IN ?? '300',
     10,
   ),
+  jwtIssuer: process.env.JWT_ISSUER,
 }));

@@ -8,10 +8,10 @@ import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
 } from '../../ports/IPasswordHasher.port';
-import { IUserFacade, USER_FACADE_TOKEN } from '../../ports/IUserFacade.port';
 import { Account } from '@domain/entities/account/account.entity';
 import { AppError } from '@packages/pattern';
 import { ok, err, Result } from 'neverthrow';
+import { ClientGrpc } from '@nestjs/microservices';
 
 export interface RegisterOutput {
   account: Account;
@@ -25,8 +25,8 @@ export class RegisterUseCase {
     private readonly accountRepository: IAccountRepository,
     @Inject(PASSWORD_HASHER_TOKEN)
     private readonly passwordHasher: IPasswordHasher,
-    @Inject(USER_FACADE_TOKEN)
-    private readonly userFacade: IUserFacade,
+    @Inject('USER_PACKAGE')
+    private client: ClientGrpc,
   ) {}
 
   async execute(dto: RegisterInput): Promise<Result<RegisterOutput, AppError>> {
@@ -42,11 +42,11 @@ export class RegisterUseCase {
       );
     }
 
-    // 2. Validate username format and blacklist via User domain
-    const usernameValidation = this.userFacade.validateUsername(dto.username);
-    if (usernameValidation.isErr()) {
-      return err(usernameValidation.error);
-    }
+    // 2. Send a request to user service to validate the username format and blacklist via User domain
+    await this.messagePublisher.publish('Account.created', {
+      email: dto.email,
+      username: dto.username,
+    });
 
     // 3. Check username availability
     const isUsernameTaken = await this.userFacade.isUsernameTaken(dto.username);

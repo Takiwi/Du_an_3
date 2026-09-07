@@ -18,6 +18,7 @@ allowBuilds:
   msgpackr-extract: true
   pg: true
   prisma: true
+  protobufjs: true
   stacktrace: true
   unrs-resolver: true
   uriparser: true

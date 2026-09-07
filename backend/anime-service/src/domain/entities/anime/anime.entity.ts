@@ -1,4 +1,4 @@
-import { AnimeId } from '@auth/domain/value-objects/animeId.vo';
+import { AnimeId } from '@domain/value-objects/animeId.vo';
 import { STATUS, TYPE } from '@generated/prisma/enums';
 import { randomUUID } from 'crypto';
 import { BaseAnime, FullAnime } from './anime.contract';
