@@ -5,7 +5,7 @@ import {
   Patch,
   Inject,
   UseGuards,
-  ValidationPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiCommonErrors,
@@ -20,15 +20,17 @@ import { UpdateUserDto } from '../dto/requests/updateUser.dto';
 import { ERROR_DEFINITIONS } from '../configs/error.config';
 import { CurrentUser } from '../decorators/currentUser.decorator';
 import { JwtAuthGuard } from '../guards/jwt.guard';
-import { CreateProfileDto } from '../dto/requests/createProfile.dto';
-import { GrpcMethod, Payload, RpcException } from '@nestjs/microservices';
-import { status } from '@grpc/grpc-js';
+// import { CreateProfileDto } from '../dto/requests/createProfile.dto';
+// import { GrpcMethod, Payload, RpcException } from '@nestjs/microservices';
+// import { status } from '@grpc/grpc-js';
 import { CreateProfileUseCase } from '@application/useCases/createProfile/createProfile.usecase';
-import { Public } from '../decorators/public.decorator';
+// import { Public } from '../decorators/public.decorator';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
+import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 
 @ApiCommonErrors()
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(LoggingInterceptor)
 @Controller('user/')
 export class UserController {
   constructor(
@@ -89,33 +91,5 @@ export class UserController {
     if (result.isErr()) throw result.error;
 
     return UserProfileMapper.toResponseDto(result.value);
-  }
-
-  // ----------------------------------------------------
-  // 2. DÀNH CHO CÁC SERVICE KHÁC GỌI QUA gRPC
-  // ----------------------------------------------------
-
-  @Public()
-  @GrpcMethod('UserService', 'createUserProfile')
-  async create(@Payload(new ValidationPipe()) createUserDto: CreateProfileDto) {
-    this.logger.debug(`Hello::::::::${createUserDto.email}`);
-    try {
-      const result = await this.createProfileUseCase.execute(createUserDto);
-
-      if (result.isErr()) {
-        throw new RpcException({
-          code: status.ALREADY_EXISTS,
-          message: JSON.stringify({
-            appErrorCode: result.error.code,
-            message: result.error.internalMessage,
-          }),
-        });
-      }
-
-      return result.value;
-    } catch (error) {
-      this.logger.debug('Hello2');
-      console.error(error);
-    }
   }
 }

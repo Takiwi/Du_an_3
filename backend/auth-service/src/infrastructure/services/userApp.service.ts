@@ -9,6 +9,8 @@ interface UserServiceClient {
     username: string;
     email: string;
   }): Observable<UserProfile>;
+
+  deleteUserProfile(userId: string): Observable<void>;
 }
 
 @Injectable()
@@ -17,6 +19,12 @@ export class UserAppService implements IUserFacade, OnModuleInit {
 
   constructor(@Inject('USER_SERVICE') private grpcClient: ClientGrpc) {}
 
+  async deleteUserProfile(userId: string): Promise<void> {
+    const result = await firstValueFrom(this.client.deleteUserProfile(userId));
+
+    return result;
+  }
+
   async createUserProfile(
     username: string,
     email: string,
@@ -24,14 +32,10 @@ export class UserAppService implements IUserFacade, OnModuleInit {
     const result = await firstValueFrom(
       this.client.createUserProfile({ username, email }).pipe(
         catchError((err) => {
-          console.log(`Log error :::::::::::::::::::`);
-          console.error(err);
           return throwError(() => mapGRpcError(err));
         }),
       ),
     );
-
-    console.log(`TEST::::::${result.email}`);
 
     return result;
   }

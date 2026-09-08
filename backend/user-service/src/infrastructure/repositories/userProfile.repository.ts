@@ -4,10 +4,21 @@ import { UserProfile } from '@domain/entities/userProfile.entity';
 import { UserId } from '@domain/value-objects/userId.vo';
 import { PrismaService } from '../database/prisma.service';
 import { asyncHandlerError } from '../helpers/asyncHandlerError.helper';
+import { Username } from '@domain/value-objects/username.vo';
 
 @Injectable()
 export class UserProfileRepository implements IUserProfileRepository {
   constructor(private readonly prismaService: PrismaService) {}
+
+  async deleteProfile(userId: UserId): Promise<void> {
+    await asyncHandlerError(async () => {
+      await this.prismaService.user.delete({
+        where: {
+          id: userId.toString(),
+        },
+      });
+    });
+  }
 
   async findById(id: UserId): Promise<UserProfile | null> {
     const user = await this.prismaService.user.findUnique({
@@ -19,20 +30,20 @@ export class UserProfileRepository implements IUserProfileRepository {
     return user ? UserProfile.reconstitute(user) : null;
   }
 
-  async findByUsername(username: string): Promise<UserProfile | null> {
+  async findByUsername(username: Username): Promise<UserProfile | null> {
     const user = await this.prismaService.user.findUnique({
       where: {
-        username,
+        username: username.toString(),
       },
     });
 
     return user ? UserProfile.reconstitute(user) : null;
   }
 
-  async existsByUsername(username: string): Promise<boolean> {
+  async existsByUsername(username: Username): Promise<boolean> {
     const user = await this.prismaService.user.findUnique({
       where: {
-        username,
+        username: username.toString(),
       },
       select: { id: true },
     });
@@ -42,7 +53,7 @@ export class UserProfileRepository implements IUserProfileRepository {
 
   async updateUsernameById(
     id: UserId,
-    updates: { username: string; lastUsernameChangedAt: Date },
+    updates: { username: Username; lastUsernameChangedAt: Date },
   ): Promise<UserProfile> {
     const result = await asyncHandlerError(async () => {
       return await this.prismaService.user.update({
@@ -50,7 +61,7 @@ export class UserProfileRepository implements IUserProfileRepository {
           id: id.toString(),
         },
         data: {
-          username: updates.username,
+          username: updates.username.toString(),
           lastUsernameChangedAt: updates.lastUsernameChangedAt,
         },
       });

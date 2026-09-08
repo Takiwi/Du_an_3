@@ -15,6 +15,8 @@ import appConfig from './config/app.config';
 import prismaDatabaseConfig from './config/prismaDatabase.config';
 import redisDatabaseConfig from './config/redisDatabase.config';
 import { ID_GENERATOR_TOKEN } from './application/ports/IdGenerator.port';
+import { UserGRpcController } from './presentation/controllers/gRpc.controller';
+import { DeleteProfileUseCase } from '@application/useCases/deleteProfile/deleteProfile.usecase';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { ID_GENERATOR_TOKEN } from './application/ports/IdGenerator.port';
     AppLoggerModule.forRoot('user-service'),
     RabbitMQModule,
   ],
-  controllers: [UserController],
+  controllers: [UserController, UserGRpcController],
   providers: [
     {
       provide: USER_PROFILE_REPOSITORY_TOKEN,
@@ -37,6 +39,7 @@ import { ID_GENERATOR_TOKEN } from './application/ports/IdGenerator.port';
       provide: ID_GENERATOR_TOKEN,
       useValue: { generate: () => randomUUID() },
     },
+    DeleteProfileUseCase,
     GetProfileUseCase,
     UpdateProfileUseCase,
     CreateProfileUseCase,

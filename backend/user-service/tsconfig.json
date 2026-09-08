@@ -18,7 +18,8 @@
       "@packages/pattern/*": ["../../packages/pattern/src/*"],
       "@packages/request-context/*": ["../../packages/request-context/src/*"],
       "@packages/logging/*": ["../../packages/logging/src/*"],
-      "@packages/api-docs/*": ["../../packages/api-docs/src/*"]
+      "@packages/api-docs/*": ["../../packages/api-docs/src/*"],
+      "@packages/grpc-contracts/*": ["../../packages/grpc-contracts/src/*"]
     }
   },
   "references": [

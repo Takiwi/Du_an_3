@@ -607,6 +607,13 @@ importers:
         version: 5.9.3
 
   packages/grpc-contracts:
+    dependencies:
+      '@grpc/grpc-js':
+        specifier: ^1.14.4
+        version: 1.14.4
+      '@packages/pattern':
+        specifier: workspace:*
+        version: link:../pattern
     devDependencies:
       '@types/node':
         specifier: ^24.13.3

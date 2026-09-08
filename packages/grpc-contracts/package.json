@@ -18,6 +18,12 @@
     "dev": "tsc -b --watch",
     "clean": "tsc -b --clean"
   },
+  "dependencies": {
+    "@packages/pattern": "workspace:*"
+  },
+  "peerDependencies": {
+    "@grpc/grpc-js": "^1.14.4"
+  },
   "devDependencies": {
     "@types/node": "^24.13.3",
     "typescript": "^5.9.3"

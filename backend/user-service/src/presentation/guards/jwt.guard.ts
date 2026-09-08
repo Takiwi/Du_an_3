@@ -1,16 +1,23 @@
 import {
   CanActivate,
   ExecutionContext,
+  Inject,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { RequestWithCookies } from '../types/requestCookie.type';
+import { ConfigService } from '@nestjs/config';
+import { AppError } from '@packages/pattern';
+import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 
-const JWKS = createRemoteJWKSet(
-  new URL('https://auth.yourdomain.com/.well-known/jwks.json'),
-);
-
+@Injectable()
 export class JwtAuthGuard implements CanActivate {
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(LOGGER_TOKEN) private readonly logger: ILogger,
+  ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<RequestWithCookies>();
     const token = this.extractTokenFromRequest(request);
@@ -18,6 +25,10 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException('Missing authentication token');
     }
+
+    const JWKS = createRemoteJWKSet(
+      new URL(this.configService.getOrThrow('jwks.url')),
+    );
 
     try {
       // Xác thực token stateless
@@ -30,7 +41,10 @@ export class JwtAuthGuard implements CanActivate {
       request['user'] = payload;
       return true;
     } catch (error) {
-      throw new UnauthorizedException('Invalid or expired token');
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error('[Auth guard error]', err);
+
+      throw new AppError('INVALID_TOKEN', 'Invalid or expired token');
     }
   }
 

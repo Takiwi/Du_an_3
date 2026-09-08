@@ -1,0 +1,26 @@
+import "google/protobuf/empty.proto";
+
+syntax = 'proto3';
+
+package user;
+
+service UserService {
+    rpc createUserProfile (CreateProfileRequest) returns (CreateProfileResponse);
+    rpc deleteUserProfile (DeleteProfileRequest) returns (google.protobuf.Empty);
+}
+
+message CreateProfileRequest {
+    string username = 1;
+    string email = 2;
+}
+
+message CreateProfileResponse {
+    string id = 1;
+    string username = 2;
+    string email = 3;
+    string status = 4;
+}
+
+message DeleteProfileRequest {
+    string userId = 1;
+}

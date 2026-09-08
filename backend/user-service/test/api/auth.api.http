@@ -2,8 +2,8 @@ POST http://localhost:3001/api/v1/auth/register
 content-type: application/json
 
 {
-  "email": "meow@gmail.com",
-  "username": "user1",
+  "email": "meow123@gmail.com",
+  "username": "user34232",
   "password": "@Abc12345"
 }
 

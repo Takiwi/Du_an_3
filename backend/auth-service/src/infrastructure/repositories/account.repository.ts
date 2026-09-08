@@ -5,7 +5,7 @@ import { AccountId } from '@domain/value-objects/accountId.vo';
 import { AccountStatus } from '@domain/value-objects/accountStatus.vo';
 import { Password } from '@domain/value-objects/password.vo';
 import { PrismaService } from '@infrastructure/database/prisma.service';
-import { asyncHandlerError } from '@infrastructure/helpers/asyncHandlerError.helper';
+import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPrismaError.helper';
 
 @Injectable()
 export class AccountRepository implements IAccountRepository {
@@ -40,7 +40,7 @@ export class AccountRepository implements IAccountRepository {
     id: AccountId,
     status: AccountStatus,
   ): Promise<Account> {
-    const result = await asyncHandlerError(async () => {
+    const result = await asyncHandlerPrismaError(async () => {
       return await this.prismaService.account.update({
         where: { id: id.toString() },
         data: { status: status.currentStatus() },
@@ -54,7 +54,7 @@ export class AccountRepository implements IAccountRepository {
     id: AccountId,
     password: Password,
   ): Promise<Account> {
-    const result = await asyncHandlerError(async () => {
+    const result = await asyncHandlerPrismaError(async () => {
       return await this.prismaService.account.update({
         where: { id: id.toString() },
         data: { password: password.toString() },
@@ -65,7 +65,7 @@ export class AccountRepository implements IAccountRepository {
   }
 
   async insertAccount(account: Account): Promise<void> {
-    await asyncHandlerError(async () => {
+    await asyncHandlerPrismaError(async () => {
       await this.prismaService.account.create({
         data: {
           id: account.getId().toString(),

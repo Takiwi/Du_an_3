@@ -51,8 +51,6 @@ export class RegisterUseCase {
       dto.email,
     );
 
-    console.log('Hello');
-
     // 3. Create Account entity
     const accountResult = Account.baseEntity({
       id: userProfile.id,
@@ -61,6 +59,9 @@ export class RegisterUseCase {
     });
 
     if (accountResult.isErr()) {
+      // rollback all
+      await this.userFacade.deleteUserProfile(userProfile.id);
+
       return err(accountResult.error);
     }
 

@@ -9,4 +9,5 @@ export interface UserProfile {
 
 export interface IUserFacade {
   createUserProfile(username: string, email: string): Promise<UserProfile>;
+  deleteUserProfile(userId: string): Promise<void>;
 }

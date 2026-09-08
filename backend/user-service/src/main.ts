@@ -22,7 +22,7 @@ async function bootstrap() {
     options: {
       package: PROTO_PACKAGES.USER,
       protoPath: PROTO_PATHS.USER,
-      url: '0.0.0.0:5002',
+      url: 'localhost:5002',
     },
   });
 

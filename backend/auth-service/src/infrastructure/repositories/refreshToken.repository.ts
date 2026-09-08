@@ -7,7 +7,7 @@ import {
   IDataHasher,
 } from '@application/ports/IDataHasher.port';
 import { PrismaService } from '@infrastructure/database/prisma.service';
-import { asyncHandlerError } from '@infrastructure/helpers/asyncHandlerError.helper';
+import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPrismaError.helper';
 
 @Injectable()
 export class RefreshTokenRepository implements IRefreshTokenRepository {
@@ -21,7 +21,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     oldToken: string,
     newToken: string,
   ): Promise<void> {
-    await asyncHandlerError(async () => {
+    await asyncHandlerPrismaError(async () => {
       await this.prismaService.refreshToken.update({
         where: {
           token: oldToken,
@@ -37,7 +37,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 
   async deleteById(id: AccountId): Promise<void> {
-    await asyncHandlerError(async () => {
+    await asyncHandlerPrismaError(async () => {
       await this.prismaService.refreshToken.delete({
         where: {
           id: id.toString(),
@@ -57,7 +57,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 
   async deleteByToken(token: string): Promise<void> {
-    await asyncHandlerError(async () => {
+    await asyncHandlerPrismaError(async () => {
       await this.prismaService.refreshToken.delete({
         where: { token },
       });
@@ -83,7 +83,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 
   async insertRefreshToken(refreshToken: RefreshToken): Promise<void> {
-    await asyncHandlerError(async () => {
+    await asyncHandlerPrismaError(async () => {
       await this.prismaService.refreshToken.create({
         data: {
           id: refreshToken.getId().toString(),
