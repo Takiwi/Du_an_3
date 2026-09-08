@@ -13,6 +13,7 @@ import {
   ApiSuccessResponseDto,
 } from '@packages/api-docs';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
+import { SKIP_TRANSFORM } from '@presentation/decorators/skipResponseFormat';
 
 @Injectable()
 export class FormatResponse<T> implements NestInterceptor {
@@ -26,11 +27,18 @@ export class FormatResponse<T> implements NestInterceptor {
   intercept(
     context: ExecutionContext,
     next: CallHandler<T>,
-  ): Observable<ApiSuccessResponseDto<T>> {
+  ): Observable<ApiSuccessResponseDto<T> | T> {
     const message = this.reflector.get<string>(
       RESPONSE_MESSAGE_KEY,
       context.getHandler(),
     );
+
+    const skip = this.reflector.getAllAndOverride<boolean>(SKIP_TRANSFORM, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (skip) return next.handle();
 
     return next.handle().pipe(
       map((data): ApiSuccessResponseDto<T> => ({
@@ -43,7 +51,6 @@ export class FormatResponse<T> implements NestInterceptor {
         },
       })),
       catchError((err: Error) => {
-        this.logger.error(err.name, err);
         return throwError(() => err);
       }),
     );

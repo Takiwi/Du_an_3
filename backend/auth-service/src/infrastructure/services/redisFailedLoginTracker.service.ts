@@ -14,7 +14,7 @@ export class RedisFailedLoginTracker implements IFailedLoginTracker {
   async incrementAndGet(accountId: AccountId): Promise<number> {
     const key = `failed_login:${accountId.toString()}`;
     const expiredIn = this.configService.getOrThrow<number>(
-      'jwt.publicExpiresIn',
+      'jwt.accessTokenExpiresIn',
     );
 
     const pipeline = this.redis.pipeline();

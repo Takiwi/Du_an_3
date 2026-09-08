@@ -17,12 +17,20 @@ import redisDatabaseConfig from './config/redisDatabase.config';
 import { ID_GENERATOR_TOKEN } from './application/ports/IdGenerator.port';
 import { UserGRpcController } from './presentation/controllers/gRpc.controller';
 import { DeleteProfileUseCase } from '@application/useCases/deleteProfile/deleteProfile.usecase';
+import jwksConfig from './config/jwks.config';
+import jwtConfig from './config/jwt.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, prismaDatabaseConfig, redisDatabaseConfig],
+      load: [
+        appConfig,
+        prismaDatabaseConfig,
+        redisDatabaseConfig,
+        jwksConfig,
+        jwtConfig,
+      ],
     }),
     AppLoggerModule.forRoot('user-service'),
     RabbitMQModule,

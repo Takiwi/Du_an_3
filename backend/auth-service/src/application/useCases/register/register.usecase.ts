@@ -51,6 +51,8 @@ export class RegisterUseCase {
       dto.email,
     );
 
+    console.log(`User id in auth service:::::::::${userProfile.id}`);
+
     // 3. Create Account entity
     const accountResult = Account.baseEntity({
       id: userProfile.id,

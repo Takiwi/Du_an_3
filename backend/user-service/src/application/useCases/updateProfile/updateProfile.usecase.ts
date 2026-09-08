@@ -37,7 +37,7 @@ export class UpdateProfileUseCase {
       if (newUsernameResult.isErr()) return err(newUsernameResult.error);
 
       const existingUser = await this.userProfileRepository.findByUsername(
-        newUsernameResult.value.toString(),
+        newUsernameResult.value,
       );
 
       if (
@@ -56,7 +56,7 @@ export class UpdateProfileUseCase {
 
       const updatedProfile =
         await this.userProfileRepository.updateUsernameById(profile.getId(), {
-          username: newUsernameResult.value.toString(),
+          username: newUsernameResult.value,
           lastUsernameChangedAt: now,
         });
 

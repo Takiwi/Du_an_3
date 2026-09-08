@@ -15,6 +15,7 @@ import {
   IMessagePublisher,
   MESSAGE_PUBLISHER,
 } from '@application/ports/messagePublisher.port';
+import { Username } from '@domain/value-objects/username.vo';
 
 @Injectable()
 export class CreateProfileUseCase {
@@ -30,8 +31,12 @@ export class CreateProfileUseCase {
   async execute(
     input: CreateProfileInput,
   ): Promise<Result<UserProfile, AppError>> {
+    const username = Username.create(input.username);
+
+    if (username.isErr()) return err(username.error);
+
     const isTaken = await this.userProfileRepository.existsByUsername(
-      input.username,
+      username.value,
     );
 
     if (isTaken) {
@@ -54,6 +59,10 @@ export class CreateProfileUseCase {
     }
 
     await this.userProfileRepository.insertProfile(profileResult.value);
+
+    console.log(
+      `UserId in user service:::::::::::${profileResult.value.getId().toString()}`,
+    );
 
     return ok(profileResult.value);
   }

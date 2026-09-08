@@ -5,6 +5,7 @@ import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 import { CreateProfileUseCase } from '@application/useCases/createProfile/createProfile.usecase';
 import { status } from '@grpc/grpc-js';
 import { DeleteProfileUseCase } from '@application/useCases/deleteProfile/deleteProfile.usecase';
+import { UserProfileMapper } from '../mappers/userProfile.mapper';
 
 @Controller()
 export class UserGRpcController {
@@ -29,10 +30,10 @@ export class UserGRpcController {
         });
       }
 
-      return result.value;
+      return UserProfileMapper.toResponseDto(result.value);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error('[User service error]', err);
+      this.logger.error('[Auth guard error]', err);
 
       throw new RpcException({
         code: status.INTERNAL,
@@ -47,7 +48,7 @@ export class UserGRpcController {
       await this.deleteProfileUseCase.execute(userId);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error('[User service error]', err);
+      this.logger.error('[Auth guard error]', err);
 
       throw new RpcException({
         code: status.INTERNAL,

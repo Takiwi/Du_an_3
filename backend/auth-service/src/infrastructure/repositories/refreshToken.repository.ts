@@ -36,26 +36,6 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     });
   }
 
-  async deleteById(id: AccountId): Promise<void> {
-    await asyncHandlerPrismaError(async () => {
-      await this.prismaService.refreshToken.delete({
-        where: {
-          id: id.toString(),
-        },
-      });
-    });
-  }
-
-  async findById(id: AccountId): Promise<RefreshToken | null> {
-    const result = await this.prismaService.refreshToken.findUnique({
-      where: {
-        id: id.toString(),
-      },
-    });
-
-    return result ? RefreshToken.reconstitute(result) : null;
-  }
-
   async deleteByToken(token: string): Promise<void> {
     await asyncHandlerPrismaError(async () => {
       await this.prismaService.refreshToken.delete({
@@ -74,10 +54,10 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     return result ? RefreshToken.reconstitute(result) : null;
   }
 
-  async revokeAllForUser(userId: AccountId): Promise<void> {
+  async revokeAllForUser(accountId: AccountId): Promise<void> {
     await this.prismaService.refreshToken.deleteMany({
       where: {
-        accountId: userId.toString(),
+        accountId: accountId.toString(),
       },
     });
   }

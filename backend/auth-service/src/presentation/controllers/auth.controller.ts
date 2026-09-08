@@ -53,10 +53,6 @@ export class AuthController {
     private readonly logger: ILogger,
   ) {}
 
-  // ----------------------------------------------------
-  // 1. DÀNH CHO CÁC SERVICE KHÁC GỌI QUA REST API
-  // ----------------------------------------------------
-
   @ApiSuccessResponse({
     status: 201,
     model: AuthResponseDto,
@@ -226,8 +222,4 @@ export class AuthController {
 
     return AuthMapper.toResponseDto(result.value);
   }
-
-  // ----------------------------------------------------
-  // 2. DÀNH CHO CÁC SERVICE KHÁC GỌI QUA gRPC
-  // ----------------------------------------------------
 }

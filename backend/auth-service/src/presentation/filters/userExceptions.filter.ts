@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   Inject,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ClsService } from '@packages/request-context';
@@ -31,8 +32,6 @@ export class UserExceptionFilter implements ExceptionFilter {
     const requestId = this.clsService.get('requestId') ?? '';
     const timestamp = new Date().toISOString();
 
-    this.logger.error(`[${request.method}] ${request.url}`);
-
     if (exception instanceof AppError) {
       const code = exception.code as keyof typeof ERROR_DEFINITIONS;
       const definition = ERROR_DEFINITIONS[code];
@@ -44,7 +43,9 @@ export class UserExceptionFilter implements ExceptionFilter {
         timestamp: timestamp,
       });
 
-      this.logger.error(exception.message);
+      this.logger.error(
+        `[${request.method}] ${request.url} - ${exception.message}`,
+      );
 
       return response.status(status).json(result);
     }
@@ -60,7 +61,9 @@ export class UserExceptionFilter implements ExceptionFilter {
         detailsError,
       );
 
-      this.logger.error(exception.message, exception);
+      this.logger.error(
+        `[${request.method}] ${request.url} - ${exception.message}`,
+      );
 
       return response.status(status).json(result);
     }
@@ -78,10 +81,21 @@ export class UserExceptionFilter implements ExceptionFilter {
       return response.status(500).json(exception.message);
     }
 
-    if (exception instanceof Error) {
-      this.logger.error(exception.message, exception, {
-        stack: exception.stack,
-      });
+    if (exception instanceof NotFoundException) {
+      this.logger.error(
+        `[${request.method}] ${request.url} - ${exception.message}`,
+      );
+
+      return response
+        .status(404)
+        .json(
+          new ApiErrorResponseDto(
+            'NOT_FOUND',
+            'Not found error',
+            { requestId: requestId, timestamp: timestamp },
+            true,
+          ),
+        );
     }
 
     return response

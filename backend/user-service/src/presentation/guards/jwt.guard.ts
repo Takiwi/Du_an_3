@@ -3,7 +3,6 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { RequestWithCookies } from '../types/requestCookie.type';
@@ -19,21 +18,24 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<RequestWithCookies>();
-    const token = this.extractTokenFromRequest(request);
-
-    if (!token) {
-      throw new UnauthorizedException('Missing authentication token');
-    }
-
     const JWKS = createRemoteJWKSet(
       new URL(this.configService.getOrThrow('jwks.url')),
     );
 
+    const request = context.switchToHttp().getRequest<RequestWithCookies>();
+    const token = this.extractTokenFromRequest(request);
+
+    if (!token) {
+      throw new AppError(
+        'VALIDATION_TOKEN_FALSE',
+        'Missing authentication token',
+      );
+    }
+
     try {
       // Xác thực token stateless
       const { payload } = await jwtVerify(token, JWKS, {
-        issuer: process.env.JWT_ISSUER,
+        issuer: this.configService.getOrThrow('jwt.jwtIssuer'),
         audience: 'user-service',
       });
 
@@ -52,8 +54,8 @@ export class JwtAuthGuard implements CanActivate {
     request: RequestWithCookies,
   ): string | undefined {
     // 1. Ưu tiên lấy từ Cookie
-    if (request.cookies && request.cookies['access_token']) {
-      return request.cookies['access_token'];
+    if (request.cookies && request.cookies['accessToken']) {
+      return request.cookies['accessToken'];
     }
   }
 }
