@@ -46,14 +46,9 @@ export class RefreshTokenUseCase {
     }
 
     // 4. Validate account in Auth repository
-    const accountIdResult = AccountId.create(payload.sub);
-    if (accountIdResult.isErr()) {
-      return err(accountIdResult.error);
-    }
+    const accountId = AccountId.reconstitute(payload.sub);
 
-    const account = await this.accountRepository.findById(
-      accountIdResult.value,
-    );
+    const account = await this.accountRepository.findById(accountId);
     if (!account) {
       return err(new AppError('USER_NOT_FOUND', 'Account not found'));
     }
@@ -76,7 +71,7 @@ export class RefreshTokenUseCase {
       await this.jwtService.generateTokenPair({
         sub: account.getId().toString(),
         email: account.getEmail(),
-        role: account.getRole(),
+        role: account.getRole().map((role) => role.toString()),
       });
 
     // 7. Update old refresh token record

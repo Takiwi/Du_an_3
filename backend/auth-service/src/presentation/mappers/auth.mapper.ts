@@ -8,7 +8,7 @@ export class AuthMapper {
       email: account.getEmail(),
       username: username,
       status: account.getStatus().currentStatus(),
-      role: account.getRole(),
+      role: account.getRole().map((role) => role.toString()),
     };
   }
 }

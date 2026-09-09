@@ -1,0 +1,8 @@
+model Role{
+    id String @id @default(uuid())
+    name String @unique
+    max_members Int?
+
+    account_role AccountRole[]
+    role_permission RolePermission[]
+}

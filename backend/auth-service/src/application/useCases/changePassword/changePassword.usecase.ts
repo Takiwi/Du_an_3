@@ -26,12 +26,11 @@ export class ChangePasswordUseCase {
     accountId: string,
     newPasswordPlain: string,
   ): Promise<Result<Account, AppError>> {
-    const accountIdResult = AccountId.create(accountId);
-    if (accountIdResult.isErr()) return err(accountIdResult.error);
+    // check account
+    const id = AccountId.reconstitute(accountId);
 
-    const account = await this.accountRepository.findById(
-      accountIdResult.value,
-    );
+    const account = await this.accountRepository.findById(id);
+
     if (!account) {
       return err(
         new AppError(
@@ -41,6 +40,7 @@ export class ChangePasswordUseCase {
       );
     }
 
+    // check password format
     const plainPassword = Password.create(newPasswordPlain);
     if (plainPassword.isErr()) return err(plainPassword.error);
 
@@ -48,6 +48,7 @@ export class ChangePasswordUseCase {
       plainPassword.value.toString(),
     );
 
+    // is new password same with new password
     const isSame = await this.passwordHasher.compare(
       plainPassword.value.toString(),
       account.getPassword().toString(),
@@ -62,11 +63,13 @@ export class ChangePasswordUseCase {
       );
     }
 
-    const updatedAccount = await this.accountRepository.updatePasswordById(
+    await this.accountRepository.updatePasswordById(
       account.getId(),
       Password.reconstitute(hashedPassword),
     );
 
-    return ok(updatedAccount);
+    account.updatePassword(hashedPassword);
+
+    return ok(account);
   }
 }

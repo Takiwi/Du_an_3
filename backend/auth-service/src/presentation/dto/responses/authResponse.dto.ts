@@ -1,4 +1,4 @@
-import { AuthStatus, Role } from '@generated/prisma/enums';
+import { AuthStatus } from '@generated/prisma/enums';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AuthResponseDto {
@@ -14,14 +14,14 @@ export class AuthResponseDto {
   @ApiProperty({ enum: AuthStatus, example: AuthStatus.VERIFIED })
   status: string;
 
-  @ApiProperty({ enum: Role, example: Role.USER })
-  role: string;
+  @ApiProperty({ example: ['USER'] })
+  role: string[];
 
   constructor(
     id: string,
     email: string,
     status: string,
-    role: string,
+    role: string[],
     username?: string,
   ) {
     this.id = id;

@@ -1,6 +1,5 @@
+import { RoleId } from '@domain/value-objects/roleId.vo';
 import { AccountStatus } from '../../value-objects/accountStatus.vo';
-
-export type Role = 'USER' | 'ADMIN';
 
 export interface BaseAccount {
   id: string;
@@ -13,7 +12,7 @@ export interface PureAccount {
   email: string;
   password: string;
   status: string;
-  role: Role;
+  role: string[];
 }
 
 export interface FullAccount {
@@ -21,5 +20,5 @@ export interface FullAccount {
   email: string;
   password: string;
   status: AccountStatus;
-  role: Role;
+  role: RoleId[];
 }

@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { RefreshTokenId } from '../../value-objects/refreshTokenId.vo';
 import { AccountId } from '../../value-objects/accountId.vo';
 import { UsedTokenHistory } from '../../value-objects/usedTokenHistory.vo';
@@ -12,20 +11,20 @@ import {
 
 export class RefreshToken {
   private readonly _id: RefreshTokenId;
-  private _userId: AccountId;
+  private _accountId: AccountId;
   private _token: string;
   private _tokensUsed: UsedTokenHistory;
   private _expiresAt: Date;
 
   private constructor(
     id: RefreshTokenId,
-    userId: AccountId,
+    accountId: AccountId,
     token: string,
     tokensUsed: UsedTokenHistory,
     expiresAt: Date,
   ) {
     this._id = id;
-    this._userId = userId;
+    this._accountId = accountId;
     this._token = token;
     this._tokensUsed = tokensUsed;
     this._expiresAt = expiresAt;
@@ -34,22 +33,19 @@ export class RefreshToken {
   private static create(
     props: RefreshTokenWithTokenUsed,
   ): Result<RefreshToken, AppError> {
-    const idResult = RefreshTokenId.create(randomUUID());
-    const accountIdResult = AccountId.create(props.accountId.toString());
-
-    const combined = Result.combine([idResult, accountIdResult]);
-
-    if (combined.isErr()) {
-      return err(combined.error);
-    }
-
-    const [id, accountId] = combined.value;
+    const id = RefreshTokenId.create();
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + props.expiresAt * 1000);
 
     return ok(
-      new RefreshToken(id, accountId, props.token, props.tokensUsed, expiresAt),
+      new RefreshToken(
+        id,
+        props.accountId,
+        props.token,
+        props.tokensUsed,
+        expiresAt,
+      ),
     );
   }
 
@@ -98,7 +94,7 @@ export class RefreshToken {
   }
 
   public getAccountId(): AccountId {
-    return this._userId;
+    return this._accountId;
   }
 
   public getToken(): string {

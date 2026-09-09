@@ -3,7 +3,7 @@ import {
   IAccountRepository,
   ACCOUNT_REPOSITORY_TOKEN,
 } from '@domain/repositories/IAccount.repository';
-import { RegisterInput } from './register.contract';
+import { RegisterInput, RegisterOutput } from './register.contract';
 import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
@@ -15,11 +15,6 @@ import {
   IUserFacade,
   USER_FACADE_TOKEN,
 } from '@application/ports/IUserFacade.port';
-
-export interface RegisterOutput {
-  account: Account;
-  username: string;
-}
 
 @Injectable()
 export class RegisterUseCase {
@@ -51,8 +46,6 @@ export class RegisterUseCase {
       dto.email,
     );
 
-    console.log(`User id in auth service:::::::::${userProfile.id}`);
-
     // 3. Create Account entity
     const accountResult = Account.baseEntity({
       id: userProfile.id,
@@ -78,6 +71,6 @@ export class RegisterUseCase {
     // 5. Insert account
     await this.accountRepository.insertAccount(account);
 
-    return ok({ account, username: dto.username });
+    return ok({ account, username: dto.username, role: ['USER'] });
   }
 }

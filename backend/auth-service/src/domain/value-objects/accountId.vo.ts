@@ -1,19 +1,14 @@
-import { AppError, EntityId } from '@packages/pattern';
-import { ok, err, Result } from 'neverthrow';
+import { EntityId } from '@packages/pattern';
 
 export class AccountId extends EntityId {
   private constructor(id: string) {
     super(id);
   }
 
-  static create(id: string): Result<AccountId, AppError> {
-    const result = EntityId.validateUUID(id);
+  static create(): AccountId {
+    const result = EntityId.generateId();
 
-    if (!result.isOk()) {
-      return err(result.error);
-    }
-
-    return ok(new AccountId(id));
+    return new AccountId(result);
   }
 
   static reconstitute(id: string) {

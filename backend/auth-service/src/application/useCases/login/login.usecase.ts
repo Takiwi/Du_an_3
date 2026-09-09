@@ -24,6 +24,10 @@ import {
   IFailedLoginTracker,
 } from '@domain/ports/failedLoginTracker.interface';
 import { ok, err, Result } from 'neverthrow';
+import {
+  IRoleRepository,
+  ROLE_REPOSITORY_TOKEN,
+} from '@domain/repositories/IRole.repository';
 
 @Injectable()
 export class LoginUseCase {
@@ -38,33 +42,42 @@ export class LoginUseCase {
     private readonly refreshTokenRepository: IRefreshTokenRepository,
     @Inject(FAILED_LOGIN_TRACKER_TOKEN)
     private readonly failedLoginTracker: IFailedLoginTracker,
+    @Inject(ROLE_REPOSITORY_TOKEN)
+    private readonly roleRepository: IRoleRepository,
     @Inject(LOGGER_TOKEN)
     private readonly logger: ILogger,
   ) {}
 
   async execute(dto: LoginInput): Promise<Result<LoginOutput, AppError>> {
+    // check email
     const account = await this.accountRepository.findByEmail(dto.email);
 
     if (!account) {
       return err(new AppError('EMAIL_NOT_FOUND', `Not found ${dto.email}`));
     }
 
+    // check status
     if (account.getStatus().isLocked()) {
-      return err(new AppError('USER_BANNED', 'The account has been banned'));
+      return err(
+        new AppError('ACCOUNT_LOCKED', 'The account has been clocked'),
+      );
     }
 
+    // check password
     const isMatch = await this.passwordHasher.compare(
       dto.password,
       account.getPassword().toString(),
     );
 
     if (!isMatch) {
+      // check login count
       const attempts = await this.failedLoginTracker.incrementAndGet(
         account.getId(),
       );
 
       const newStatus = account.getStatus().recordFailedLogin(attempts);
 
+      // Check if you've exceeded the login limit.
       if (!account.getStatus().equals(newStatus)) {
         account.updateStatus(newStatus);
         await this.accountRepository.updateStatusById(
@@ -85,14 +98,38 @@ export class LoginUseCase {
       );
     }
 
+    // get account role and permission
+    const roles = await this.roleRepository.findManyRoleAndPermissionById(
+      account.getRole(),
+    );
+
+    if (roles.length === 0)
+      return err(
+        new AppError('ROLE_NOT_FOUND', `Account doesn't have any Role`),
+      );
+
+    const accountRoles = roles.map((role) => role.getRole());
+
+    const permissions = [
+      ...new Set(
+        roles.flatMap((role) =>
+          role
+            .getPermission()
+            .map((pr) => `${pr.getResource()}:${pr.getAction()}`),
+        ),
+      ),
+    ];
+
+    // create token pair
     const { accessToken, refreshToken } = await this.jwtAuth.generateTokenPair({
       sub: account.getId().toString(),
-      email: account.getEmail(),
-      role: account.getRole(),
+      role: accountRoles,
+      permission: permissions,
     });
 
+    // save refresh token
     const newRefreshToken = RefreshToken.baseEntity({
-      accountId: account.getId().toString(),
+      accountId: account.getId(),
       token: refreshToken,
       expiresAt: this.jwtAuth.getTokenExpiresIn('refresh'),
     });

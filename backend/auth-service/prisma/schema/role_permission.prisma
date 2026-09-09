@@ -1,0 +1,9 @@
+model RolePermission {
+    permissionId String
+    permission Permission @relation(fields: [permissionId], references: [id])
+
+    roleId String
+    role Role @relation(fields: [roleId], references: [id])
+
+    @@id([permissionId, roleId])
+}

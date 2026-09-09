@@ -1,48 +1,44 @@
-import { randomUUID } from 'node:crypto';
 import { AccountStatus } from '../../value-objects/accountStatus.vo';
 import { AccountId } from '../../value-objects/accountId.vo';
 import { Password } from '../../value-objects/password.vo';
 import { AppError } from '@packages/pattern';
 import { ok, err, Result } from 'neverthrow';
-import {
-  BaseAccount,
-  PureAccount,
-  Role,
-  FullAccount,
-} from './account.contract';
+import { BaseAccount, PureAccount, FullAccount } from './account.contract';
+import { Role } from '../authorization/role.entity';
+import { RoleId } from '@domain/value-objects/roleId.vo';
 
 export class Account {
   private readonly _id: AccountId;
   private _email: string;
   private _password: Password;
   private _status: AccountStatus;
-  private _role: Role;
+  private _roles: RoleId[];
 
   private constructor(
     id: AccountId,
     email: string,
     password: Password,
     status: AccountStatus,
-    role: Role,
+    role: RoleId[],
   ) {
     this._id = id;
     this._email = email;
     this._password = password;
     this._status = status;
-    this._role = role;
+    this._roles = role;
   }
 
   private static create(props: FullAccount): Result<Account, AppError> {
-    const accountIdResult = AccountId.create(props.id ?? randomUUID());
+    const accountId = AccountId.create();
     const passwordResult = Password.create(props.password);
 
-    const combineResult = Result.combine([accountIdResult, passwordResult]);
+    const combineResult = Result.combine([passwordResult]);
 
     if (combineResult.isErr()) {
       return err(combineResult.error);
     }
 
-    const [accountId, password] = combineResult.value;
+    const [password] = combineResult.value;
 
     return ok(
       new Account(accountId, props.email, password, props.status, props.role),
@@ -51,30 +47,25 @@ export class Account {
 
   static baseEntity(props: BaseAccount): Result<Account, AppError> {
     const defaultStatus = AccountStatus.active();
-    const defaultRole: Role = 'USER';
+    const defaultRole = [Role.defaultRole().getRoleId()];
 
     return this.create({ ...props, status: defaultStatus, role: defaultRole });
   }
 
-  static createByAdmin(props: BaseAccount): Result<Account, AppError> {
-    const defaultStatus = AccountStatus.locked();
-    const defaultRole: Role = 'USER';
+  // static createByAdmin(props: BaseAccount): Result<Account, AppError> {
+  //   const defaultStatus = AccountStatus.locked();
+  //   const defaultRole: Role = 'USER';
 
-    return this.create({ ...props, status: defaultStatus, role: defaultRole });
-  }
+  //   return this.create({ ...props, status: defaultStatus, role: defaultRole });
+  // }
 
   static reconstitute(props: PureAccount): Account {
     const userStatus = AccountStatus.reconstitute(props.status);
     const accountId = AccountId.reconstitute(props.id);
     const password = Password.reconstitute(props.password);
+    const roles = RoleId.toRoleIdArray(props.role);
 
-    return new Account(
-      accountId,
-      props.email,
-      password,
-      userStatus,
-      props.role,
-    );
+    return new Account(accountId, props.email, password, userStatus, roles);
   }
 
   getId(): AccountId {
@@ -105,7 +96,7 @@ export class Account {
     this._password = password.value;
   }
 
-  getRole(): Role {
-    return this._role;
+  getRole(): RoleId[] {
+    return this._roles;
   }
 }

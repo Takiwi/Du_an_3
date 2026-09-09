@@ -1,0 +1,20 @@
+enum Action {
+    READ 
+    WRITE
+    APPROVE
+}
+
+enum Resource {
+    USER_DATA
+    ANIME_DATA
+    STREAM_DATA
+}
+
+
+model Permission {
+    id String @id @default(uuid())
+    action Action
+    resource Resource
+
+    role_permission RolePermission[]
+}

@@ -14,17 +14,29 @@ export class AccountRepository implements IAccountRepository {
   async findByEmail(email: string): Promise<Account | null> {
     const user = await this.prismaService.account.findUnique({
       where: { email },
+      include: {
+        account_role: true,
+      },
     });
 
-    return user ? Account.reconstitute(user) : null;
+    if (!user) return null;
+
+    const roleId = user.account_role.map((role) => role.roleId);
+
+    return Account.reconstitute({ ...user, role: roleId });
   }
 
   async findById(id: AccountId): Promise<Account | null> {
     const user = await this.prismaService.account.findUnique({
       where: { id: id.toString() },
+      include: { account_role: true },
     });
 
-    return user ? Account.reconstitute(user) : null;
+    if (!user) return null;
+
+    const roleId = user.account_role.map((role) => role.roleId);
+
+    return Account.reconstitute({ ...user, role: roleId });
   }
 
   async existsByEmail(email: string): Promise<boolean> {
@@ -36,32 +48,22 @@ export class AccountRepository implements IAccountRepository {
     return !!user;
   }
 
-  async updateStatusById(
-    id: AccountId,
-    status: AccountStatus,
-  ): Promise<Account> {
-    const result = await asyncHandlerPrismaError(async () => {
+  async updateStatusById(id: AccountId, status: AccountStatus): Promise<void> {
+    await asyncHandlerPrismaError(async () => {
       return await this.prismaService.account.update({
         where: { id: id.toString() },
         data: { status: status.currentStatus() },
       });
     });
-
-    return Account.reconstitute(result);
   }
 
-  async updatePasswordById(
-    id: AccountId,
-    password: Password,
-  ): Promise<Account> {
-    const result = await asyncHandlerPrismaError(async () => {
+  async updatePasswordById(id: AccountId, password: Password): Promise<void> {
+    await asyncHandlerPrismaError(async () => {
       return await this.prismaService.account.update({
         where: { id: id.toString() },
         data: { password: password.toString() },
       });
     });
-
-    return Account.reconstitute(result);
   }
 
   async insertAccount(account: Account): Promise<void> {
@@ -72,7 +74,6 @@ export class AccountRepository implements IAccountRepository {
           email: account.getEmail(),
           password: account.getPassword().toString(),
           status: account.getStatus().currentStatus(),
-          role: account.getRole(),
         },
       });
     });

@@ -2,8 +2,8 @@ export const JWT_AUTHENTICATION_TOKEN = 'IJwtAuthentication';
 
 export interface JwtPayload {
   sub: string;
-  email?: string;
-  role?: string;
+  role: string[];
+  permission: string[];
 }
 
 export interface TokenPair {

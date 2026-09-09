@@ -40,10 +40,6 @@ export class UserController {
     @Inject(LOGGER_TOKEN) private readonly logger: ILogger,
   ) {}
 
-  // ----------------------------------------------------
-  // 1. DÀNH CHO CÁC SERVICE KHÁC GỌI QUA REST API
-  // ----------------------------------------------------
-
   @ApiSuccessResponse({
     status: 200,
     model: UserProfileResponseDto,
