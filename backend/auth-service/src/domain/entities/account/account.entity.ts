@@ -29,19 +29,23 @@ export class Account {
   }
 
   private static create(props: FullAccount): Result<Account, AppError> {
-    const accountId = AccountId.create();
-    const passwordResult = Password.create(props.password);
+    const accountId = props.id
+      ? AccountId.reconstitute(props.id)
+      : AccountId.create();
+    const password = Password.create(props.password);
 
-    const combineResult = Result.combine([passwordResult]);
-
-    if (combineResult.isErr()) {
-      return err(combineResult.error);
+    if (password.isErr()) {
+      return err(password.error);
     }
 
-    const [password] = combineResult.value;
-
     return ok(
-      new Account(accountId, props.email, password, props.status, props.role),
+      new Account(
+        accountId,
+        props.email,
+        password.value,
+        props.status,
+        props.role,
+      ),
     );
   }
 

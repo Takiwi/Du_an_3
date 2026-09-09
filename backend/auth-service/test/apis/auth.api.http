@@ -2,8 +2,8 @@ POST http://localhost:3001/api/v1/auth/register
 content-type: application/json
 
 {
-  "email": "user1@gmail.com",
-  "username": "user1",
+  "email": "user123@gmail.com",
+  "username": "user123",
   "password": "@Abc12345"
 }
 
@@ -12,7 +12,7 @@ POST http://localhost:3001/api/v1/auth/login
 content-type: application/json
 
 {
-  "email": "meow123@gmail.com",
+  "email": "user123@gmail.com",
   "password": "@Abc12345"
 }
 

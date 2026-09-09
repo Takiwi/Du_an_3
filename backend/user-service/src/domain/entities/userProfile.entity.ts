@@ -24,19 +24,17 @@ export class UserProfile {
   }
 
   static create(props: BaseUserProfile): Result<UserProfile, AppError> {
-    const idResult = UserId.create(props.id);
+    const id = UserId.create();
     const usernameResult = Username.firstUsername(props.username);
-    const userStatusResult = UserStatus.active();
+    const userStatus = UserStatus.active();
 
-    const combineResult = Result.combine([idResult, usernameResult]);
-
-    if (combineResult.isErr()) {
-      return err(combineResult.error);
+    if (usernameResult.isErr()) {
+      return err(usernameResult.error);
     }
 
-    const [id, username] = combineResult.value;
-
-    return ok(new UserProfile(id, username, props.email, userStatusResult));
+    return ok(
+      new UserProfile(id, usernameResult.value, props.email, userStatus),
+    );
   }
 
   static reconstitute(props: PureUserProfile): UserProfile {

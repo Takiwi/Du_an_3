@@ -16,6 +16,10 @@ import {
 import { AccountId } from '@domain/value-objects/accountId.vo';
 import { RotateTokenOutput } from './refreshToken.contract';
 import { err, ok, Result } from 'neverthrow';
+import {
+  IRoleRepository,
+  ROLE_REPOSITORY_TOKEN,
+} from '@domain/repositories/IRole.repository';
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -28,6 +32,8 @@ export class RefreshTokenUseCase {
     private readonly cryptoService: IDataHasher,
     @Inject(ACCOUNT_REPOSITORY_TOKEN)
     private readonly accountRepository: IAccountRepository,
+    @Inject(ROLE_REPOSITORY_TOKEN)
+    private readonly roleRepository: IRoleRepository,
   ) {}
 
   async execute(token: string): Promise<Result<RotateTokenOutput, AppError>> {
@@ -49,6 +55,7 @@ export class RefreshTokenUseCase {
     const accountId = AccountId.reconstitute(payload.sub);
 
     const account = await this.accountRepository.findById(accountId);
+
     if (!account) {
       return err(new AppError('USER_NOT_FOUND', 'Account not found'));
     }
@@ -66,15 +73,37 @@ export class RefreshTokenUseCase {
       return err(reuseCheck.error);
     }
 
-    // 6. Generate new token pair
+    // 6. get account role and permission
+    const roles = await this.roleRepository.findManyRoleAndPermissionById(
+      account.getRole(),
+    );
+
+    if (roles.length === 0)
+      return err(
+        new AppError('ROLE_NOT_FOUND', `Account doesn't have any Role`),
+      );
+
+    const accountRoles = roles.map((role) => role.getRoleName());
+
+    const permissions = [
+      ...new Set(
+        roles.flatMap((role) =>
+          role
+            .getPermission()
+            .map((pr) => `${pr.getResource()}:${pr.getAction()}`),
+        ),
+      ),
+    ];
+
+    // 7. Generate new token pair
     const { accessToken, refreshToken } =
       await this.jwtService.generateTokenPair({
         sub: account.getId().toString(),
-        email: account.getEmail(),
-        role: account.getRole().map((role) => role.toString()),
+        role: accountRoles,
+        permission: permissions,
       });
 
-    // 7. Update old refresh token record
+    // 8. Update old refresh token record
     const hashedNewRefreshToken = this.cryptoService.hash(refreshToken);
     await this.refreshTokenRepository.updateTokenAndTokensUsedByToken(
       hashedToken,

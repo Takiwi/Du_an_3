@@ -41,7 +41,7 @@ import { CurrentUser } from '@presentation/decorators/currentUser.decorator';
 @ApiCommonErrors()
 @UseGuards(JwtAuthGuard)
 @Controller('auth/')
-export class AuthController {
+export class AuthenticationController {
   constructor(
     private readonly registerUseCase: RegisterUseCase,
     private readonly logoutUseCase: LogoutUseCase,
@@ -71,6 +71,7 @@ export class AuthController {
   @Public()
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
+    this.logger.debug(`Hello from register endpoint`);
     const result = await this.registerUseCase.execute(createUserDto);
 
     if (result.isErr()) throw result.error;

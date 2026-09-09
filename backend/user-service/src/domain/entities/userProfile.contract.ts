@@ -1,5 +1,4 @@
 export interface BaseUserProfile {
-  id: string;
   username: string;
   email: string;
   lastUsernameChangedAt?: Date | null;

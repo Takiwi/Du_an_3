@@ -10,7 +10,7 @@ import jwtConfig from './config/jwt.config';
 import cookieConfig from './config/cookie.config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './presentation/controllers/auth.controller';
+import { AuthenticationController } from './presentation/controllers/authentication.controller';
 import { JwksController } from './presentation/controllers/jwks.controller';
 import { DATA_HASHER_TOKEN } from './application/ports/IDataHasher.port';
 import { CryptoDataHasher } from './infrastructure/services/cryptoDataHasher.service';
@@ -39,6 +39,13 @@ import { RedisService } from '@infrastructure/database/redis.service';
 import { RabbitMQModule } from './modules/rabbitMQ.module';
 import { UserExceptionFilter } from '@presentation/filters/userExceptions.filter';
 import { GRpcModule } from './modules/gRpc.module';
+import { ROLE_REPOSITORY_TOKEN } from '@domain/repositories/IRole.repository';
+import { RoleRepository } from '@infrastructure/repositories/role.repository';
+import { AuthorizationController } from '@presentation/controllers/authorization.controller';
+import { CreateRoleUseCase } from '@application/useCases/role/createRole.usecase';
+import { GetRoleList } from '@application/useCases/role/getRoleList.usecase';
+import { UpdateRoleInfoUseCase } from '@application/useCases/role/updateRole.usecase';
+import { DeleteRoleUseCase } from '@application/useCases/role/deleteRole.usecase';
 @Module({
   imports: [
     ClsModule,
@@ -64,8 +71,16 @@ import { GRpcModule } from './modules/gRpc.module';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AuthController, JwksController],
+  controllers: [
+    AuthenticationController,
+    AuthorizationController,
+    JwksController,
+  ],
   providers: [
+    {
+      provide: ROLE_REPOSITORY_TOKEN,
+      useClass: RoleRepository,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: FormatResponse,
@@ -115,6 +130,10 @@ import { GRpcModule } from './modules/gRpc.module';
     RefreshTokenUseCase,
     RegisterUseCase,
     ChangePasswordUseCase,
+    CreateRoleUseCase,
+    GetRoleList,
+    UpdateRoleInfoUseCase,
+    DeleteRoleUseCase,
   ],
   exports: [JWT_AUTHENTICATION_TOKEN, PassportModule, JwtModule],
 })

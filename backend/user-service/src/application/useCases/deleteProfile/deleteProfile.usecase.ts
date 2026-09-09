@@ -19,17 +19,14 @@ export class DeleteProfileUseCase {
 
   async execute(userId: string): Promise<Result<void, AppError>> {
     // check profile
-    const id = UserId.create(userId);
+    const id = UserId.reconstitute(userId);
 
-    if (id.isErr())
-      return err(new AppError('INVALID_USER_ID', `Invalid user id: ${userId}`));
-
-    const user = await this.userProfileRepository.findById(id.value);
+    const user = await this.userProfileRepository.findById(id);
 
     if (!user)
       return err(new AppError('USER_NOT_FOUND', `User ${userId} not found`));
 
-    await this.userProfileRepository.deleteProfile(id.value);
+    await this.userProfileRepository.deleteProfile(id);
 
     this.logger.info(`User ${userId} deleted`);
 

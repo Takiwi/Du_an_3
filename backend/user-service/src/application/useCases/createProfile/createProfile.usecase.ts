@@ -8,10 +8,6 @@ import { AppError } from '@packages/pattern';
 import { err, ok, Result } from 'neverthrow';
 import { CreateProfileInput } from './createProfile.contract';
 import {
-  ID_GENERATOR_TOKEN,
-  IdGenerator,
-} from '@application/ports/IdGenerator.port';
-import {
   IMessagePublisher,
   MESSAGE_PUBLISHER,
 } from '@application/ports/messagePublisher.port';
@@ -22,8 +18,6 @@ export class CreateProfileUseCase {
   constructor(
     @Inject(USER_PROFILE_REPOSITORY_TOKEN)
     private readonly userProfileRepository: IUserProfileRepository,
-    @Inject(ID_GENERATOR_TOKEN)
-    private readonly idGenerator: IdGenerator,
     @Inject(MESSAGE_PUBLISHER)
     private readonly messagePublisher: IMessagePublisher,
   ) {}
@@ -49,7 +43,6 @@ export class CreateProfileUseCase {
     }
 
     const profileResult = UserProfile.create({
-      id: this.idGenerator.generate(),
       username: input.username,
       email: input.email,
     });
@@ -59,10 +52,6 @@ export class CreateProfileUseCase {
     }
 
     await this.userProfileRepository.insertProfile(profileResult.value);
-
-    console.log(
-      `UserId in user service:::::::::::${profileResult.value.getId().toString()}`,
-    );
 
     return ok(profileResult.value);
   }

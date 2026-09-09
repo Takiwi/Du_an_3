@@ -108,7 +108,7 @@ export class LoginUseCase {
         new AppError('ROLE_NOT_FOUND', `Account doesn't have any Role`),
       );
 
-    const accountRoles = roles.map((role) => role.getRole());
+    const accountRoles = roles.map((role) => role.getRoleName());
 
     const permissions = [
       ...new Set(

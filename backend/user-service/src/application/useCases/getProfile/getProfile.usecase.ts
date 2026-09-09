@@ -16,18 +16,13 @@ export class GetProfileUseCase {
   ) {}
 
   async execute(userId: string): Promise<Result<UserProfile, AppError>> {
-    const idResult = UserId.create(userId);
+    const id = UserId.reconstitute(userId);
 
-    if (idResult.isErr()) return err(idResult.error);
-
-    const profile = await this.userProfileRepository.findById(idResult.value);
+    const profile = await this.userProfileRepository.findById(id);
 
     if (!profile) {
       return err(
-        new AppError(
-          'USER_NOT_FOUND',
-          `User Id: ${idResult.value.toString()} not found`,
-        ),
+        new AppError('USER_NOT_FOUND', `User Id: ${id.toString()} not found`),
       );
     }
 

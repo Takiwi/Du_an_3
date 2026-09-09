@@ -1,5 +1,4 @@
-import { AppError, ValueObject } from '@packages/pattern';
-import { Result, err, ok } from 'neverthrow';
+import { ValueObject } from '@packages/pattern';
 
 export type STATUS = 'ACTIVE' | 'BANNED' | 'DEACTIVATED';
 
@@ -8,12 +7,8 @@ export class UserStatus extends ValueObject<{ status: string }> {
     super({ status });
   }
 
-  static create(status: string): Result<UserStatus, AppError> {
-    if (!['ACTIVE', 'BANNED', 'DEACTIVATED'].includes(status)) {
-      return err(new AppError('INVALID_USER_STATUS', ''));
-    }
-
-    return ok(new UserStatus(status as STATUS));
+  static create(status: STATUS): UserStatus {
+    return new UserStatus(status);
   }
 
   static active() {

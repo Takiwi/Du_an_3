@@ -1,7 +1,7 @@
 import { RoleId } from '@domain/value-objects/roleId.vo';
 import { AppError } from '@packages/pattern';
 import { err, ok, Result } from 'neverthrow';
-import { BaseRole, prismaRole } from './role.contract';
+import { BaseRole, prismaRole, UpdateRoleProps } from './role.contract';
 import { Permission } from './permission.entity';
 
 export type ROLE = 'ADMIN' | 'USER';
@@ -25,11 +25,13 @@ export class Role {
   }
 
   static create(props: BaseRole): Result<Role, AppError> {
-    const id = RoleId.create();
+    const id = RoleId.createId();
 
-    const permissions = props.permission.map((item) =>
-      Permission.create(item.action, item.resource),
-    );
+    const permissions = props.permission
+      ? props.permission.map((item) =>
+          Permission.create(item.action, item.resource),
+        )
+      : [];
 
     if (
       props.max_members &&
@@ -47,7 +49,7 @@ export class Role {
   }
 
   static defaultRole() {
-    const id = RoleId.create();
+    const id = RoleId.createId();
     const permission = [Permission.defaultPermission()];
 
     return new Role(id, 'USER', permission, null);
@@ -56,9 +58,11 @@ export class Role {
   static reconstitute(props: prismaRole) {
     const id = RoleId.reconstitute(props.id);
 
-    const permissions = props.role_permission.map((rp) =>
-      Permission.reconstitute(rp.permission),
-    );
+    const permissions = props.role_permission
+      ? props.role_permission.map((rp) =>
+          Permission.reconstitute(rp.permission),
+        )
+      : [];
 
     return new Role(id, props.name, permissions, props.max_members);
   }
@@ -67,8 +71,12 @@ export class Role {
     return this.id;
   }
 
-  getRole() {
+  getRoleName() {
     return this._name;
+  }
+
+  updateRoleName(name: string) {
+    this._name = name;
   }
 
   getPermission() {
@@ -77,5 +85,27 @@ export class Role {
 
   getMax_members() {
     return this._max_members;
+  }
+
+  updateMax_members(max_members: number | null) {
+    if (max_members && this._max_members && max_members < this._max_members) {
+      return err(
+        new AppError(
+          'INVALID_VALUE',
+          'The new value must not be less than or equal to the current value.',
+        ),
+      );
+    }
+
+    this._max_members = max_members;
+  }
+
+  update(props: UpdateRoleProps): Role {
+    return new Role(
+      this.id,
+      props.name ?? this._name,
+      this._permission,
+      props.max_members !== undefined ? props.max_members : this._max_members,
+    );
   }
 }

@@ -2,7 +2,7 @@ import { RoleId } from '@domain/value-objects/roleId.vo';
 import { AccountStatus } from '../../value-objects/accountStatus.vo';
 
 export interface BaseAccount {
-  id: string;
+  id?: string;
   email: string;
   password: string;
 }
