@@ -9,6 +9,16 @@ import { Injectable } from '@nestjs/common';
 export class RoleRepository implements IRoleRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
+  async findByName(name: string): Promise<Role | null> {
+    const result = await this.prismaService.role.findUnique({
+      where: {
+        name,
+      },
+    });
+
+    return result ? Role.reconstitute(result) : null;
+  }
+
   async findAll(): Promise<Role[]> {
     const result = await this.prismaService.role.findMany();
 

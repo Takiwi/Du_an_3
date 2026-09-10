@@ -6,6 +6,7 @@ export const ROLE_REPOSITORY_TOKEN = 'IRoleRepository';
 export interface IRoleRepository {
   findAll(): Promise<Role[]>;
   findById(roleId: RoleId): Promise<Role | null>;
+  findByName(name: string): Promise<Role | null>;
   findManyRoleAndPermissionById(ids: RoleId[]): Promise<Role[]>;
   insertRoleById(role: Role): Promise<void>;
   deleteRoleById(roleId: RoleId): Promise<void>;

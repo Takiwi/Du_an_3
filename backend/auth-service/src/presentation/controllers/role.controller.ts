@@ -1,16 +1,26 @@
 import { CreateRoleUseCase } from '@application/useCases/role/createRole.usecase';
 import { DeleteRoleUseCase } from '@application/useCases/role/deleteRole.usecase';
+import { GetRoleList } from '@application/useCases/role/getRoleList.usecase';
 import { UpdateRoleInfoUseCase } from '@application/useCases/role/updateRole.usecase';
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CreateRoleDto } from '@presentation/dto/requests/createRole.dto';
 import { UpdateRoleDto } from '@presentation/dto/requests/updateRole.dto';
 
-@Controller('role')
-export class AuthorizationController {
+@Controller('roles')
+export class RoleController {
   constructor(
     private readonly createRoleUseCase: CreateRoleUseCase,
     private readonly updateRoleInfoUseCase: UpdateRoleInfoUseCase,
     private readonly deleteRoleUseCase: DeleteRoleUseCase,
+    private readonly getRoleList: GetRoleList,
   ) {}
 
   // role CRUD
@@ -28,7 +38,7 @@ export class AuthorizationController {
     if (result.isErr()) throw result.error;
   }
 
-  @Get('delete/:id')
+  @Delete('delete/:id')
   async delete(@Param() id: string) {
     const result = await this.deleteRoleUseCase.execute(id);
 
@@ -36,5 +46,7 @@ export class AuthorizationController {
   }
 
   @Get('')
-  async getRoleList() {}
+  async roleList() {
+    return await this.getRoleList.execute();
+  }
 }

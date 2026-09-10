@@ -41,11 +41,11 @@ import { UserExceptionFilter } from '@presentation/filters/userExceptions.filter
 import { GRpcModule } from './modules/gRpc.module';
 import { ROLE_REPOSITORY_TOKEN } from '@domain/repositories/IRole.repository';
 import { RoleRepository } from '@infrastructure/repositories/role.repository';
-import { AuthorizationController } from '@presentation/controllers/authorization.controller';
 import { CreateRoleUseCase } from '@application/useCases/role/createRole.usecase';
 import { GetRoleList } from '@application/useCases/role/getRoleList.usecase';
 import { UpdateRoleInfoUseCase } from '@application/useCases/role/updateRole.usecase';
 import { DeleteRoleUseCase } from '@application/useCases/role/deleteRole.usecase';
+import { RoleController } from '@presentation/controllers/role.controller';
 @Module({
   imports: [
     ClsModule,
@@ -71,11 +71,7 @@ import { DeleteRoleUseCase } from '@application/useCases/role/deleteRole.usecase
       inject: [ConfigService],
     }),
   ],
-  controllers: [
-    AuthenticationController,
-    AuthorizationController,
-    JwksController,
-  ],
+  controllers: [AuthenticationController, RoleController, JwksController],
   providers: [
     {
       provide: ROLE_REPOSITORY_TOKEN,

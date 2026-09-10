@@ -6,7 +6,7 @@ export type ROLE = 'ADMIN' | 'USER';
 export interface BaseRole {
   name: string;
   max_members: number | null;
-  permission?: BasePermission[];
+  permission: BasePermission[];
 }
 
 export interface FullRole extends BaseRole {

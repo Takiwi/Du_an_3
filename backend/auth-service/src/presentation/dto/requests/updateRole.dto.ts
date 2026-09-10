@@ -1,11 +1,11 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateRoleDto } from './createRole.dto';
 import { IsArray, IsString, IsUUID } from 'class-validator';
-import { UpdateRoleInfoInput } from '@application/useCases/role/updateRole.usecase';
+import { UpdateRoleProps } from '@domain/entities/authorization/role.contract';
 
 export class UpdateRoleDto
   extends PartialType(CreateRoleDto)
-  implements UpdateRoleInfoInput
+  implements UpdateRoleProps
 {
   @ApiProperty({ format: 'uuid', example: '123asd-sdf....' })
   @IsUUID('4', { message: 'This must be UUID' })

@@ -23,6 +23,7 @@ export class CreateRoleUseCase {
     const role = Role.create({
       name: dto.name,
       max_members: dto.max_members,
+      permission: [],
     });
 
     if (role.isErr()) return err(role.error);

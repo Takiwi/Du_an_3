@@ -17,4 +17,6 @@ model Permission {
     resource Resource
 
     role_permission RolePermission[]
+
+    @@unique([action, resource])
 }

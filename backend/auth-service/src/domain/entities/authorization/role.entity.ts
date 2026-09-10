@@ -27,11 +27,19 @@ export class Role {
   static create(props: BaseRole): Result<Role, AppError> {
     const id = RoleId.createId();
 
-    const permissions = props.permission
-      ? props.permission.map((item) =>
-          Permission.create(item.action, item.resource),
-        )
-      : [];
+    if (props.permission.length === 0) {
+      return ok(new Role(id, props.name, [], props.max_members));
+    }
+
+    const permissions = Result.combine(
+      props.permission.map((item) =>
+        Permission.create(item.action, item.resource),
+      ),
+    );
+
+    if (permissions.isErr()) {
+      return err(permissions.error);
+    }
 
     if (
       props.max_members &&
@@ -45,7 +53,7 @@ export class Role {
       );
     }
 
-    return ok(new Role(id, props.name, permissions, props.max_members));
+    return ok(new Role(id, props.name, permissions.value, props.max_members));
   }
 
   static defaultRole() {
