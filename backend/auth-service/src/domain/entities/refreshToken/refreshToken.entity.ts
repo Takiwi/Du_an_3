@@ -33,7 +33,7 @@ export class RefreshToken {
   private static create(
     props: RefreshTokenWithTokenUsed,
   ): Result<RefreshToken, AppError> {
-    const id = RefreshTokenId.create();
+    const id = RefreshTokenId.createId();
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + props.expiresAt * 1000);

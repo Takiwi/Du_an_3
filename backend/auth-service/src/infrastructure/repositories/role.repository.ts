@@ -22,9 +22,7 @@ export class RoleRepository implements IRoleRepository {
   async findAll(): Promise<Role[]> {
     const result = await this.prismaService.role.findMany();
 
-    return result.length > 0
-      ? result.map((role) => Role.reconstitute(role))
-      : [];
+    return result.map((role) => Role.reconstitute(role));
   }
 
   async findById(roleId: RoleId): Promise<Role | null> {

@@ -9,3 +9,8 @@ export interface BasePermission {
 export interface PurePermission extends BasePermission {
   id: string;
 }
+
+export interface UpdatePermissionProps {
+  action?: string;
+  resource?: string;
+}

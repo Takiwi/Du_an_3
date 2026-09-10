@@ -31,7 +31,7 @@ export class Account {
   private static create(props: FullAccount): Result<Account, AppError> {
     const accountId = props.id
       ? AccountId.reconstitute(props.id)
-      : AccountId.create();
+      : AccountId.createId();
     const password = Password.create(props.password);
 
     if (password.isErr()) {

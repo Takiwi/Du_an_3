@@ -1,0 +1,7 @@
+POST http://localhost:3001/api/v1/permissions/create
+content-type: application/json
+
+{
+  "action": "USER",
+  "resource": "@Abc12345"
+}

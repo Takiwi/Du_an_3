@@ -46,6 +46,13 @@ import { GetRoleList } from '@application/useCases/role/getRoleList.usecase';
 import { UpdateRoleInfoUseCase } from '@application/useCases/role/updateRole.usecase';
 import { DeleteRoleUseCase } from '@application/useCases/role/deleteRole.usecase';
 import { RoleController } from '@presentation/controllers/role.controller';
+import { PermissionController } from '@presentation/controllers/permission.controller';
+import { PERMISSION_REPOSITORY_TOKEN } from '@domain/repositories/IPermission.repository';
+import { PermissionRepository } from '@infrastructure/repositories/permission.repository';
+import { UpdatePermissionUseCase } from '@application/useCases/permission/updatePermission.usecase';
+import { DeletePermissionUseCase } from '@application/useCases/permission/deletePermission.usecase';
+import { GetPermissionListUseCase } from '@application/useCases/permission/getPermissionList.usecase';
+import { CreatePermissionUseCase } from '@application/useCases/permission/createPermission.usecase';
 @Module({
   imports: [
     ClsModule,
@@ -71,8 +78,17 @@ import { RoleController } from '@presentation/controllers/role.controller';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AuthenticationController, RoleController, JwksController],
+  controllers: [
+    AuthenticationController,
+    RoleController,
+    PermissionController,
+    JwksController,
+  ],
   providers: [
+    {
+      provide: PERMISSION_REPOSITORY_TOKEN,
+      useClass: PermissionRepository,
+    },
     {
       provide: ROLE_REPOSITORY_TOKEN,
       useClass: RoleRepository,
@@ -130,8 +146,11 @@ import { RoleController } from '@presentation/controllers/role.controller';
     GetRoleList,
     UpdateRoleInfoUseCase,
     DeleteRoleUseCase,
+    CreatePermissionUseCase,
+    UpdatePermissionUseCase,
+    DeletePermissionUseCase,
+    GetPermissionListUseCase,
   ],
-  exports: [JWT_AUTHENTICATION_TOKEN, PassportModule, JwtModule],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

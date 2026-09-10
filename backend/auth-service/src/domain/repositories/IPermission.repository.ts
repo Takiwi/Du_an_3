@@ -12,6 +12,9 @@ export interface IPermissionRepository {
     action: Action,
     resource: Resource,
   ): Promise<Permission | null>;
+  findById(id: PermissionId): Promise<Permission | null>;
   insertPermission(permission: Permission): Promise<void>;
   deleteById(permissionId: PermissionId): Promise<void>;
+  updatePermission(permission: Permission): Promise<void>;
+  findAll(): Promise<Permission[]>;
 }

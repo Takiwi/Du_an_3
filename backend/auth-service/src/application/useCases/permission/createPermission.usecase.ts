@@ -19,7 +19,9 @@ export class CreatePermissionUseCase {
     private readonly permissionRepository: IPermissionRepository,
   ) {}
 
-  async execute(dto: CreatePermissionInput): Promise<Result<void, AppError>> {
+  async execute(
+    dto: CreatePermissionInput,
+  ): Promise<Result<Permission, AppError>> {
     const permission = Permission.create(dto.action, dto.resource);
 
     if (permission.isErr()) return err(permission.error);
@@ -40,6 +42,6 @@ export class CreatePermissionUseCase {
 
     await this.permissionRepository.insertPermission(permission.value);
 
-    return ok();
+    return ok(permission.value);
   }
 }

@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { CreateRoleDto } from '@presentation/dto/requests/createRole.dto';
 import { UpdateRoleDto } from '@presentation/dto/requests/updateRole.dto';
+import { RoleMapper } from '@presentation/mappers/role.mapper';
 
 @Controller('roles')
 export class RoleController {
@@ -23,12 +24,13 @@ export class RoleController {
     private readonly getRoleList: GetRoleList,
   ) {}
 
-  // role CRUD
   @Post('create')
   async create(@Body() createRoleDto: CreateRoleDto) {
     const result = await this.createRoleUseCase.execute(createRoleDto);
 
     if (result.isErr()) throw result.error;
+
+    return RoleMapper.toResponseDto(result.value);
   }
 
   @Patch('update/:id')
@@ -47,6 +49,6 @@ export class RoleController {
 
   @Get('')
   async roleList() {
-    return await this.getRoleList.execute();
+    return RoleMapper.toArrayResponseDto(await this.getRoleList.execute());
   }
 }

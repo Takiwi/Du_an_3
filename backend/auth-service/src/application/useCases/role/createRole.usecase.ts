@@ -19,7 +19,7 @@ export class CreateRoleUseCase {
     private readonly roleRepository: IRoleRepository,
   ) {}
 
-  async execute(dto: CreateRoleInput): Promise<Result<void, AppError>> {
+  async execute(dto: CreateRoleInput): Promise<Result<Role, AppError>> {
     const role = Role.create({
       name: dto.name,
       max_members: dto.max_members,
@@ -30,6 +30,6 @@ export class CreateRoleUseCase {
 
     await this.roleRepository.insertRoleById(role.value);
 
-    return ok();
+    return ok(role.value);
   }
 }
