@@ -35,6 +35,9 @@ import { RegisterUseCase } from './application/useCases/register/register.usecas
 import { ChangePasswordUseCase } from './application/useCases/changePassword/changePassword.usecase';
 import { FormatResponse } from '@presentation/interceptors/formatResponse.interceptor';
 import { PrismaService } from '@infrastructure/database/prisma.service';
+import { PrismaUnitOfWork } from '@infrastructure/services/prismaUnitOfWork.service';
+import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-context.service';
+import { TRANSACTION_ROLLBACK_ERROR } from './application/ports/IUnitOfWork.port';
 import { RedisService } from '@infrastructure/database/redis.service';
 import { RabbitMQModule } from './modules/rabbitMQ.module';
 import { UserExceptionFilter } from '@presentation/filters/userExceptions.filter';
@@ -134,6 +137,11 @@ import { CreatePermissionUseCase } from '@application/useCases/permission/create
       useClass: BlacklistTokenRepository,
     },
     PrismaService,
+    PrismaTransaction,
+    {
+      provide: TRANSACTION_ROLLBACK_ERROR,
+      useClass: PrismaUnitOfWork,
+    },
     RedisService,
     JwksService,
     JwtStrategy,

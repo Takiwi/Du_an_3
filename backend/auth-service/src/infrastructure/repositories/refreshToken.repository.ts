@@ -8,6 +8,7 @@ import {
 } from '@application/ports/IDataHasher.port';
 import { PrismaService } from '@infrastructure/database/prisma.service';
 import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPrismaError.helper';
+import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-context.service';
 
 @Injectable()
 export class RefreshTokenRepository implements IRefreshTokenRepository {
@@ -15,6 +16,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     private readonly prismaService: PrismaService,
     @Inject(DATA_HASHER_TOKEN)
     private readonly cryptoService: IDataHasher,
+    private readonly prismaTransaction: PrismaTransaction,
   ) {}
 
   async updateTokenAndTokensUsedByToken(
@@ -22,7 +24,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     newToken: string,
   ): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.refreshToken.update({
+      await this.client.refreshToken.update({
         where: {
           token: oldToken,
         },
@@ -38,7 +40,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
 
   async deleteByToken(token: string): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.refreshToken.delete({
+      await this.client.refreshToken.delete({
         where: { token },
       });
     });
@@ -55,7 +57,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
   }
 
   async revokeAllForUser(accountId: AccountId): Promise<void> {
-    await this.prismaService.refreshToken.deleteMany({
+    await this.client.refreshToken.deleteMany({
       where: {
         accountId: accountId.toString(),
       },
@@ -64,7 +66,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
 
   async insertRefreshToken(refreshToken: RefreshToken): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.refreshToken.create({
+      await this.client.refreshToken.create({
         data: {
           id: refreshToken.getId().toString(),
           accountId: refreshToken.getAccountId().toString(),
@@ -74,5 +76,9 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
         },
       });
     });
+  }
+
+  private get client() {
+    return this.prismaTransaction.getPrismaClient(this.prismaService);
   }
 }

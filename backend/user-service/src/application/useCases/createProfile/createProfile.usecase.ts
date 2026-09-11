@@ -25,6 +25,17 @@ export class CreateProfileUseCase {
   async execute(
     input: CreateProfileInput,
   ): Promise<Result<UserProfile, AppError>> {
+    const email = await this.userProfileRepository.findByEmail(input.email);
+
+    if (email) {
+      return err(
+        new AppError(
+          'EMAIL_ALREADY_EXISTS',
+          `Email ${input.email} already exists`,
+        ),
+      );
+    }
+
     const username = Username.create(input.username);
 
     if (username.isErr()) return err(username.error);

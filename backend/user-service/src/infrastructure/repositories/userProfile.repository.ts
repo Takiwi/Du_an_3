@@ -10,6 +10,16 @@ import { Username } from '@domain/value-objects/username.vo';
 export class UserProfileRepository implements IUserProfileRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
+  async findByEmail(email: string): Promise<UserProfile | null> {
+    const result = await this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    return result ? UserProfile.reconstitute(result) : null;
+  }
+
   async deleteProfile(userId: UserId): Promise<void> {
     await asyncHandlerError(async () => {
       await this.prismaService.user.delete({

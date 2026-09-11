@@ -20,6 +20,10 @@ import {
   IRoleRepository,
   ROLE_REPOSITORY_TOKEN,
 } from '@domain/repositories/IRole.repository';
+import {
+  IUnitOfWork,
+  TRANSACTION_ROLLBACK_ERROR,
+} from '@application/ports/IUnitOfWork.port';
 
 @Injectable()
 export class RefreshTokenUseCase {
@@ -34,6 +38,8 @@ export class RefreshTokenUseCase {
     private readonly accountRepository: IAccountRepository,
     @Inject(ROLE_REPOSITORY_TOKEN)
     private readonly roleRepository: IRoleRepository,
+    @Inject(TRANSACTION_ROLLBACK_ERROR)
+    private readonly unitOfWork: IUnitOfWork,
   ) {}
 
   async execute(token: string): Promise<Result<RotateTokenOutput, AppError>> {
@@ -66,11 +72,15 @@ export class RefreshTokenUseCase {
 
     // 5. Detect token reuse
     const reuseCheck = hasRefreshToken.isReuse(hashedToken);
+
     if (reuseCheck.isErr()) {
-      await this.refreshTokenRepository.revokeAllForUser(
-        hasRefreshToken.getAccountId(),
-      );
-      return err(reuseCheck.error);
+      await this.unitOfWork.runInTransaction(async () => {
+        await this.refreshTokenRepository.revokeAllForUser(
+          hasRefreshToken.getAccountId(),
+        );
+
+        return err(reuseCheck.error);
+      });
     }
 
     // 6. get account role and permission

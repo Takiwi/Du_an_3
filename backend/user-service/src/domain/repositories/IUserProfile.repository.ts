@@ -7,6 +7,7 @@ export const USER_PROFILE_REPOSITORY_TOKEN = 'IUserProfileRepository';
 export interface IUserProfileRepository {
   findById(id: UserId): Promise<UserProfile | null>;
   findByUsername(username: Username): Promise<UserProfile | null>;
+  findByEmail(email: string): Promise<UserProfile | null>;
   existsByUsername(username: Username): Promise<boolean>;
   updateUsernameById(
     id: UserId,

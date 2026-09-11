@@ -3,11 +3,15 @@ import { IRoleRepository } from '@domain/repositories/IRole.repository';
 import { RoleId } from '@domain/value-objects/roleId.vo';
 import { PrismaService } from '@infrastructure/database/prisma.service';
 import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPrismaError.helper';
+import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-context.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RoleRepository implements IRoleRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly prismaTransaction: PrismaTransaction,
+  ) {}
 
   async findByName(name: string): Promise<Role | null> {
     const result = await this.prismaService.role.findUnique({
@@ -37,7 +41,7 @@ export class RoleRepository implements IRoleRepository {
 
   async updateRoleInfo(role: Role): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.role.update({
+      await this.client.role.update({
         where: {
           id: role.getRoleId().toString(),
         },
@@ -48,7 +52,7 @@ export class RoleRepository implements IRoleRepository {
 
   async deleteRoleById(roleId: RoleId): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.role.delete({
+      await this.client.role.delete({
         where: {
           id: roleId.toString(),
         },
@@ -58,7 +62,7 @@ export class RoleRepository implements IRoleRepository {
 
   async insertRoleById(role: Role): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.role.create({
+      await this.client.role.create({
         data: {
           id: role.getRoleId().toString(),
           name: role.getRoleName(),
@@ -85,5 +89,9 @@ export class RoleRepository implements IRoleRepository {
     });
 
     return results.map((role) => Role.reconstitute(role));
+  }
+
+  private get client() {
+    return this.prismaTransaction.getPrismaClient(this.prismaService);
   }
 }

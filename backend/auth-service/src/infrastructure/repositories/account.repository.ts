@@ -6,10 +6,14 @@ import { AccountStatus } from '@domain/value-objects/accountStatus.vo';
 import { Password } from '@domain/value-objects/password.vo';
 import { PrismaService } from '@infrastructure/database/prisma.service';
 import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPrismaError.helper';
+import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-context.service';
 
 @Injectable()
 export class AccountRepository implements IAccountRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly prismaTransaction: PrismaTransaction,
+  ) {}
 
   async findByEmail(email: string): Promise<Account | null> {
     const user = await this.prismaService.account.findUnique({
@@ -50,7 +54,7 @@ export class AccountRepository implements IAccountRepository {
 
   async updateStatusById(id: AccountId, status: AccountStatus): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      return await this.prismaService.account.update({
+      return await this.client.account.update({
         where: { id: id.toString() },
         data: { status: status.currentStatus() },
       });
@@ -59,7 +63,7 @@ export class AccountRepository implements IAccountRepository {
 
   async updatePasswordById(id: AccountId, password: Password): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      return await this.prismaService.account.update({
+      return await this.client.account.update({
         where: { id: id.toString() },
         data: { password: password.toString() },
       });
@@ -68,14 +72,23 @@ export class AccountRepository implements IAccountRepository {
 
   async insertAccount(account: Account): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.account.create({
+      await this.client.account.create({
         data: {
           id: account.getId().toString(),
           email: account.getEmail(),
           password: account.getPassword().toString(),
           status: account.getStatus().currentStatus(),
+          account_role: {
+            create: account.getRole().map((role) => {
+              return { roleId: role.getRoleId() };
+            }),
+          },
         },
       });
     });
+  }
+
+  private get client() {
+    return this.prismaTransaction.getPrismaClient(this.prismaService);
   }
 }

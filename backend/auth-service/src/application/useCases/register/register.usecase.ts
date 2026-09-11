@@ -15,6 +15,10 @@ import {
   IUserFacade,
   USER_FACADE_TOKEN,
 } from '@application/ports/IUserFacade.port';
+import {
+  IUnitOfWork,
+  TRANSACTION_ROLLBACK_ERROR,
+} from '@application/ports/IUnitOfWork.port';
 
 @Injectable()
 export class RegisterUseCase {
@@ -24,29 +28,19 @@ export class RegisterUseCase {
     @Inject(PASSWORD_HASHER_TOKEN)
     private readonly passwordHasher: IPasswordHasher,
     @Inject(USER_FACADE_TOKEN)
-    private userFacade: IUserFacade,
+    private readonly userFacade: IUserFacade,
+    @Inject(TRANSACTION_ROLLBACK_ERROR)
+    private readonly unitOfWork: IUnitOfWork,
   ) {}
 
   async execute(dto: RegisterInput): Promise<Result<RegisterOutput, AppError>> {
-    // 1. Check email
-    const isEmailTaken = await this.accountRepository.existsByEmail(dto.email);
-
-    if (isEmailTaken) {
-      return err(
-        new AppError(
-          'EMAIL_ALREADY_EXISTS',
-          `Email ${dto.email} already exists`,
-        ),
-      );
-    }
-
-    // 2. Send a request to user service to validate the username format and blacklist via User domain
+    // 1. Send a request to user service to validate the username format and blacklist via User domain
     const userProfile = await this.userFacade.createUserProfile(
       dto.username,
       dto.email,
     );
 
-    // 3. Create Account entity
+    // 2. Create Account entity
     const accountResult = Account.baseEntity({
       id: userProfile.id,
       email: dto.email,
@@ -54,23 +48,35 @@ export class RegisterUseCase {
     });
 
     if (accountResult.isErr()) {
-      // rollback all
-      await this.userFacade.deleteUserProfile(userProfile.id);
-
       return err(accountResult.error);
     }
 
     const account = accountResult.value;
 
-    // 4. Hash password
+    // 3. Hash password
     const hashedPassword = await this.passwordHasher.hash(dto.password);
 
-    // 5. update password
+    // 4. update password
     account.updatePassword(hashedPassword);
 
-    // 5. Insert account
-    await this.accountRepository.insertAccount(account);
+    const result = await this.unitOfWork.runInTransaction(async () => {
+      // 5. Insert account
+      await this.accountRepository.insertAccount(account);
 
-    return ok({ account, username: dto.username, role: ['USER'] });
+      return ok();
+    });
+
+    if (result.isErr()) {
+      // rollback all
+      await this.userFacade.deleteUserProfile(userProfile.id);
+
+      return err(result.error);
+    }
+
+    return ok({
+      account: account,
+      username: dto.username,
+      role: ['USER'],
+    });
   }
 }

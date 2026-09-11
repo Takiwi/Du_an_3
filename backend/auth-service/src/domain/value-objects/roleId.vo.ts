@@ -28,7 +28,7 @@ export class RoleId extends EntityId {
     return roles.map((role) => new RoleId(role));
   }
 
-  toString() {
+  getRoleId() {
     return this._id;
   }
 }

@@ -7,11 +7,15 @@ import { IPermissionRepository } from '@domain/repositories/IPermission.reposito
 import { PermissionId } from '@domain/value-objects/permissionId.vo';
 import { PrismaService } from '@infrastructure/database/prisma.service';
 import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPrismaError.helper';
+import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-context.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PermissionRepository implements IPermissionRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly prismaTransaction: PrismaTransaction,
+  ) {}
 
   async findAll(): Promise<Permission[]> {
     const results = await this.prismaService.permission.findMany();
@@ -21,7 +25,7 @@ export class PermissionRepository implements IPermissionRepository {
 
   async updatePermission(permission: Permission): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.permission.update({
+      await this.client.permission.update({
         where: {
           id: permission.getId().toString(),
         },
@@ -61,7 +65,7 @@ export class PermissionRepository implements IPermissionRepository {
 
   async insertPermission(permission: Permission): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.permission.create({
+      await this.client.permission.create({
         data: {
           id: permission.getId().toString(),
           action: permission.getAction(),
@@ -73,11 +77,14 @@ export class PermissionRepository implements IPermissionRepository {
 
   async deleteById(permissionId: PermissionId): Promise<void> {
     await asyncHandlerPrismaError(async () => {
-      await this.prismaService.permission.delete({
+      await this.client.permission.delete({
         where: {
           id: permissionId.toString(),
         },
       });
     });
+  }
+  private get client() {
+    return this.prismaTransaction.getPrismaClient(this.prismaService);
   }
 }
