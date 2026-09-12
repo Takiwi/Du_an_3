@@ -1,13 +1,11 @@
+import { CreateAccountInput } from '@application/sagas/account/account.contract';
 import { Account } from '@domain/entities/account/account.entity';
 
-export interface RegisterInput {
-  username: string;
-  email: string;
-  password: string;
-}
+export type RegisterInputUseCase = Omit<CreateAccountInput, 'username'> & {
+  profileId: string;
+};
 
-export interface RegisterOutput {
+export interface RegisterOutputUseCase {
   account: Account;
-  username: string;
   role: string[];
 }

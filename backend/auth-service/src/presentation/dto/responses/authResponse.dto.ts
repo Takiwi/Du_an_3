@@ -9,13 +9,13 @@ export class AuthResponseDto {
   username?: string;
 
   @ApiProperty({ format: 'email', example: 'example@gmail.com' })
-  email: string;
+  email?: string;
 
   @ApiProperty({ enum: AuthStatus, example: AuthStatus.VERIFIED })
-  status: string;
+  status?: string;
 
   @ApiProperty({ example: ['USER'] })
-  role: string[];
+  role?: string[];
 
   constructor(
     id: string,

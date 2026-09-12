@@ -10,7 +10,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { RegisterUseCase } from '@application/useCases/register/register.usecase';
 import { CreateUserDto } from '../dto/requests/createUser.dto';
 import {
   ApiSuccessResponse,
@@ -37,13 +36,14 @@ import { ERROR_DEFINITIONS } from '@presentation/configs/error.config';
 import { Public } from '@presentation/decorators/public.decorator';
 import { RequestWithCookies } from '@presentation/types/requestCookie.type';
 import { CurrentUser } from '@presentation/decorators/currentUser.decorator';
+import { CreateAccountSaga } from '@application/sagas/account/createAccount.saga';
 
 @ApiCommonErrors()
 @UseGuards(JwtAuthGuard)
 @Controller('auth/')
 export class AuthenticationController {
   constructor(
-    private readonly registerUseCase: RegisterUseCase,
+    private readonly createAccountSaga: CreateAccountSaga,
     private readonly logoutUseCase: LogoutUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly refreshTokenUseCase: RefreshTokenUseCase,
@@ -72,14 +72,11 @@ export class AuthenticationController {
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     this.logger.debug(`Hello from register endpoint`);
-    const result = await this.registerUseCase.execute(createUserDto);
+    const result = await this.createAccountSaga.execute(createUserDto);
 
     if (result.isErr()) throw result.error;
 
-    return AuthMapper.toResponseDto(
-      result.value.account,
-      result.value.username,
-    );
+    return AuthMapper.toResponseDto(result.value);
   }
 
   @ApiSuccessResponse({
@@ -121,7 +118,7 @@ export class AuthenticationController {
       path: 'auth/',
     });
 
-    return AuthMapper.toResponseDto(result.value.account);
+    return AuthMapper.toResponseDto({ id: result.value.accountId });
   }
 
   @ApiSuccessResponse({
@@ -220,7 +217,5 @@ export class AuthenticationController {
     );
 
     if (result.isErr()) throw result.error;
-
-    return AuthMapper.toResponseDto(result.value);
   }
 }

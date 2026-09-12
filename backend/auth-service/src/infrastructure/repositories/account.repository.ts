@@ -7,6 +7,8 @@ import { Password } from '@domain/value-objects/password.vo';
 import { PrismaService } from '@infrastructure/database/prisma.service';
 import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPrismaError.helper';
 import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-context.service';
+import { Result } from 'neverthrow';
+import { AppError } from '@packages/pattern';
 
 @Injectable()
 export class AccountRepository implements IAccountRepository {
@@ -14,6 +16,16 @@ export class AccountRepository implements IAccountRepository {
     private readonly prismaService: PrismaService,
     private readonly prismaTransaction: PrismaTransaction,
   ) {}
+
+  async deleteAccount(accountId: AccountId): Promise<Result<void, AppError>> {
+    const result = await asyncHandlerPrismaError(async () => {
+      await this.client.account.delete({
+        where: { id: accountId.toString() },
+      });
+    });
+
+    return result;
+  }
 
   async findByEmail(email: string): Promise<Account | null> {
     const user = await this.prismaService.account.findUnique({
@@ -52,26 +64,32 @@ export class AccountRepository implements IAccountRepository {
     return !!user;
   }
 
-  async updateStatusById(id: AccountId, status: AccountStatus): Promise<void> {
-    await asyncHandlerPrismaError(async () => {
-      return await this.client.account.update({
+  async updateStatusById(
+    id: AccountId,
+    status: AccountStatus,
+  ): Promise<Result<void, AppError>> {
+    return await asyncHandlerPrismaError(async () => {
+      await this.client.account.update({
         where: { id: id.toString() },
         data: { status: status.currentStatus() },
       });
     });
   }
 
-  async updatePasswordById(id: AccountId, password: Password): Promise<void> {
-    await asyncHandlerPrismaError(async () => {
-      return await this.client.account.update({
+  async updatePasswordById(
+    id: AccountId,
+    password: Password,
+  ): Promise<Result<void, AppError>> {
+    return await asyncHandlerPrismaError(async () => {
+      await this.client.account.update({
         where: { id: id.toString() },
         data: { password: password.toString() },
       });
     });
   }
 
-  async insertAccount(account: Account): Promise<void> {
-    await asyncHandlerPrismaError(async () => {
+  async insertAccount(account: Account): Promise<Result<void, AppError>> {
+    return await asyncHandlerPrismaError(async () => {
       await this.client.account.create({
         data: {
           id: account.getId().toString(),

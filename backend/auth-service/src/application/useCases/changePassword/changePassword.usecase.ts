@@ -9,7 +9,6 @@ import {
 } from '@domain/repositories/IAccount.repository';
 import { AccountId } from '@domain/value-objects/accountId.vo';
 import { Password } from '@domain/value-objects/password.vo';
-import { Account } from '@domain/entities/account/account.entity';
 import { err, ok, Result } from 'neverthrow';
 import { AppError } from '@packages/pattern';
 
@@ -25,7 +24,7 @@ export class ChangePasswordUseCase {
   async execute(
     accountId: string,
     newPasswordPlain: string,
-  ): Promise<Result<Account, AppError>> {
+  ): Promise<Result<void, AppError>> {
     // check account
     const id = AccountId.reconstitute(accountId);
 
@@ -70,6 +69,6 @@ export class ChangePasswordUseCase {
 
     account.updatePassword(hashedPassword);
 
-    return ok(account);
+    return ok();
   }
 }

@@ -3,7 +3,6 @@ import {
   IAccountRepository,
   ACCOUNT_REPOSITORY_TOKEN,
 } from '@domain/repositories/IAccount.repository';
-import { RegisterInput, RegisterOutput } from './register.contract';
 import {
   IPasswordHasher,
   PASSWORD_HASHER_TOKEN,
@@ -12,13 +11,13 @@ import { Account } from '@domain/entities/account/account.entity';
 import { AppError } from '@packages/pattern';
 import { ok, err, Result } from 'neverthrow';
 import {
-  IUserFacade,
-  USER_FACADE_TOKEN,
-} from '@application/ports/IUserFacade.port';
-import {
   IUnitOfWork,
   TRANSACTION_ROLLBACK_ERROR,
 } from '@application/ports/IUnitOfWork.port';
+import {
+  RegisterInputUseCase,
+  RegisterOutputUseCase,
+} from './register.contract';
 
 @Injectable()
 export class RegisterUseCase {
@@ -27,22 +26,16 @@ export class RegisterUseCase {
     private readonly accountRepository: IAccountRepository,
     @Inject(PASSWORD_HASHER_TOKEN)
     private readonly passwordHasher: IPasswordHasher,
-    @Inject(USER_FACADE_TOKEN)
-    private readonly userFacade: IUserFacade,
     @Inject(TRANSACTION_ROLLBACK_ERROR)
     private readonly unitOfWork: IUnitOfWork,
   ) {}
 
-  async execute(dto: RegisterInput): Promise<Result<RegisterOutput, AppError>> {
-    // 1. Send a request to user service to validate the username format and blacklist via User domain
-    const userProfile = await this.userFacade.createUserProfile(
-      dto.username,
-      dto.email,
-    );
-
+  async execute(
+    dto: RegisterInputUseCase,
+  ): Promise<Result<RegisterOutputUseCase, AppError>> {
     // 2. Create Account entity
     const accountResult = Account.baseEntity({
-      id: userProfile.id,
+      id: dto.profileId,
       email: dto.email,
       password: dto.password,
     });
@@ -61,21 +54,15 @@ export class RegisterUseCase {
 
     const result = await this.unitOfWork.runInTransaction(async () => {
       // 5. Insert account
-      await this.accountRepository.insertAccount(account);
-
-      return ok();
+      return await this.accountRepository.insertAccount(account);
     });
 
     if (result.isErr()) {
-      // rollback all
-      await this.userFacade.deleteUserProfile(userProfile.id);
-
       return err(result.error);
     }
 
     return ok({
       account: account,
-      username: dto.username,
       role: ['USER'],
     });
   }

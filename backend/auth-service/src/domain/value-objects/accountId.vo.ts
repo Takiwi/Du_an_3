@@ -22,7 +22,7 @@ export class AccountId extends EntityId {
     return new AccountId(id);
   }
 
-  getId() {
+  toString() {
     return this._id;
   }
 }

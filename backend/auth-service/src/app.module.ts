@@ -56,6 +56,9 @@ import { UpdatePermissionUseCase } from '@application/useCases/permission/update
 import { DeletePermissionUseCase } from '@application/useCases/permission/deletePermission.usecase';
 import { GetPermissionListUseCase } from '@application/useCases/permission/getPermissionList.usecase';
 import { CreatePermissionUseCase } from '@application/useCases/permission/createPermission.usecase';
+import { CreateAccountSaga } from '@application/sagas/account/createAccount.saga';
+import { UserAppService } from '@infrastructure/services/userApp.service';
+import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/deleteAccount.usecase';
 @Module({
   imports: [
     ClsModule,
@@ -158,6 +161,9 @@ import { CreatePermissionUseCase } from '@application/useCases/permission/create
     UpdatePermissionUseCase,
     DeletePermissionUseCase,
     GetPermissionListUseCase,
+    CreateAccountSaga,
+    UserAppService,
+    DeleteAccountUseCase,
   ],
 })
 export class AppModule implements NestModule {

@@ -140,6 +140,10 @@ export class LoginUseCase {
 
     await this.refreshTokenRepository.insertRefreshToken(newRefreshToken.value);
 
-    return ok({ account, accessToken, refreshToken });
+    return ok({
+      accountId: account.getId().toString(),
+      accessToken,
+      refreshToken,
+    });
   }
 }

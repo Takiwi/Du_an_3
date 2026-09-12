@@ -1,3 +1,6 @@
+import { AppError } from '@packages/pattern';
+import { Result } from 'neverthrow';
+
 export const USER_FACADE_TOKEN = 'IUserFacade';
 
 export interface UserProfile {
@@ -8,6 +11,9 @@ export interface UserProfile {
 }
 
 export interface IUserFacade {
-  createUserProfile(username: string, email: string): Promise<UserProfile>;
-  deleteUserProfile(userId: string): Promise<void>;
+  createUserProfile(
+    username: string,
+    email: string,
+  ): Promise<Result<UserProfile, AppError>>;
+  deleteUserProfile(userId: string): Promise<Result<void, AppError>>;
 }

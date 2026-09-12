@@ -1,14 +1,19 @@
-import { Account } from '@domain/entities/account/account.entity';
 import { AuthResponseDto } from '../dto/responses/authResponse.dto';
 
 export class AuthMapper {
-  static toResponseDto(account: Account, username?: string): AuthResponseDto {
+  static toResponseDto(props: {
+    id: string;
+    username?: string;
+    email?: string;
+    role?: string[];
+    status?: string;
+  }): AuthResponseDto {
     return {
-      id: account.getId().toString(),
-      email: account.getEmail(),
-      username: username,
-      status: account.getStatus().currentStatus(),
-      role: account.getRole().map((role) => role.toString()),
+      id: props.id,
+      email: props.email,
+      username: props.username,
+      status: props.status,
+      role: props.role,
     };
   }
 }
