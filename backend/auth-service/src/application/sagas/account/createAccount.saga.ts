@@ -2,7 +2,7 @@ import {
   IUserFacade,
   USER_FACADE_TOKEN,
 } from '@application/ports/IUserFacade.port';
-import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/deleteAccount.usecase';
+import { DeleteAccountUseCase } from '@application/useCases/account/deleteAccount.usecase';
 import { RegisterUseCase } from '@application/useCases/register/register.usecase';
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateAccountInput, CreateAccountOutput } from './account.contract';

@@ -1,10 +1,10 @@
-enum STATUS {
+enum Status {
     COMING_SOON
     CURRENT_SHOWING
     COMPLETED
 }
 
-enum TYPE {
+enum type {
     TV_SHOW
     MOVIE
     OVE
@@ -15,8 +15,8 @@ model Anime {
   id          String   @id
   title       String
   description String? @db.Text
-  status      STATUS   @default(COMING_SOON)
-  type        TYPE  @default(MOVIE)
+  status      Status   @default(COMING_SOON)
+  type        type  @default(MOVIE)
   seriesId    String
   series      Series @relation(fields: [seriesId], references: [id])
   animeCategories AnimeCategory[]

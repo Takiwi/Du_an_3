@@ -11,7 +11,8 @@
       // Path nội bộ của riêng auth-service (ngắn gọn vì baseUrl đã là ./)
       "@domain/*": ["src/domain/*"],
       "@application/*": ["src/application/*"],
-      "@shared/*": ["src/shared/*"],
+      "@presentation/*": ["src/presentation/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
       "@generated/*": ["src/generated/*"],
 
       // Path trỏ ra các package dùng chung bên ngoài

@@ -1,11 +1,10 @@
 model AnimeCategory {
-    id String @id
-
     animeId String
     anime Anime @relation(fields: [animeId], references: [id])
 
     categoryId String
     category Category @relation(fields: [categoryId], references: [id])
 
+    @@id([animeId, categoryId])
     @@map("AnimeCategories")
 }

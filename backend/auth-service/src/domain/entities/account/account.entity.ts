@@ -27,7 +27,7 @@ export class Account {
     this._roles = role;
   }
 
-  private static create(props: FullAccount): Result<Account, AppError> {
+  static create(props: FullAccount): Result<Account, AppError> {
     const accountId = props.id
       ? AccountId.reconstitute(props.id)
       : AccountId.createId();

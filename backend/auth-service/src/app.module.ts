@@ -56,7 +56,7 @@ import { DeletePermissionUseCase } from '@application/useCases/permission/delete
 import { GetPermissionListUseCase } from '@application/useCases/permission/getPermissionList.usecase';
 import { CreatePermissionUseCase } from '@application/useCases/permission/createPermission.usecase';
 import { CreateAccountSaga } from '@application/sagas/account/createAccount.saga';
-import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/deleteAccount.usecase';
+import { DeleteAccountUseCase } from '@application/useCases/account/deleteAccount.usecase';
 import { AuthExceptionFilter } from '@presentation/filters/authExceptions.filter';
 @Module({
   imports: [

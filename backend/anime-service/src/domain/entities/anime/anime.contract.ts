@@ -1,4 +1,5 @@
-import { STATUS, TYPE } from '@generated/prisma/enums';
+export type Status = 'COMING_SOON' | 'CURRENT_SHOWING' | 'COMPLETED';
+export type Types = 'TV_SHOW' | 'MOVIE' | 'OVE' | 'SPECIAL';
 
 export interface BaseAnime {
   title: string;
@@ -7,8 +8,9 @@ export interface BaseAnime {
 
 export interface FullAnime extends BaseAnime {
   id: string;
-  status: STATUS;
-  type: TYPE;
+  status: Status;
+  categories: string[];
+  types: Types;
   view: number;
   rating: number;
 }
