@@ -32,6 +32,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.4.6",
     "@packages/api-docs": "workspace:*",
+    "@packages/authorization": "workspace:*",
     "@packages/grpc-contracts": "workspace:*",
     "@packages/logging": "workspace:*",
     "@packages/pattern": "workspace:*",

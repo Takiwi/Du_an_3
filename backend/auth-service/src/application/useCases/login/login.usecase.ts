@@ -123,8 +123,8 @@ export class LoginUseCase {
     // create token pair
     const { accessToken, refreshToken } = await this.jwtAuth.generateTokenPair({
       sub: account.getId().toString(),
-      role: accountRoles,
-      permission: permissions,
+      roles: accountRoles,
+      permissions: permissions,
     });
 
     // save refresh token

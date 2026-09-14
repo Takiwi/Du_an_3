@@ -3,16 +3,16 @@ import { mapGRpcError } from '@infrastructure/mappers/gRPCError.mapper';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { AppError } from '@packages/pattern';
-import { err, Result } from 'neverthrow';
+import { err, ok, Result } from 'neverthrow';
 import { firstValueFrom, Observable } from 'rxjs';
 
 interface UserServiceClient {
   createUserProfile(input: {
     username: string;
     email: string;
-  }): Observable<Result<UserProfile, AppError>>;
+  }): Observable<UserProfile>;
 
-  deleteUserProfile(userId: string): Observable<Result<void, AppError>>;
+  deleteUserProfile(input: { userId: string }): Observable<unknown>;
 }
 
 @Injectable()
@@ -22,11 +22,12 @@ export class UserAppService implements IUserFacade, OnModuleInit {
   constructor(@Inject('USER_SERVICE') private grpcClient: ClientGrpc) {}
 
   async deleteUserProfile(userId: string): Promise<Result<void, AppError>> {
-    const result = await firstValueFrom(this.client.deleteUserProfile(userId));
-
-    if (result.isErr()) return result;
-
-    return result;
+    try {
+      await firstValueFrom(this.client.deleteUserProfile({ userId }));
+      return ok(undefined);
+    } catch (error) {
+      return err(mapGRpcError(error));
+    }
   }
 
   async createUserProfile(
@@ -38,9 +39,7 @@ export class UserAppService implements IUserFacade, OnModuleInit {
         this.client.createUserProfile({ username, email }),
       );
 
-      if (result.isErr()) return result;
-
-      return result;
+      return ok(result);
     } catch (error) {
       return err(mapGRpcError(error));
     }

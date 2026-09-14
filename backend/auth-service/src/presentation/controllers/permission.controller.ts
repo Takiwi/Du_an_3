@@ -11,10 +11,12 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { Roles } from '@packages/authorization';
 import { CreatePermissionDto } from '@presentation/dto/requests/createPermission.dto';
 import { UpdatePermissionDto } from '@presentation/dto/requests/updatePermission.dto';
 import { PermissionMapper } from '@presentation/mappers/permission.mapper';
 
+@Roles('ADMIN')
 @Controller('permissions')
 export class PermissionController {
   constructor(

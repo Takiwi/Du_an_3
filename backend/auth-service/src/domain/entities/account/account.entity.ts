@@ -4,7 +4,6 @@ import { Password } from '../../value-objects/password.vo';
 import { AppError } from '@packages/pattern';
 import { ok, err, Result } from 'neverthrow';
 import { BaseAccount, PureAccount, FullAccount } from './account.contract';
-import { Role } from '../authorization/role.entity';
 import { RoleId } from '@domain/value-objects/roleId.vo';
 
 export class Account {
@@ -51,17 +50,10 @@ export class Account {
 
   static baseEntity(props: BaseAccount): Result<Account, AppError> {
     const defaultStatus = AccountStatus.active();
-    const defaultRole = [Role.defaultRole().getRoleId()];
+    const defaultRole = [];
 
     return this.create({ ...props, status: defaultStatus, role: defaultRole });
   }
-
-  // static createByAdmin(props: BaseAccount): Result<Account, AppError> {
-  //   const defaultStatus = AccountStatus.locked();
-  //   const defaultRole: Role = 'USER';
-
-  //   return this.create({ ...props, status: defaultStatus, role: defaultRole });
-  // }
 
   static reconstitute(props: PureAccount): Account {
     const userStatus = AccountStatus.reconstitute(props.status);

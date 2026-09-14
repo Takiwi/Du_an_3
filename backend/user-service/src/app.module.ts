@@ -19,6 +19,9 @@ import { UserGRpcController } from './presentation/controllers/gRpc.controller';
 import { DeleteProfileUseCase } from '@application/useCases/deleteProfile/deleteProfile.usecase';
 import jwksConfig from './config/jwks.config';
 import jwtConfig from './config/jwt.config';
+import { UserExceptionFilter } from './presentation/filters/userExceptions.filter';
+import { APP_FILTER } from '@nestjs/core/constants';
+import { ClsModule } from '@packages/request-context';
 
 @Module({
   imports: [
@@ -34,6 +37,7 @@ import jwtConfig from './config/jwt.config';
     }),
     AppLoggerModule.forRoot('user-service'),
     RabbitMQModule,
+    ClsModule,
   ],
   controllers: [UserController, UserGRpcController],
   providers: [
@@ -41,12 +45,16 @@ import jwtConfig from './config/jwt.config';
       provide: USER_PROFILE_REPOSITORY_TOKEN,
       useClass: UserProfileRepository,
     },
-    PrismaService,
-    RedisService,
     {
       provide: ID_GENERATOR_TOKEN,
       useValue: { generate: () => randomUUID() },
     },
+    {
+      provide: APP_FILTER,
+      useClass: UserExceptionFilter,
+    },
+    RedisService,
+    PrismaService,
     DeleteProfileUseCase,
     GetProfileUseCase,
     UpdateProfileUseCase,

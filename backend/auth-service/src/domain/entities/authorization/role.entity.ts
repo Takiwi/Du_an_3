@@ -56,13 +56,6 @@ export class Role {
     return ok(new Role(id, props.name, permissions.value, props.max_members));
   }
 
-  static defaultRole() {
-    const id = RoleId.createId();
-    const permission = [Permission.defaultPermission()];
-
-    return new Role(id, 'USER', permission, null);
-  }
-
   static reconstitute(props: prismaRole) {
     const id = RoleId.reconstitute(props.id);
 

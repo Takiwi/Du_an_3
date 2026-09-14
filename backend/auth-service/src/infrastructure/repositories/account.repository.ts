@@ -97,9 +97,13 @@ export class AccountRepository implements IAccountRepository {
           password: account.getPassword().toString(),
           status: account.getStatus().currentStatus(),
           account_role: {
-            create: account.getRole().map((role) => {
-              return { roleId: role.getRoleId() };
-            }),
+            create: {
+              role: {
+                connect: {
+                  name: 'USER',
+                },
+              },
+            },
           },
         },
       });

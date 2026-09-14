@@ -109,8 +109,8 @@ export class RefreshTokenUseCase {
     const { accessToken, refreshToken } =
       await this.jwtService.generateTokenPair({
         sub: account.getId().toString(),
-        role: accountRoles,
-        permission: permissions,
+        roles: accountRoles,
+        permissions: permissions,
       });
 
     // 8. Update old refresh token record

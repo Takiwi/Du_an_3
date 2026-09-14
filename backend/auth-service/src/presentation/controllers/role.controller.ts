@@ -14,7 +14,8 @@ import {
 import { CreateRoleDto } from '@presentation/dto/requests/createRole.dto';
 import { UpdateRoleDto } from '@presentation/dto/requests/updateRole.dto';
 import { RoleMapper } from '@presentation/mappers/role.mapper';
-
+import { Roles } from '@packages/authorization';
+@Roles('ADMIN')
 @Controller('roles')
 export class RoleController {
   constructor(

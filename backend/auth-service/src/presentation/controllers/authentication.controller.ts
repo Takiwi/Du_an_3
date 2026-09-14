@@ -19,7 +19,7 @@ import {
 import { AuthResponseDto } from '../dto/responses/authResponse.dto';
 import { AuthMapper } from '../mappers/auth.mapper';
 import { AppError } from '@packages/pattern';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { LogoutUseCase } from '@application/useCases/logout/logout.usecase';
 import { RefreshTokenUseCase } from '@application/useCases/refreshToken/refreshToken.usecase';
 import { ConfigService } from '@nestjs/config';
@@ -34,7 +34,6 @@ import {
 } from '@presentation/guards/jwtAuth.guard';
 import { ERROR_DEFINITIONS } from '@presentation/configs/error.config';
 import { Public } from '@presentation/decorators/public.decorator';
-import { RequestWithCookies } from '@presentation/types/requestCookie.type';
 import { CurrentUser } from '@presentation/decorators/currentUser.decorator';
 import { CreateAccountSaga } from '@application/sagas/account/createAccount.saga';
 
@@ -71,7 +70,6 @@ export class AuthenticationController {
   @Public()
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
-    this.logger.debug(`Hello from register endpoint`);
     const result = await this.createAccountSaga.execute(createUserDto);
 
     if (result.isErr()) throw result.error;
@@ -128,10 +126,7 @@ export class AuthenticationController {
   @ApplyApiErrorsResponse(ERROR_DEFINITIONS, ['TOKEN_NOT_FOUND'])
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
-  async logout(
-    @Res({ passthrough: true }) res: Response,
-    @Req() req: RequestWithCookies,
-  ) {
+  async logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
     const accessToken = req.cookies?.accessToken;
     const refreshToken = req.cookies?.refreshToken;
 
@@ -161,7 +156,7 @@ export class AuthenticationController {
   @Post('refresh')
   async refresh(
     @Res({ passthrough: true }) res: Response,
-    @Req() req: RequestWithCookies,
+    @Req() req: Request,
   ) {
     const refreshToken = req.cookies?.refreshToken;
 

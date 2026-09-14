@@ -44,7 +44,7 @@ export class UserExceptionFilter implements ExceptionFilter {
       });
 
       this.logger.error(
-        `[${request.method}] ${request.url} - ${exception.message}`,
+        `[${request.method}] ${request.url} - ${exception.code} - ${exception.message}`,
       );
 
       return response.status(status).json(result);
@@ -62,7 +62,7 @@ export class UserExceptionFilter implements ExceptionFilter {
       );
 
       this.logger.error(
-        `[${request.method}] ${request.url} - ${exception.message}`,
+        `[${request.method}] ${request.url} - ${exception.code} - ${exception.message}`,
       );
 
       return response.status(status).json(result);

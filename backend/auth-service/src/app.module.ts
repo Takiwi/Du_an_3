@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ClsModule, RequestIdMiddleware } from '@packages/request-context';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppLoggerModule } from '@packages/logging';
 import appConfig from './config/app.config';
@@ -40,7 +40,6 @@ import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-c
 import { TRANSACTION_ROLLBACK_ERROR } from './application/ports/IUnitOfWork.port';
 import { RedisService } from '@infrastructure/database/redis.service';
 import { RabbitMQModule } from './modules/rabbitMQ.module';
-import { UserExceptionFilter } from '@presentation/filters/userExceptions.filter';
 import { GRpcModule } from './modules/gRpc.module';
 import { ROLE_REPOSITORY_TOKEN } from '@domain/repositories/IRole.repository';
 import { RoleRepository } from '@infrastructure/repositories/role.repository';
@@ -57,8 +56,9 @@ import { DeletePermissionUseCase } from '@application/useCases/permission/delete
 import { GetPermissionListUseCase } from '@application/useCases/permission/getPermissionList.usecase';
 import { CreatePermissionUseCase } from '@application/useCases/permission/createPermission.usecase';
 import { CreateAccountSaga } from '@application/sagas/account/createAccount.saga';
-import { UserAppService } from '@infrastructure/services/userApp.service';
 import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/deleteAccount.usecase';
+import { AuthExceptionFilter } from '@presentation/filters/authExceptions.filter';
+import { RoleAndPermissionGuard } from '@packages/authorization';
 @Module({
   imports: [
     ClsModule,
@@ -92,6 +92,10 @@ import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/delete
   ],
   providers: [
     {
+      provide: APP_GUARD,
+      useClass: RoleAndPermissionGuard,
+    },
+    {
       provide: PERMISSION_REPOSITORY_TOKEN,
       useClass: PermissionRepository,
     },
@@ -109,7 +113,7 @@ import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/delete
     },
     {
       provide: APP_FILTER,
-      useClass: UserExceptionFilter,
+      useClass: AuthExceptionFilter,
     },
     {
       provide: DATA_HASHER_TOKEN,
@@ -139,12 +143,12 @@ import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/delete
       provide: BLACKLIST_TOKEN,
       useClass: BlacklistTokenRepository,
     },
-    PrismaService,
-    PrismaTransaction,
     {
       provide: TRANSACTION_ROLLBACK_ERROR,
       useClass: PrismaUnitOfWork,
     },
+    PrismaService,
+    PrismaTransaction,
     RedisService,
     JwksService,
     JwtStrategy,
@@ -162,7 +166,6 @@ import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/delete
     DeletePermissionUseCase,
     GetPermissionListUseCase,
     CreateAccountSaga,
-    UserAppService,
     DeleteAccountUseCase,
   ],
 })

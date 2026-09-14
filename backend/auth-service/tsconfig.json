@@ -21,7 +21,8 @@
       "@packages/request-context/*": ["../../packages/request-context/src/*"],
       "@packages/logging/*": ["../../packages/logging/src/*"],
       "@packages/api-docs/*": ["../../packages/api-docs/src/*"],
-      "@packages/grpc-contracts": ["../../packages/grpc-contracts/src/*"]
+      "@packages/grpc-contracts": ["../../packages/grpc-contracts/src/*"],
+      "@packages/authorization": ["../../packages/authorization/src/*"]
     }
   },
   "references": [
@@ -29,8 +30,9 @@
     { "path": "../../packages/request-context" },
     { "path": "../../packages/logging" },
     { "path": "../../packages/api-docs" },
-    { "path": "../../packages/grpc-contracts" }
+    { "path": "../../packages/grpc-contracts" },
+    { "path": "../../packages/authorization" }
   ],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/types/*"],
   "exclude": ["node_modules", "test", "dist", "**/*.spec.ts"]
 }
