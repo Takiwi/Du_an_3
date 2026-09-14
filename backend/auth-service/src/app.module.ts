@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ClsModule, RequestIdMiddleware } from '@packages/request-context';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppLoggerModule } from '@packages/logging';
 import appConfig from './config/app.config';
@@ -58,7 +58,6 @@ import { CreatePermissionUseCase } from '@application/useCases/permission/create
 import { CreateAccountSaga } from '@application/sagas/account/createAccount.saga';
 import { DeleteAccountUseCase } from '@application/useCases/deleteAccount/deleteAccount.usecase';
 import { AuthExceptionFilter } from '@presentation/filters/authExceptions.filter';
-import { RoleAndPermissionGuard } from '@packages/authorization';
 @Module({
   imports: [
     ClsModule,
@@ -91,10 +90,6 @@ import { RoleAndPermissionGuard } from '@packages/authorization';
     JwksController,
   ],
   providers: [
-    {
-      provide: APP_GUARD,
-      useClass: RoleAndPermissionGuard,
-    },
     {
       provide: PERMISSION_REPOSITORY_TOKEN,
       useClass: PermissionRepository,

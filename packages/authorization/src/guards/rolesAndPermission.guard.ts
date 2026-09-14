@@ -3,7 +3,7 @@ import { Reflector } from "@nestjs/core";
 import { Request } from "express";
 import "@packages/common";
 import { ROLES_KEY } from "../decorators/roles.decorator";
-import { PERMISSION_KEYS } from "../decorators/permission.decorator";
+import { PERMISSION_KEYS } from "../decorators/permissions.decorator";
 import { AppError } from "@packages/pattern";
 
 @Injectable()

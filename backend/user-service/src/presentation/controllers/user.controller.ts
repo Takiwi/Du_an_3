@@ -19,24 +19,22 @@ import { UserProfileMapper } from '../mappers/userProfile.mapper';
 import { UpdateUserDto } from '../dto/requests/updateUser.dto';
 import { ERROR_DEFINITIONS } from '../configs/error.config';
 import { CurrentUser } from '../decorators/currentUser.decorator';
-import { JwtAuthGuard } from '../guards/jwt.guard';
-// import { CreateProfileDto } from '../dto/requests/createProfile.dto';
-// import { GrpcMethod, Payload, RpcException } from '@nestjs/microservices';
-// import { status } from '@grpc/grpc-js';
-import { CreateProfileUseCase } from '@application/useCases/createProfile/createProfile.usecase';
-// import { Public } from '../decorators/public.decorator';
 import { ILogger, LOGGER_TOKEN } from '@packages/logging';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
+import {
+  JwtAuthGuard,
+  Permissions,
+  RoleAndPermissionGuard,
+} from '@packages/authorization';
 
 @ApiCommonErrors()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RoleAndPermissionGuard)
 @UseInterceptors(LoggingInterceptor)
 @Controller('user/')
 export class UserController {
   constructor(
     private readonly getProfileUseCase: GetProfileUseCase,
     private readonly updateProfileUseCase: UpdateProfileUseCase,
-    private readonly createProfileUseCase: CreateProfileUseCase,
     @Inject(LOGGER_TOKEN) private readonly logger: ILogger,
   ) {}
 
@@ -50,6 +48,7 @@ export class UserController {
     'USER_NOT_FOUND',
     'VALIDATION_TOKEN_FALSE',
   ])
+  @Permissions('USER_DATA:READ')
   @Get('me')
   async userInfo(@CurrentUser('sub') userReq: string) {
     const result = await this.getProfileUseCase.execute(userReq);

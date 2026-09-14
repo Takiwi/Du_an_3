@@ -1,0 +1,9 @@
+
+
+###
+GET  http://localhost:3003/api/v1/user/me
+content-type: application/json
+
+###
+GET  http://localhost:3001/api/v1/.well-known/jwks.json
+content-type: application/json

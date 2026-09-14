@@ -10,12 +10,16 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateRoleDto } from '@presentation/dto/requests/createRole.dto';
 import { UpdateRoleDto } from '@presentation/dto/requests/updateRole.dto';
 import { RoleMapper } from '@presentation/mappers/role.mapper';
 import { Roles } from '@packages/authorization';
+import { RoleAndPermissionGuard } from '@packages/authorization';
+
 @Roles('ADMIN')
+@UseGuards(RoleAndPermissionGuard)
 @Controller('roles')
 export class RoleController {
   constructor(

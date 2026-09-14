@@ -6,6 +6,7 @@ import { PROTO_PACKAGES, PROTO_PATHS } from '@packages/grpc-contracts';
 import { Logger } from 'nestjs-pino';
 import { ValidationError, ValidationPipe } from '@nestjs/common';
 import { ValidationFieldException } from './presentation/errors/validationField.error';
+import '@packages/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
