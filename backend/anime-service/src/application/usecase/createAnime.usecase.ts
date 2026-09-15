@@ -11,6 +11,7 @@ import {
   IUnitOfWork,
   TRANSACTION_ROLLBACK_ERROR,
 } from '@application/ports/IUnitOfWork.port';
+import { SeriesId } from '@domain/value-objects/seriesId.vo';
 
 @Injectable()
 export class CreateAnimeUseCase {
@@ -22,20 +23,24 @@ export class CreateAnimeUseCase {
   ) {}
 
   async execute(dto: CreateAnimeInput): Promise<Result<Anime, AppError>> {
-    const anime = Anime.create(dto);
+    const { seriesId, ...animeDto } = dto;
 
-    if (anime.isErr()) return anime;
+    const combined = Result.combine([
+      SeriesId.create(seriesId),
+      Anime.create(animeDto),
+    ]);
+
+    if (combined.isErr()) return err(combined.error[0]);
+
+    const [id, anime] = combined.value;
 
     // 1. check if anime exists, if no add it
     const result = await this.unitOfWork.runInTransaction(async () => {
-      return await this.animeRepository.isExistsOrInsert(
-        dto.title,
-        dto.releaseDate,
-      );
+      return await this.animeRepository.isExistsOrInsert(id, anime);
     });
 
     if (result.isErr()) return err(result.error);
 
-    return ok(anime.value);
+    return ok(anime);
   }
 }

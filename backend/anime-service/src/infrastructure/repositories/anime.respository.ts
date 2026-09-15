@@ -32,23 +32,22 @@ export class AnimeRepository implements IAnimeRepository {
           id: anime.getId().toString(),
           title: anime.getTitle(),
           season: anime.getSeason(),
-          seriesId: seriesId.toString(),
           releaseDate: anime.getReleaseDate(),
           isPublished: anime.getIsPublic(),
           rating: anime.getRating(),
           status: anime.getStatus(),
           type: anime.getTypes(),
           view: anime.getViews(),
-          animeCategories: {
+          categories: {
             create: anime.getCategories().map((cate) => ({
               category: {
-                connect: { id: cate },
+                connect: { id: cate.toString() },
               },
             })),
           },
         },
         include: {
-          animeCategories: { where: { animeId: anime.getId().toString() } },
+          categories: { where: { animeId: anime.getId().toString() } },
         },
       });
     });
@@ -59,17 +58,20 @@ export class AnimeRepository implements IAnimeRepository {
 
     const finalResult = result.value;
 
-    return Anime.reconstitute({
-      id: finalResult.id,
-      title: finalResult.title,
-      season: finalResult.season,
-      status: finalResult.status,
-      types: finalResult.type,
-      views: finalResult.view,
-      rating: finalResult.rating,
-      releaseDate: finalResult.releaseDate,
-      isPublished: finalResult.isPublished,
-    });
+    return ok(
+      Anime.reconstitute({
+        id: finalResult.id,
+        title: finalResult.title,
+        season: finalResult.season,
+        status: finalResult.status,
+        type: finalResult.type,
+        views: finalResult.view,
+        rating: finalResult.rating,
+        releaseDate: finalResult.releaseDate,
+        isPublished: finalResult.isPublished,
+        categories: finalResult.categories.map((cate) => cate.categoryId),
+      }),
+    );
   }
 
   async insertAnime(
@@ -91,7 +93,7 @@ export class AnimeRepository implements IAnimeRepository {
             create: anime.getCategories().map((cate) => ({
               category: {
                 connect: {
-                  id: cate,
+                  id: cate.toString(),
                 },
               },
             })),

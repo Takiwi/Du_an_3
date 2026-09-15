@@ -18,10 +18,10 @@ model Anime {
   status      Status   @default(COMING_SOON)
   type        Type  @default(MOVIE)
 
-  seriesId    String
-  series      Series @relation(fields: [seriesId], references: [id])
-  animeCategories AnimeCategory[]
+  relationFrom AnimeRelation[] @relation("FromAnime")
+  relationTo AnimeRelation[] @relation("ToAnime")
 
+    categories AnimeCategory[]
   releaseDate DateTime?
   season     String 
 

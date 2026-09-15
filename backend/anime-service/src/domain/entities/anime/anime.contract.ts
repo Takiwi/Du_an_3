@@ -6,13 +6,15 @@ export interface BaseAnime {
   season: string;
   releaseDate: Date | null;
 }
-
 export interface FullAnime extends BaseAnime {
-  id: string;
-  status: Status;
+  status: string;
   categories: string[];
-  types: Types;
+  type: string;
   views: number;
   rating: number;
   isPublished: boolean;
+}
+
+export interface PureAnime extends FullAnime {
+  id: string;
 }

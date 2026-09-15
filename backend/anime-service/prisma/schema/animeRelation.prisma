@@ -1,0 +1,19 @@
+enum RelationType {
+    SEQUEL
+    PREQUEL
+    SIDE_STORY
+    SPIN_OFF
+    ALTERNATIVE
+}
+
+model AnimeRelation {
+    id String @id
+    fromAnimeId String
+    toAnimeId String
+    relationType RelationType
+
+    fromAnime Anime @relation("FromAnime", fields: [fromAnimeId], references: [id])
+    toAnime Anime @relation("ToAnime", fields: [toAnimeId], references: [id])
+
+    @@unique([fromAnimeId, toAnimeId, relationType])
+}
