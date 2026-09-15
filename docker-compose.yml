@@ -1,3 +1,5 @@
 include:
   - ./backend/auth-service/docker-compose.db.yml
   - ./backend/user-service/docker-compose.db.yml
+  - ./backend/anime-service/docker/docker-compose.db.yml
+  - ./backend/search-service/docker/docker-compose.elasticsearch.yml

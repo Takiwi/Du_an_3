@@ -4,7 +4,7 @@ enum Status {
     COMPLETED
 }
 
-enum type {
+enum Type {
     TV_SHOW
     MOVIE
     OVE
@@ -16,18 +16,23 @@ model Anime {
   title       String
   description String? @db.Text
   status      Status   @default(COMING_SOON)
-  type        type  @default(MOVIE)
+  type        Type  @default(MOVIE)
+
   seriesId    String
   series      Series @relation(fields: [seriesId], references: [id])
   animeCategories AnimeCategory[]
 
   releaseDate DateTime?
-  season     DateTime 
+  season     String 
 
   view        Int      @default(0)
-  rating      Decimal  @default(0)
+  rating      Float  @default(0)
+
+  isPublished Boolean @default(false)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@unique([title, releaseDate])
   @@map("Anime")
 }

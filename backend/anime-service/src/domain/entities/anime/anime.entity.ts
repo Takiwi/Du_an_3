@@ -12,6 +12,8 @@ export class Anime {
   private _types: Types;
   private _views: number;
   private _rating: number;
+  private _releaseDate: Date | null;
+  private _isPublished: boolean;
 
   private constructor(
     id: AnimeId,
@@ -22,6 +24,8 @@ export class Anime {
     types: Types,
     views: number,
     rating: number,
+    releaseDate: Date | null,
+    isPublished: boolean,
   ) {
     this._id = id;
     this._title = title;
@@ -31,6 +35,8 @@ export class Anime {
     this._types = types;
     this._views = views;
     this._rating = rating;
+    this._releaseDate = releaseDate;
+    this._isPublished = isPublished;
   }
 
   static create(props: BaseAnime): Result<Anime, AppError> {
@@ -39,6 +45,7 @@ export class Anime {
     const defaultView = 0;
     const defaultRating = 0;
     const defaultCategories = [];
+    const defaultIsPublic = false;
 
     const id = AnimeId.createId();
 
@@ -52,6 +59,8 @@ export class Anime {
         defaultTypes,
         defaultView,
         defaultRating,
+        props.releaseDate,
+        defaultIsPublic,
       ),
     );
   }
@@ -66,9 +75,17 @@ export class Anime {
       props.categories,
       props.status,
       props.types,
-      props.view,
+      props.views,
       props.rating,
+      props.releaseDate,
+      props.isPublished,
     );
+  }
+
+  isEquals(title: string, releaseDate: Date) {
+    if (this._title === title && this._releaseDate === releaseDate) return true;
+
+    return false;
   }
 
   getId() {
@@ -101,5 +118,13 @@ export class Anime {
 
   getCategories() {
     return this._categories;
+  }
+
+  getReleaseDate() {
+    return this._releaseDate;
+  }
+
+  getIsPublic() {
+    return this._isPublished;
   }
 }

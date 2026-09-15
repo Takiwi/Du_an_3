@@ -21,3 +21,8 @@
 - auth redis: 6381
 - redis_commander: 8083
 - gRPC: 5002
+
+### search service (3004)
+
+- Elasticsearch: 9200
+- gRPC: 5003

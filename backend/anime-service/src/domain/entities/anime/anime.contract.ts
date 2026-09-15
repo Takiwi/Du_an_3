@@ -4,6 +4,7 @@ export type Types = 'TV_SHOW' | 'MOVIE' | 'OVE' | 'SPECIAL';
 export interface BaseAnime {
   title: string;
   season: string;
+  releaseDate: Date | null;
 }
 
 export interface FullAnime extends BaseAnime {
@@ -11,6 +12,7 @@ export interface FullAnime extends BaseAnime {
   status: Status;
   categories: string[];
   types: Types;
-  view: number;
+  views: number;
   rating: number;
+  isPublished: boolean;
 }

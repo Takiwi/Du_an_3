@@ -6,7 +6,7 @@ import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPri
 import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-context.service';
 import { Injectable } from '@nestjs/common';
 import { AppError } from '@packages/pattern';
-import { Result } from 'neverthrow';
+import { err, ok, Result } from 'neverthrow';
 
 @Injectable()
 export class AnimeRepository implements IAnimeRepository {
@@ -14,6 +14,63 @@ export class AnimeRepository implements IAnimeRepository {
     private readonly prisma: PrismaService,
     private readonly prismaTransaction: PrismaTransaction,
   ) {}
+
+  async isExistsOrInsert(
+    seriesId: SeriesId,
+    anime: Anime,
+  ): Promise<Result<Anime, AppError>> {
+    const result = await asyncHandlerPrismaError(async () => {
+      return await this.client.anime.upsert({
+        where: {
+          title_releaseDate: {
+            title: anime.getTitle(),
+            releaseDate: anime.getReleaseDate() ?? '',
+          },
+        },
+        update: {},
+        create: {
+          id: anime.getId().toString(),
+          title: anime.getTitle(),
+          season: anime.getSeason(),
+          seriesId: seriesId.toString(),
+          releaseDate: anime.getReleaseDate(),
+          isPublished: anime.getIsPublic(),
+          rating: anime.getRating(),
+          status: anime.getStatus(),
+          type: anime.getTypes(),
+          view: anime.getViews(),
+          animeCategories: {
+            create: anime.getCategories().map((cate) => ({
+              category: {
+                connect: { id: cate },
+              },
+            })),
+          },
+        },
+        include: {
+          animeCategories: { where: { animeId: anime.getId().toString() } },
+        },
+      });
+    });
+
+    if (result.isErr()) {
+      return err(result.error);
+    }
+
+    const finalResult = result.value;
+
+    return Anime.reconstitute({
+      id: finalResult.id,
+      title: finalResult.title,
+      season: finalResult.season,
+      status: finalResult.status,
+      types: finalResult.type,
+      views: finalResult.view,
+      rating: finalResult.rating,
+      releaseDate: finalResult.releaseDate,
+      isPublished: finalResult.isPublished,
+    });
+  }
 
   async insertAnime(
     seriesId: SeriesId,

@@ -5,4 +5,5 @@ export interface CreateAnimeInput {
   type: string;
   views: number;
   rating: number;
+  releaseDate: string;
 }
