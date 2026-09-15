@@ -61,7 +61,7 @@ export class Anime {
     }
 
     if (!['TV_SHOW', 'MOVIE', 'OVE', 'SPECIAL'].includes(props.type)) {
-      return err(new AppError('INVALID_TYPE', `Invalid type ${props.status}`));
+      return err(new AppError('INVALID_TYPE', `Invalid type ${props.type}`));
     }
 
     return ok(

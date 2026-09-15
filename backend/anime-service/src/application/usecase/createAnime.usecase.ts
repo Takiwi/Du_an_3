@@ -11,7 +11,9 @@ import {
   IUnitOfWork,
   TRANSACTION_ROLLBACK_ERROR,
 } from '@application/ports/IUnitOfWork.port';
-import { SeriesId } from '@domain/value-objects/seriesId.vo';
+import { AnimeRelation } from '@domain/entities/animeRelation/animeRelation.entity';
+import { AnimeId } from '@domain/value-objects/animeId.vo';
+import { RelationType } from '@domain/value-objects/relationType.vo';
 
 @Injectable()
 export class CreateAnimeUseCase {
@@ -23,24 +25,57 @@ export class CreateAnimeUseCase {
   ) {}
 
   async execute(dto: CreateAnimeInput): Promise<Result<Anime, AppError>> {
-    const { seriesId, ...animeDto } = dto;
+    const anime = Anime.create(dto);
 
-    const combined = Result.combine([
-      SeriesId.create(seriesId),
-      Anime.create(animeDto),
-    ]);
+    if (anime.isErr()) {
+      return err(anime.error);
+    }
 
-    if (combined.isErr()) return err(combined.error[0]);
+    // 1. check relation anime
+    const relationEntities: AnimeRelation[] = [];
 
-    const [id, anime] = combined.value;
+    if (dto.relation?.length) {
+      // 1.1 create anime id
+      const animeIds = Result.combine(
+        dto.relation.map((rela) => AnimeId.create(rela.relationAnimeId)),
+      );
 
-    // 1. check if anime exists, if no add it
+      if (animeIds.isErr()) return err(animeIds.error[0]);
+
+      // 1.2 check anime id is exist
+      const animeList = await this.animeRepository.isExistsManyId(
+        animeIds.value,
+      );
+
+      const missingIds = animeIds.value.filter(
+        (id) => !animeList.includes(id.toString()),
+      );
+
+      if (missingIds.length > 0) {
+        return err(
+          new AppError(
+            'ANIME_NOT_FOUND',
+            `Not found anime id: ${missingIds.join(', ')}`,
+          ),
+        );
+      }
+
+      // 1.3 create RelationType
+      const relationTypes = Result.combine(
+        dto.relation.map((rela) => RelationType.create(rela.relationType)),
+      );
+
+      if (relationTypes.isErr()) return err(relationTypes.error[0]);
+
+      // 1.4 cycle check
+    }
+
     const result = await this.unitOfWork.runInTransaction(async () => {
-      return await this.animeRepository.isExistsOrInsert(id, anime);
+      return await this.animeRepository.isExistsOrInsert(anime.value);
     });
 
     if (result.isErr()) return err(result.error);
 
-    return ok(anime);
+    return ok(anime.value);
   }
 }

@@ -1,6 +1,6 @@
 import { Anime } from '@domain/entities/anime/anime.entity';
 import { IAnimeRepository } from '@domain/repositories/IAnime.repository';
-import { SeriesId } from '@domain/value-objects/seriesId.vo';
+import { AnimeId } from '@domain/value-objects/animeId.vo';
 import { PrismaService } from '@infrastructure/database/prisma.service';
 import { asyncHandlerPrismaError } from '@infrastructure/helpers/asyncHandlerPrismaError.helper';
 import { PrismaTransaction } from '@infrastructure/services/prisma-transaction-context.service';
@@ -15,10 +15,44 @@ export class AnimeRepository implements IAnimeRepository {
     private readonly prismaTransaction: PrismaTransaction,
   ) {}
 
-  async isExistsOrInsert(
-    seriesId: SeriesId,
-    anime: Anime,
-  ): Promise<Result<Anime, AppError>> {
+  async isCreateCycle(fromAnimeId: AnimeId, toAnimeId: AnimeId): Promise<void> {
+    await this.client.$queryRaw<>
+    `
+      WITH RECURSIVE ancestors AS (
+        SELECT "fromAnimeId", "toAnimeId"
+        FROM "AnimeRelation"
+        WHERE "fromAnimeId" = ${fromAnimeId.toString()}
+      )
+    `
+  }
+
+  async isExistsManyId(ids: AnimeId[]): Promise<string[]> {
+    const results = await this.client.anime.findMany({
+      where: {
+        id: { in: ids.map((id) => id.toString()) },
+      },
+      select: { id: true },
+    });
+
+    return results.map((result) => result.id);
+  }
+
+  async findManyById(ids: AnimeId[]): Promise<Anime[]> {
+    const results = await this.client.anime.findMany({
+      where: {
+        id: { in: ids.map((id) => id.toString()) },
+      },
+      include: { categories: { select: { categoryId: true } } },
+    });
+
+    return results.map((result) => {
+      const categoryId = result.categories.map((id) => id.categoryId);
+
+      return Anime.reconstitute({ ...result, categories: categoryId });
+    });
+  }
+
+  async isExistsOrInsert(anime: Anime): Promise<Result<Anime, AppError>> {
     const result = await asyncHandlerPrismaError(async () => {
       return await this.client.anime.upsert({
         where: {
@@ -37,7 +71,7 @@ export class AnimeRepository implements IAnimeRepository {
           rating: anime.getRating(),
           status: anime.getStatus(),
           type: anime.getTypes(),
-          view: anime.getViews(),
+          views: anime.getViews(),
           categories: {
             create: anime.getCategories().map((cate) => ({
               category: {
@@ -60,24 +94,13 @@ export class AnimeRepository implements IAnimeRepository {
 
     return ok(
       Anime.reconstitute({
-        id: finalResult.id,
-        title: finalResult.title,
-        season: finalResult.season,
-        status: finalResult.status,
-        type: finalResult.type,
-        views: finalResult.view,
-        rating: finalResult.rating,
-        releaseDate: finalResult.releaseDate,
-        isPublished: finalResult.isPublished,
+        ...finalResult,
         categories: finalResult.categories.map((cate) => cate.categoryId),
       }),
     );
   }
 
-  async insertAnime(
-    seriesId: SeriesId,
-    anime: Anime,
-  ): Promise<Result<void, AppError>> {
+  async insertAnime(anime: Anime): Promise<Result<void, AppError>> {
     return await asyncHandlerPrismaError(async () => {
       await this.client.anime.create({
         data: {
@@ -87,8 +110,7 @@ export class AnimeRepository implements IAnimeRepository {
           rating: anime.getRating(),
           status: anime.getStatus(),
           type: anime.getTypes(),
-          view: anime.getViews(),
-          seriesId: seriesId.toString(),
+          views: anime.getViews(),
           animeCategories: {
             create: anime.getCategories().map((cate) => ({
               category: {

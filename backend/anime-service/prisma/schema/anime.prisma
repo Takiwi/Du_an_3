@@ -21,11 +21,11 @@ model Anime {
   relationFrom AnimeRelation[] @relation("FromAnime")
   relationTo AnimeRelation[] @relation("ToAnime")
 
-    categories AnimeCategory[]
+  categories AnimeCategory[]
   releaseDate DateTime?
   season     String 
 
-  view        Int      @default(0)
+  views        Int      @default(0)
   rating      Float  @default(0)
 
   isPublished Boolean @default(false)

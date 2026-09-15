@@ -8,5 +8,8 @@ export interface CreateAnimeInput {
   categories: string[];
   releaseDate: Date | null;
   isPublished: boolean;
-  seriesId: string;
+  relation?: {
+    relationAnimeId: string;
+    relationType: string;
+  }[];
 }
