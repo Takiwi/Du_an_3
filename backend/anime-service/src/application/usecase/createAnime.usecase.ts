@@ -11,9 +11,7 @@ import {
   IUnitOfWork,
   TRANSACTION_ROLLBACK_ERROR,
 } from '@application/ports/IUnitOfWork.port';
-import { AnimeRelation } from '@domain/entities/animeRelation/animeRelation.entity';
-import { AnimeId } from '@domain/value-objects/animeId.vo';
-import { RelationType } from '@domain/value-objects/relationType.vo';
+import { IMessage, MESSAGE_TOKEN } from '@application/ports/IMessage.port';
 
 @Injectable()
 export class CreateAnimeUseCase {
@@ -22,6 +20,8 @@ export class CreateAnimeUseCase {
     private readonly animeRepository: IAnimeRepository,
     @Inject(TRANSACTION_ROLLBACK_ERROR)
     private readonly unitOfWork: IUnitOfWork,
+    @Inject(MESSAGE_TOKEN)
+    private readonly message: IMessage,
   ) {}
 
   async execute(dto: CreateAnimeInput): Promise<Result<Anime, AppError>> {
@@ -31,50 +31,14 @@ export class CreateAnimeUseCase {
       return err(anime.error);
     }
 
-    // 1. check relation anime
-    const relationEntities: AnimeRelation[] = [];
-
-    if (dto.relation?.length) {
-      // 1.1 create anime id
-      const animeIds = Result.combine(
-        dto.relation.map((rela) => AnimeId.create(rela.relationAnimeId)),
-      );
-
-      if (animeIds.isErr()) return err(animeIds.error[0]);
-
-      // 1.2 check anime id is exist
-      const animeList = await this.animeRepository.isExistsManyId(
-        animeIds.value,
-      );
-
-      const missingIds = animeIds.value.filter(
-        (id) => !animeList.includes(id.toString()),
-      );
-
-      if (missingIds.length > 0) {
-        return err(
-          new AppError(
-            'ANIME_NOT_FOUND',
-            `Not found anime id: ${missingIds.join(', ')}`,
-          ),
-        );
-      }
-
-      // 1.3 create RelationType
-      const relationTypes = Result.combine(
-        dto.relation.map((rela) => RelationType.create(rela.relationType)),
-      );
-
-      if (relationTypes.isErr()) return err(relationTypes.error[0]);
-
-      // 1.4 cycle check
-    }
-
+    // check if the anime already exists; if not, add the new anime
     const result = await this.unitOfWork.runInTransaction(async () => {
       return await this.animeRepository.isExistsOrInsert(anime.value);
     });
 
     if (result.isErr()) return err(result.error);
+
+    this.message.publisher(anime.value, 1);
 
     return ok(anime.value);
   }

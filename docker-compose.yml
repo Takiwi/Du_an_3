@@ -3,3 +3,4 @@ include:
   - ./backend/user-service/docker-compose.db.yml
   - ./backend/anime-service/docker/docker-compose.db.yml
   - ./backend/search-service/docker/docker-compose.elasticsearch.yml
+  - ./docker/docker-compose.rabbitmq.yml

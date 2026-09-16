@@ -11,7 +11,7 @@ import { AnimeId } from '@domain/value-objects/animeId.vo';
 import { CategoryId } from '@domain/value-objects/categoryId.vo';
 
 export class Anime {
-  private _id: AnimeId;
+  private readonly _id: AnimeId;
   private _title: string;
   private _season: string;
   private _categories: CategoryId[];
@@ -148,7 +148,7 @@ export class Anime {
     return this._status;
   }
 
-  getTypes() {
+  getType() {
     return this._type;
   }
 

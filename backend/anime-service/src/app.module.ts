@@ -1,18 +1,21 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import prismaDatabaseConfig from './config/prismaDatabase.config';
-import { PrismaService } from './shared/database/prisma.service';
 import { ClsModule, RequestIdMiddleware } from '@packages/request-context';
+import { PrismaService } from '@infrastructure/database/prisma.service';
+import appConfig from './config/app.config';
+import rabbitmqConfig from './config/rabbitmq.config';
+import { AnimeController } from '@presentation/controllers/anime.controller';
 
 @Module({
   imports: [
     ClsModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [prismaDatabaseConfig],
+      load: [appConfig, prismaDatabaseConfig, rabbitmqConfig],
     }),
   ],
-  controllers: [],
+  controllers: [AnimeController],
   providers: [PrismaService],
   exports: [PrismaService],
 })

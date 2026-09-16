@@ -7,3 +7,4 @@ export * from "./dto/meta.dto";
 export * from "./dto/successResponse.dto";
 export * from "./dto/validationErrorDetail.dto";
 export * from "./dto/validationErrorResponse.dto";
+export * from "./dto/id.dto";

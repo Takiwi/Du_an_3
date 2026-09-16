@@ -1,5 +1,5 @@
 {
-  "name": "@packages/api-docs",
+  "name": "@packages/contracts",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,14 +18,11 @@
     "dev": "tsc -b --watch",
     "clean": "tsc -b --clean"
   },
-  "peerDependencies": {
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/config": "^4.0.4",
-    "@nestjs/swagger": "^11.4.6",
-    "class-validator": "^0.15.1"
-  },
   "devDependencies": {
-    "@types/express": "^5.0.6",
+    "@types/node": "^24.13.3",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "zod": "^4.5.4"
   }
 }

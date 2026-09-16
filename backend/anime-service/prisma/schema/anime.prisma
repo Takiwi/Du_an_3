@@ -11,6 +11,13 @@ enum Type {
     SPECIAL
 }
 
+enum Season {
+    Spring
+    Summer
+    Fall
+    Winter
+}
+
 model Anime {
   id          String   @id
   title       String
@@ -23,7 +30,7 @@ model Anime {
 
   categories AnimeCategory[]
   releaseDate DateTime?
-  season     String 
+  season     Season 
 
   views        Int      @default(0)
   rating      Float  @default(0)

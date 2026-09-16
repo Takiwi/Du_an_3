@@ -1,5 +1,6 @@
 export type Status = 'COMING_SOON' | 'CURRENT_SHOWING' | 'COMPLETED';
 export type Types = 'TV_SHOW' | 'MOVIE' | 'OVE' | 'SPECIAL';
+export type Season = 'Spring' | 'Summer' | 'Fall' | 'Winter';
 
 export interface BaseAnime {
   title: string;

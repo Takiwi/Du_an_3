@@ -1,7 +1,6 @@
 import { CreateAnimeInput } from '@application/usecase/createAnime.contract';
 import {
   ArrayUnique,
-  IsArray,
   IsBoolean,
   IsDate,
   IsNumber,
@@ -13,7 +12,6 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { RelationAnime } from './relationAnime.dto';
 
 export class CreateAnimeDto implements CreateAnimeInput {
   @ApiProperty({ example: 'Waifu number one' })
@@ -64,10 +62,6 @@ export class CreateAnimeDto implements CreateAnimeInput {
   @IsBoolean({ message: 'This is must be a boolean' })
   isPublished: boolean;
 
-  @ApiProperty({ type: RelationAnime })
-  @IsArray({ message: 'This is must be array' })
-  relation?: RelationAnime[];
-
   constructor(
     title: string,
     season: string,
@@ -78,7 +72,6 @@ export class CreateAnimeDto implements CreateAnimeInput {
     categories: string[],
     releaseDate: Date,
     isPublished: boolean,
-    relation: RelationAnime[],
   ) {
     this.title = title;
     this.season = season;
@@ -89,6 +82,5 @@ export class CreateAnimeDto implements CreateAnimeInput {
     this.categories = categories;
     this.releaseDate = releaseDate;
     this.isPublished = isPublished;
-    this.relation = relation;
   }
 }

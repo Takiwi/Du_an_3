@@ -15,15 +15,30 @@ export class AnimeRepository implements IAnimeRepository {
     private readonly prismaTransaction: PrismaTransaction,
   ) {}
 
-  async isCreateCycle(fromAnimeId: AnimeId, toAnimeId: AnimeId): Promise<void> {
-    await this.client.$queryRaw<>
-    `
+  async isCreateCycle(
+    fromAnimeId: AnimeId,
+    toAnimeId: AnimeId,
+  ): Promise<boolean> {
+    const result = await this.client.$queryRaw<{ exists: number }[]>`
       WITH RECURSIVE ancestors AS (
         SELECT "fromAnimeId", "toAnimeId"
         FROM "AnimeRelation"
-        WHERE "fromAnimeId" = ${fromAnimeId.toString()}
-      )
-    `
+        WHERE "fromAnimeId" = ${toAnimeId.toString()} AND "relationType" IN ('PREQUEL', 'SEQUEL')
+
+        UNION ALL
+
+        SELECT a."fromAnimeId", r."toAnimeId"
+        FROM ancestors a
+        JOIN "AnimeRelation" r ON a."toAnimeId" = r."fromAnimeId"
+        WHERE r."relationType" IN ('PREQUEL', 'SEQUEL')
+      ) 
+      SELECT 1 AS exists
+      FROM ancestors
+      WHERE "toAnimeId" = ${fromAnimeId.toString()}
+      LIMIT 1;
+    `;
+
+    return result.length > 0;
   }
 
   async isExistsManyId(ids: AnimeId[]): Promise<string[]> {
