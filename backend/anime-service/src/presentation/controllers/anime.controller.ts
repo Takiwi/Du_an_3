@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiCommonErrors } from '@packages/api-docs';
 import { CreateAnimeDto } from '../dto/requests/createAnime.dto';
-import { CreateAnimeUseCase } from '@application/usecase/createAnime.usecase';
+import { CreateAnimeUseCase } from '@application/usecase/anime/createAnime.usecase';
 import { animeMapper } from '@presentation/mapper/anime.mapper';
 
 @ApiCommonErrors()

@@ -10,5 +10,4 @@ export interface IAnimeRepository {
   insertAnime(anime: Anime): Promise<Result<void, AppError>>;
   isExistsOrInsert(anime: Anime): Promise<Result<Anime, AppError>>;
   isExistsManyId(ids: AnimeId[]): Promise<string[]>;
-  isCreateCycle(fromAnimeId: AnimeId, toAnimeId: AnimeId): Promise<boolean>;
 }

@@ -1,11 +1,11 @@
 export type Status = 'COMING_SOON' | 'CURRENT_SHOWING' | 'COMPLETED';
 export type Types = 'TV_SHOW' | 'MOVIE' | 'OVE' | 'SPECIAL';
-export type Season = 'Spring' | 'Summer' | 'Fall' | 'Winter';
 
 export interface BaseAnime {
   title: string;
   season: string;
-  releaseDate: Date | null;
+  author: string[];
+  studio: string[];
 }
 export interface FullAnime extends BaseAnime {
   status: string;
@@ -14,6 +14,7 @@ export interface FullAnime extends BaseAnime {
   views: number;
   rating: number;
   isPublished: boolean;
+  releaseDate: Date | null;
 }
 
 export interface PureAnime extends FullAnime {

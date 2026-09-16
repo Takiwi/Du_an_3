@@ -1,4 +1,4 @@
-import { CreateAnimeInput } from '@application/usecase/createAnime.contract';
+import { CreateAnimeInput } from '@application/usecase/anime/createAnime.contract';
 import {
   ArrayUnique,
   IsBoolean,
@@ -18,6 +18,16 @@ export class CreateAnimeDto implements CreateAnimeInput {
   @IsString({ message: 'This field must be a string' })
   @MinLength(2, { message: 'The title must have at least 2 characters' })
   title: string;
+
+  @ApiProperty({ type: [String], example: ['author 1', 'author 2'] })
+  @ArrayUnique({ message: 'This is must be an array' })
+  @IsString({ each: true })
+  author: string[];
+
+  @ApiProperty({ type: [String], example: ['author 1', 'author 2'] })
+  @ArrayUnique({ message: 'This is must be an array' })
+  @IsString({ each: true })
+  studio: string[];
 
   @ApiProperty({ example: 'Spring' })
   @IsString({ message: 'This field must be a string' })
@@ -64,6 +74,8 @@ export class CreateAnimeDto implements CreateAnimeInput {
 
   constructor(
     title: string,
+    author: string[],
+    studio: string[],
     season: string,
     status: string,
     type: string,
@@ -74,6 +86,8 @@ export class CreateAnimeDto implements CreateAnimeInput {
     isPublished: boolean,
   ) {
     this.title = title;
+    this.author = author;
+    this.studio = studio;
     this.season = season;
     this.status = status;
     this.type = type;

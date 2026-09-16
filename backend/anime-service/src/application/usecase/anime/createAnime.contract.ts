@@ -1,5 +1,7 @@
 export interface CreateAnimeInput {
   title: string;
+  author: string[];
+  studio: string[];
   season: string;
   status: string;
   type: string;

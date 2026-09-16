@@ -24,11 +24,9 @@ model Anime {
   description String? @db.Text
   status      Status   @default(COMING_SOON)
   type        Type  @default(MOVIE)
+  author String[] @default([])
+  studio String[] @default([])
 
-  relationFrom AnimeRelation[] @relation("FromAnime")
-  relationTo AnimeRelation[] @relation("ToAnime")
-
-  categories AnimeCategory[]
   releaseDate DateTime?
   season     Season 
 
@@ -39,7 +37,12 @@ model Anime {
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  categories AnimeCategory[]
 
-  @@unique([title, releaseDate])
+  relationFrom AnimeRelation[] @relation("FromAnime")
+  relationTo AnimeRelation[] @relation("ToAnime")
+
+  @@unique([title, season, author, studio])
   @@map("Anime")
 }

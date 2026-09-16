@@ -9,48 +9,60 @@ import { err, ok, Result } from 'neverthrow';
 import { AppError } from '@packages/pattern';
 import { AnimeId } from '@domain/value-objects/animeId.vo';
 import { CategoryId } from '@domain/value-objects/categoryId.vo';
+import { ReleaseSchedule } from '@domain/value-objects/releaseSchedule.vo';
 
 export class Anime {
   private readonly _id: AnimeId;
   private _title: string;
-  private _season: string;
+  private _author: string[];
+  private _studio: string[];
+  private _releaseSchedule: ReleaseSchedule;
   private _categories: CategoryId[];
   private _status: Status;
   private _type: Types;
   private _views: number;
   private _rating: number;
-  private _releaseDate: Date | null;
   private _isPublished: boolean;
 
   private constructor(
     id: AnimeId,
     title: string,
-    season: string,
+    author: string[],
+    studio: string[],
+    releaseSchedule: ReleaseSchedule,
     categories: CategoryId[],
     status: Status,
     type: Types,
     views: number,
     rating: number,
-    releaseDate: Date | null,
     isPublished: boolean,
   ) {
     this._id = id;
-    this._title = title;
-    this._season = season;
+    this._title = title.toLowerCase();
+    this._author = author;
+    this._studio = studio;
+    this._releaseSchedule = releaseSchedule;
     this._categories = categories;
     this._status = status;
     this._type = type;
     this._views = views;
     this._rating = rating;
-    this._releaseDate = releaseDate;
     this._isPublished = isPublished;
   }
 
   static create(props: FullAnime): Result<Anime, AppError> {
     const id = AnimeId.createId();
-    const categoryIds = props.categories.map((cate) =>
-      CategoryId.reconstitute(cate),
-    );
+
+    const combined = Result.combine([
+      ReleaseSchedule.create(props.season, props.releaseDate),
+      Result.combine(props.categories.map((cate) => CategoryId.create(cate))),
+    ]);
+
+    if (combined.isErr()) {
+      return err(combined.error[0]);
+    }
+
+    const [releaseSchedule, categoryIds] = combined.value;
 
     if (
       !['COMING_SOON', 'CURRENT_SHOWING', 'COMPLETED'].includes(props.status)
@@ -68,13 +80,14 @@ export class Anime {
       new Anime(
         id,
         props.title,
-        props.season,
+        props.author,
+        props.studio,
+        releaseSchedule,
         categoryIds,
         props.status as Status,
         props.type as Types,
         props.views,
         props.rating,
-        props.releaseDate,
         props.isPublished,
       ),
     );
@@ -90,17 +103,20 @@ export class Anime {
 
     const id = AnimeId.createId();
 
+    const releaseSchedule = ReleaseSchedule.reconstitute(props.season, null);
+
     return ok(
       new Anime(
         id,
         props.title,
-        props.season,
+        props.author,
+        props.studio,
+        releaseSchedule,
         defaultCategories,
         defaultStatus,
         defaultTypes,
         defaultView,
         defaultRating,
-        props.releaseDate,
         defaultIsPublic,
       ),
     );
@@ -111,25 +127,24 @@ export class Anime {
     const categoryIds = props.categories.map((cate) =>
       CategoryId.reconstitute(cate),
     );
+    const releaseSchedule = ReleaseSchedule.reconstitute(
+      props.season,
+      props.releaseDate,
+    );
 
     return new Anime(
       id,
       props.title,
-      props.season,
+      props.author,
+      props.studio,
+      releaseSchedule,
       categoryIds,
       props.status as Status,
       props.type as Types,
       props.views,
       props.rating,
-      props.releaseDate,
       props.isPublished,
     );
-  }
-
-  isEquals(title: string, releaseDate: Date) {
-    if (this._title === title && this._releaseDate === releaseDate) return true;
-
-    return false;
   }
 
   getId() {
@@ -140,8 +155,16 @@ export class Anime {
     return this._title;
   }
 
-  getSeason() {
-    return this._season;
+  getAuthor() {
+    return this._author;
+  }
+
+  getStudio() {
+    return this._studio;
+  }
+
+  getReleaseSchedule() {
+    return this._releaseSchedule;
   }
 
   getStatus() {
@@ -162,10 +185,6 @@ export class Anime {
 
   getCategories() {
     return this._categories;
-  }
-
-  getReleaseDate() {
-    return this._releaseDate;
   }
 
   getIsPublic() {

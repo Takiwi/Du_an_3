@@ -5,12 +5,14 @@ export const animeMapper = (anime: Anime): AnimeResponseDto => {
   return {
     id: anime.getId().toString(),
     title: anime.getTitle(),
-    season: anime.getSeason(),
+    author: anime.getAuthor(),
+    studio: anime.getStudio(),
+    season: anime.getReleaseSchedule().getSeason(),
     status: anime.getStatus(),
     type: anime.getType(),
     views: anime.getViews(),
     rating: anime.getRating(),
     categories: anime.getCategories().map((cate) => cate.toString()),
-    releaseDate: anime.getReleaseDate(),
+    releaseDate: anime.getReleaseSchedule().getReleaseDate(),
   };
 };

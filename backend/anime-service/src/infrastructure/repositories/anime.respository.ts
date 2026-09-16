@@ -15,32 +15,6 @@ export class AnimeRepository implements IAnimeRepository {
     private readonly prismaTransaction: PrismaTransaction,
   ) {}
 
-  async isCreateCycle(
-    fromAnimeId: AnimeId,
-    toAnimeId: AnimeId,
-  ): Promise<boolean> {
-    const result = await this.client.$queryRaw<{ exists: number }[]>`
-      WITH RECURSIVE ancestors AS (
-        SELECT "fromAnimeId", "toAnimeId"
-        FROM "AnimeRelation"
-        WHERE "fromAnimeId" = ${toAnimeId.toString()} AND "relationType" IN ('PREQUEL', 'SEQUEL')
-
-        UNION ALL
-
-        SELECT a."fromAnimeId", r."toAnimeId"
-        FROM ancestors a
-        JOIN "AnimeRelation" r ON a."toAnimeId" = r."fromAnimeId"
-        WHERE r."relationType" IN ('PREQUEL', 'SEQUEL')
-      ) 
-      SELECT 1 AS exists
-      FROM ancestors
-      WHERE "toAnimeId" = ${fromAnimeId.toString()}
-      LIMIT 1;
-    `;
-
-    return result.length > 0;
-  }
-
   async isExistsManyId(ids: AnimeId[]): Promise<string[]> {
     const results = await this.client.anime.findMany({
       where: {
@@ -68,24 +42,29 @@ export class AnimeRepository implements IAnimeRepository {
   }
 
   async isExistsOrInsert(anime: Anime): Promise<Result<Anime, AppError>> {
+    const releaseDate = anime.getReleaseSchedule().getReleaseDate();
+    const season = anime.getReleaseSchedule().getSeason();
+
     const result = await asyncHandlerPrismaError(async () => {
       return await this.client.anime.upsert({
         where: {
-          title_releaseDate: {
+          title_season_author_studio: {
             title: anime.getTitle(),
-            releaseDate: anime.getReleaseDate() ?? '',
+            author: anime.getAuthor(),
+            studio: anime.getStudio(),
+            season: season,
           },
         },
         update: {},
         create: {
           id: anime.getId().toString(),
           title: anime.getTitle(),
-          season: anime.getSeason(),
-          releaseDate: anime.getReleaseDate(),
+          season: season,
+          releaseDate: releaseDate,
           isPublished: anime.getIsPublic(),
           rating: anime.getRating(),
           status: anime.getStatus(),
-          type: anime.getTypes(),
+          type: anime.getType(),
           views: anime.getViews(),
           categories: {
             create: anime.getCategories().map((cate) => ({
@@ -121,12 +100,15 @@ export class AnimeRepository implements IAnimeRepository {
         data: {
           id: anime.getId().toString(),
           title: anime.getTitle(),
-          season: anime.getSeason(),
+          author: anime.getAuthor(),
+          studio: anime.getStudio(),
+          season: anime.getReleaseSchedule().getSeason(),
           rating: anime.getRating(),
           status: anime.getStatus(),
-          type: anime.getTypes(),
+          type: anime.getType(),
           views: anime.getViews(),
-          animeCategories: {
+          releaseDate: anime.getReleaseSchedule().getReleaseDate(),
+          categories: {
             create: anime.getCategories().map((cate) => ({
               category: {
                 connect: {

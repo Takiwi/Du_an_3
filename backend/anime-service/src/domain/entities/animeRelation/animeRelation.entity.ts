@@ -5,6 +5,8 @@ import { AppError } from '@packages/pattern';
 import { err, ok, Result } from 'neverthrow';
 
 export class AnimeRelation {
+  static HIERARCHICAL_TYPES = ['PREQUEL', 'SEQUEL', 'SPIN_OFF'];
+
   private readonly _id: AnimeRelationId;
   private _fromAnimeId: AnimeId;
   private _toAnimeId: AnimeId;
@@ -27,6 +29,15 @@ export class AnimeRelation {
     toAnimeId: string,
     relationType: string,
   ): Result<AnimeRelation, AppError> {
+    if (fromAnimeId === toAnimeId) {
+      return err(
+        new AppError(
+          'CANNOT_RELATE_TO_SELF',
+          `From Anime id ${fromAnimeId} and to anime id ${toAnimeId} must be difference`,
+        ),
+      );
+    }
+
     const id = AnimeId.createId();
 
     const combined = Result.combine([
@@ -39,15 +50,6 @@ export class AnimeRelation {
 
     const [fromAnimeIdResult, toAnimeIdResult, relationTypeResult] =
       combined.value;
-
-    if (fromAnimeIdResult.equals(toAnimeIdResult)) {
-      return err(
-        new AppError(
-          'INVALID_ANIME_RELATION',
-          `From Anime id ${fromAnimeIdResult.toString()} and to anime id ${toAnimeIdResult.toString()} must be difference`,
-        ),
-      );
-    }
 
     return ok(
       new AnimeRelation(
